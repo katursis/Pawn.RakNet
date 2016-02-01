@@ -6,10 +6,13 @@ Sending RPC
 stock SendChatMessage(senderid, msg[])
 {
   new BitStream:bs = BS_New(), RPC_Chat = 101;
+  
   BS_WriteValue(bs, BS_INT16, senderid, 
                     BS_INT8, strlen(msg), 
                     BS_STRING, msg);
+                    
   SendRPC(senderid, RPC_Chat, bs);
+  
   BS_Delete(bs);
 }
 ```
@@ -18,8 +21,11 @@ Sending packet
 stock FakeLostConnectionForPlayer(playerid)
 {
   new BitStream:bs = BS_New(), ID_CONNECTION_LOST = 33;
+  
   BS_WriteValue(bs, BS_INT8, ID_CONNECTION_LOST);
+  
   SendPacket(playerid, bs);
+  
   BS_Delete(bs);
 }
 ```
@@ -94,7 +100,8 @@ public OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs)
 	new message[256], len;
 	
 	BS_ReadValue(bs, BS_UINT8, len,
-					 BS_STRING, message, len);
+					BS_STRING, message, len);
+					 
 	printf("chat message from player %d: %s", playerid, message);
 	}
 	
