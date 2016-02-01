@@ -7,11 +7,11 @@ stock SendChatMessage(senderid, msg[])
 {
   new BitStream:bs = BS_New(), RPC_Chat = 101;
   
-  BS_WriteValue(bs, BS_INT16, senderid, 
-                    BS_INT8, strlen(msg), 
-                    BS_STRING, msg);
+  BS_WriteValue(bs, RNM_INT16, senderid, 
+                    RNM_INT8, strlen(msg), 
+                    RNM_STRING, msg);
                     
-  SendRPC(senderid, RPC_Chat, bs);
+  RNM_SendRPC(senderid, RPC_Chat, bs);
   
   BS_Delete(bs);
 }
@@ -22,9 +22,9 @@ stock FakeLostConnectionForPlayer(playerid)
 {
   new BitStream:bs = BS_New(), ID_CONNECTION_LOST = 33;
   
-  BS_WriteValue(bs, BS_INT8, ID_CONNECTION_LOST);
+  BS_WriteValue(bs, RNM_INT8, ID_CONNECTION_LOST);
   
-  SendPacket(playerid, bs);
+  RNM_SendPacket(playerid, bs);
   
   BS_Delete(bs);
 }
@@ -43,29 +43,29 @@ public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
 	surfingvehid, animationid, animflags;
 	 
     BS_IgnoreBits(bs, 8); // packet id 1 byte
-	BS_ReadValue(bs, BS_UINT16, lrkeys,
-					 BS_UINT16, udkeys,
-				     BS_UINT16, sampkeys,
-					 BS_FLOAT, pos[0],
-					 BS_FLOAT, pos[1],
-					 BS_FLOAT, pos[2],
-					 BS_FLOAT, quaternion[0],
-					 BS_FLOAT, quaternion[1],
-                     BS_FLOAT, quaternion[2],
-                     BS_FLOAT, quaternion[3],
-	                 BS_UINT8, health,
-                     BS_UINT8, armor,
-	                 BS_UINT8, weaponid,
-                     BS_UINT8, specialaction,
-                     BS_FLOAT, speed[0],
-					 BS_FLOAT, speed[1],
-					 BS_FLOAT, speed[2],
-					 BS_FLOAT, surfingoffsets[0],
-					 BS_FLOAT, surfingoffsets[1],
-					 BS_FLOAT, surfingoffsets[2],
-					 BS_UINT16, surfingvehid,
-					 BS_INT16, animationid,
-					 BS_INT16, animflags);
+	BS_ReadValue(bs, RNM_UINT16, lrkeys,
+					 RNM_UINT16, udkeys,
+				     RNM_UINT16, sampkeys,
+					 RNM_FLOAT, pos[0],
+					 RNM_FLOAT, pos[1],
+					 RNM_FLOAT, pos[2],
+					 RNM_FLOAT, quaternion[0],
+					 RNM_FLOAT, quaternion[1],
+                     RNM_FLOAT, quaternion[2],
+                     RNM_FLOAT, quaternion[3],
+	                 RNM_UINT8, health,
+                     RNM_UINT8, armor,
+	                 RNM_UINT8, weaponid,
+                     RNM_UINT8, specialaction,
+                     RNM_FLOAT, speed[0],
+					 RNM_FLOAT, speed[1],
+					 RNM_FLOAT, speed[2],
+					 RNM_FLOAT, surfingoffsets[0],
+					 RNM_FLOAT, surfingoffsets[1],
+					 RNM_FLOAT, surfingoffsets[2],
+					 RNM_UINT16, surfingvehid,
+					 RNM_INT16, animationid,
+					 RNM_INT16, animflags);
 					  
 	printf("lrkeys %d udkeys %d sampkeys %d\n" \
 	       "pos %.2f %.2f %.2f\n" \
@@ -99,8 +99,8 @@ public OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs)
 	{
 	new message[256], len;
 	
-	BS_ReadValue(bs, BS_UINT8, len,
-					BS_STRING, message, len);
+	BS_ReadValue(bs, RNM_UINT8, len,
+					RNM_STRING, message, len);
 					 
 	printf("chat message from player %d: %s", playerid, message);
 	}
