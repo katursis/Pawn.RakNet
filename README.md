@@ -1,7 +1,7 @@
 # RakNet Manager
 Plugin for SA:MP Server that allows you to work with RakNet in PAWN
 # Examples (0.3.7-R2)
->> Sending RPC
+Sending RPC
 ```pawn
 stock SendChatMessage(senderid, msg[])
 {
@@ -13,7 +13,7 @@ stock SendChatMessage(senderid, msg[])
   BS_Delete(bs);
 }
 ```
->> Sending packet
+Sending packet
 ```pawn
 stock FakeLostConnectionForPlayer(playerid)
 {
@@ -23,7 +23,7 @@ stock FakeLostConnectionForPlayer(playerid)
   BS_Delete(bs);
 }
 ```
->> Intercept incoming onfoot sync of player 
+Intercept incoming onfoot sync of player 
  ```pawn
 new ID_PLAYER_SYNC = 207;
 public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
@@ -84,7 +84,7 @@ public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
 	return 1;
 }
 ```
->> Intercept incoming chat message rpc
+Intercept incoming chat message rpc
 ```pawn
 new RPC_Chat = 101;
 public OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs)
