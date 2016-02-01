@@ -4,8 +4,8 @@ int Natives::Register(AMX *amx)
 {
 	static std::vector<AMX_NATIVE_INFO> vec_native = {
 
-		{ "SendRPC", Natives::SendRPC },
-		{ "SendPacket", Natives::SendPacket },
+		{ "RNM_SendRPC", Natives::SendRPC },
+		{ "RNM_SendPacket", Natives::SendPacket },
 
 		{ "BS_New", Natives::BitStream__New },
 		{ "BS_Delete", Natives::BitStream__Delete },
