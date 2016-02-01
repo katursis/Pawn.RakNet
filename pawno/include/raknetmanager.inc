@@ -14,25 +14,25 @@
 */
 enum
 {
-	BS_INT8,
-	BS_INT16,
-	BS_INT32,
-	BS_UINT8,
-	BS_UINT16,
-	BS_UINT32,	
-	BS_FLOAT,
-	BS_BOOL,	
-	BS_STRING,
+	RNM_INT8,
+	RNM_INT16,
+	RNM_INT32,
+	RNM_UINT8,
+	RNM_UINT16,
+	RNM_UINT32,	
+	RNM_FLOAT,
+	RNM_BOOL,	
+	RNM_STRING,
 	
 	// compressed values
-	BS_CINT8, 
-	BS_CINT16,
-	BS_CINT32,
-	BS_CUINT8,
-	BS_CUINT16,
-	BS_CUINT32,	
-	BS_CFLOAT,
-	BS_CBOOL,	
+	RNM_CINT8, 
+	RNM_CINT16,
+	RNM_CINT32,
+	RNM_CUINT8,
+	RNM_CUINT16,
+	RNM_CUINT32,	
+	RNM_CFLOAT,
+	RNM_CBOOL,		
 }
 
 /*
@@ -41,8 +41,8 @@ enum
 >> https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
 >> playerid == -1 => send to all players
 */
-native SendRPC(playerid, rpcid, BitStream:bs);  
-native SendPacket(playerid, BitStream:bs);
+native RNM_SendRPC(playerid, rpcid, BitStream:bs);  
+native RNM_SendPacket(playerid, BitStream:bs);
 
 native BitStream:BS_New();
 native BS_Delete(&BitStream:bs);
