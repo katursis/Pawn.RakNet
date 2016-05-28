@@ -1,5 +1,7 @@
 # RakNet Manager
-Plugin for SA:MP Server that allows you to work with RakNet in PAWN
+Plugin for SA:MP Server that allows you to work with RakNet in PAWN.
+
+Required 0.3z-R1 version or newer.
 # Examples (0.3.7)
 RPC
 ```pawn
