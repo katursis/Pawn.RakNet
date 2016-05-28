@@ -5,7 +5,7 @@ logprintf_t logprintf;
 extern void *pAMXFunctions;
 
 PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports()
-{	
+{
 	return SUPPORTS_VERSION | SUPPORTS_AMX_NATIVES;
 }
 
@@ -15,32 +15,24 @@ PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData)
 	logprintf = reinterpret_cast<logprintf_t>(ppData[PLUGIN_DATA_LOGPRINTF]);
 
 	if (Hooks::Init())
-	{	
-		logprintf("");
-		logprintf(">> RakNet Manager plugin v1.0.0 by urShadow loaded");
-		logprintf("");		
-	}
+		return logprintf("[RNM] Loading..."), true;
 
-	return true;
+	return logprintf("[RNM] Address of the RakServer not found. Stopped"), false;
 }
 
 PLUGIN_EXPORT void PLUGIN_CALL Unload()
 {
-	logprintf("");
-	logprintf(">> RakNet Manager plugin unloaded");
-	logprintf("");	
+	logprintf("[RNM] Unloaded");
 }
 
-PLUGIN_EXPORT int PLUGIN_CALL AmxLoad(AMX *amx)
+PLUGIN_EXPORT void PLUGIN_CALL AmxLoad(AMX *amx)
 {
 	Callbacks::OnAmxLoad(amx);
-	
-	return Natives::Register(amx);	
+
+	Natives::Register(amx);
 }
 
-PLUGIN_EXPORT int PLUGIN_CALL AmxUnload(AMX *amx)
-{	
+PLUGIN_EXPORT void PLUGIN_CALL AmxUnload(AMX *amx)
+{
 	Callbacks::OnAmxUnload(amx);
-
-	return AMX_ERR_NONE;
 }

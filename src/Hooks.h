@@ -1,60 +1,81 @@
 #ifndef RAKNETMANAGER_HOOKS_H_
 #define RAKNETMANAGER_HOOKS_H_
 
+#ifdef THISCALL
+#undef THISCALL
+#endif
+
+#ifdef _WIN32
+#define THISCALL __thiscall
+#else
+#define THISCALL
+#endif
+
 class Hooks
 {
 public:
 
 	static bool Init(void);
 
-	// functions
-	static int						GetIndexFromPlayerID(const PlayerID &);
-	static PlayerID					GetPlayerIDFromIndex(int index);
-	static void						DeallocatePacket(Packet *p);
-	static void						SendPacket(int playerid, RakNet::BitStream *bs); // player id == -1 => broadcast
-	static void						SendRPC(int playerid, int rpcid, RakNet::BitStream *bs); // player id == -1 => broadcast
-	
+	static int GetIndexFromPlayerID(const PlayerID &);
+	static PlayerID GetPlayerIDFromIndex(int index);
+	static void DeallocatePacket(Packet *p);
+	static bool SendPacket(int player_id, RakNet::BitStream *bs,
+		int priority, int reliability); // player id == -1 => broadcast
+	static bool SendRPC(int player_id, int rpc_id, RakNet::BitStream *bs,
+		int priority, int reliability); // player id == -1 => broadcast
+
 private:
 
-	// handles
+	struct RPCHandle
+	{
+		static void Create(void)
+		{
+			Generator<0>::Run();
+		}
 
-#ifdef _WIN32
-	static void * __thiscall		HOOK_RakPeer__Ctor(void *);
-	static Packet * __thiscall		HOOK_RakPeer__Receive(void *);	
-	static void __thiscall			HOOK_RakPeer__SendBuffered(void *, unsigned char *, int, PacketPriority, 
-																PacketReliability, char, PlayerID, bool, int);
-	static bool __thiscall			HOOK_RakPeer__RPC(void *, unsigned char *, unsigned char *,
-														unsigned int, PacketPriority, PacketReliability, 
-														char, PlayerID, bool, bool, NetworkID, void *);
-	static void * __thiscall		HOOK_RPCMap__AddIdentifierWithFunction(void *, unsigned char, void *, bool);
-	static void * __thiscall		HOOK_RPCMap__GetNodeFromIndex(void *, unsigned char);
-	static void __cdecl				HOOK_HandleRPCFunction(RPCParameters *);
-#else
-	static void * 					HOOK_RakPeer__Ctor(void *);
-	static Packet * 				HOOK_RakPeer__Receive(void *);
-	static void 					HOOK_RakPeer__SendBuffered(void *, unsigned char *, int, PacketPriority,
-																PacketReliability, char, PlayerID, bool, int);
-	static bool 					HOOK_RakPeer__RPC(void *, unsigned char *, unsigned char *,
-														unsigned int, PacketPriority, PacketReliability,
-														char, PlayerID, bool, bool, NetworkID, void *);
-	static void * 					HOOK_RPCMap__AddIdentifierWithFunction(void *, unsigned char, void *, bool);
-	static void * 					HOOK_RPCMap__GetNodeFromIndex(void *, unsigned char);
-	static void 					HOOK_HandleRPCFunction(RPCParameters *);
-#endif
+		template<size_t ID>
+		struct Generator
+		{
+			static void Handle(RPCParameters *p)
+			{
+				Hooks::ReceiveRPC(ID, p);
+			}
 
-	// hooks
-	static std::shared_ptr<urmem::hook> _hook_rakpeer__ctor;
-	static std::shared_ptr<urmem::hook>	_hook_rakpeer__receive;
-	static std::shared_ptr<urmem::hook> _hook_rakpeer__send_buffered;
-	static std::shared_ptr<urmem::hook> _hook_rakpeer__rpc;	
-	static std::shared_ptr<urmem::hook> _hook_rpcmap__add_identifier_with_function;		
-	static std::shared_ptr<urmem::hook> _hook_rpcmap__get_node_from_index;
+			static void Run(void)
+			{
+				Hooks::_custom_rpc[ID] = reinterpret_cast<RPCFunction>(&Handle);
 
-	static std::array<RPCFunction, MAX_RPC_MAP_SIZE> _rpc_map; // original rpc map
-	static int _last_rpc_index;
+				Generator<ID + 1>::Run();
+			}
+		};
+	};
 
-	static void	*_rakpeer; // rakpeer pointer
+	static void * HOOK_GetRakServerInterface(void);
+	static bool THISCALL HOOK_RakServer__Send(void *_this, RakNet::BitStream *bitStream, int priority,
+		int reliability, char orderingChannel, PlayerID playerId, bool broadcast);
+	static bool THISCALL HOOK_RakServer__RPC(void *_this, RPCIndex *uniqueID, RakNet::BitStream *bitStream, int priority,
+		int reliability, char orderingChannel, PlayerID playerId, bool broadcast, bool shiftTimestamp);
+	static Packet * THISCALL HOOK_RakServer__Receive(void *_this);
+	static void * THISCALL HOOK_RakServer__RegisterAsRemoteProcedureCall(void *_this, RPCIndex *uniqueID, RPCFunction functionPointer);
+	static void ReceiveRPC(int rpc_id, RPCParameters *p);
+
+	static std::shared_ptr<urmem::hook>
+		_hook_get_rak_server_interface,
+		_hook_rakserver__send,
+		_hook_rakserver__rpc,
+		_hook_rakserver__receive,
+		_hook_rakserver__register_as_remote_procedure_call;
+
+	static std::array<RPCFunction, MAX_RPC_MAP_SIZE>
+		_original_rpc,
+		_custom_rpc;
+};
+
+template<>
+struct Hooks::RPCHandle::Generator<MAX_RPC_MAP_SIZE>
+{
+	static void Run(void) {}
 };
 
 #endif // RAKNETMANAGER_HOOKS_H_
-

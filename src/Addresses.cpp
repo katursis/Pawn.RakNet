@@ -1,41 +1,38 @@
 #include "Main.h"
 
-urmem::address_t	Addresses::FUNC_RAKPEER__CTOR{};
-urmem::address_t	Addresses::FUNC_RAKPEER__RECEIVE{};
-urmem::address_t	Addresses::FUNC_RAKPEER__SEND_BUFFERED{};
-urmem::address_t	Addresses::FUNC_RAKPEER__RPC{};
-urmem::address_t	Addresses::FUNC_RAKPEER__GET_INDEX_FROM_PLAYER_ID{};
-urmem::address_t	Addresses::FUNC_RAKPEER__GET_PLAYER_ID_FROM_INDEX{};
-urmem::address_t	Addresses::FUNC_RAKPEER__DEALLOCATE_PACKET{};
+urmem::address_t
+Addresses::RAKSERVER{},
+Addresses::FUNC_RAKSERVER__SEND{},
+Addresses::FUNC_RAKSERVER__RPC{},
+Addresses::FUNC_RAKSERVER__RECEIVE{},
+Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL{},
+Addresses::FUNC_RAKSERVER__DEALLOCATE_PACKET{},
+Addresses::FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID{},
+Addresses::FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX{};
 
-urmem::address_t	Addresses::FUNC_RPCMAP__ADD_IDENTIFIER_WITH_FUNCTION{};
-urmem::address_t	Addresses::FUNC_RPCMAP__GET_NODE_FROM_INDEX{};
-
-// TODO: autosearching of addresses
-bool Addresses::Init(void)
+bool Addresses::Init(urmem::address_t rakserver)
 {
-	
-#ifdef WIN32
-	Addresses::FUNC_RAKPEER__CTOR = 0x455140;
-	Addresses::FUNC_RAKPEER__RECEIVE = 0x458510;
-	Addresses::FUNC_RAKPEER__SEND_BUFFERED = 0x4522C0;
-	Addresses::FUNC_RAKPEER__RPC = 0x455340;
-	Addresses::FUNC_RAKPEER__GET_INDEX_FROM_PLAYER_ID = 0x455620;
-	Addresses::FUNC_RAKPEER__GET_PLAYER_ID_FROM_INDEX = 0x450160;
-	Addresses::FUNC_RAKPEER__DEALLOCATE_PACKET = 0x4500B0;
-	Addresses::FUNC_RPCMAP__ADD_IDENTIFIER_WITH_FUNCTION = 0x460AC0;
-	Addresses::FUNC_RPCMAP__GET_NODE_FROM_INDEX = 0x460AA0;
-#else	
-	Addresses::FUNC_RAKPEER__CTOR = 0x8072D30;
-	Addresses::FUNC_RAKPEER__RECEIVE = 0x8071D60;
-	Addresses::FUNC_RAKPEER__SEND_BUFFERED = 0x806E980;
-	Addresses::FUNC_RAKPEER__RPC = 0x8071710;
-	Addresses::FUNC_RAKPEER__GET_INDEX_FROM_PLAYER_ID = 0x80716E0;
-	Addresses::FUNC_RAKPEER__GET_PLAYER_ID_FROM_INDEX = 0x806D6B0;
-	Addresses::FUNC_RAKPEER__DEALLOCATE_PACKET = 0x806D480;
-	Addresses::FUNC_RPCMAP__ADD_IDENTIFIER_WITH_FUNCTION = 0x8067A10;
-	Addresses::FUNC_RPCMAP__GET_NODE_FROM_INDEX = 0x80679E0;	
+	if (auto vmt = urmem::pointer(RAKSERVER = rakserver).field<urmem::address_t *>(0))
+	{
+#ifdef _WIN32
+		FUNC_RAKSERVER__SEND = vmt[7];
+		FUNC_RAKSERVER__RPC = vmt[32];
+		FUNC_RAKSERVER__RECEIVE = vmt[10];
+		FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL = vmt[29];
+		FUNC_RAKSERVER__DEALLOCATE_PACKET = vmt[12];
+		FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID = vmt[57];
+		FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX = vmt[58];
+#else
+		FUNC_RAKSERVER__SEND = vmt[9];
+		FUNC_RAKSERVER__RPC = vmt[35];
+		FUNC_RAKSERVER__RECEIVE = vmt[11];
+		FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL = vmt[30];
+		FUNC_RAKSERVER__DEALLOCATE_PACKET = vmt[13];
+		FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID = vmt[58];
+		FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX = vmt[59];
 #endif
+		return logprintf("[RNM] Addresses found"), true;
+	}
 
-	return true;
+	return logprintf("[RNM] Addresses not found"), false;
 }

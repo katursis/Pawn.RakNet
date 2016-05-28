@@ -1,80 +1,145 @@
 #include "Main.h"
 
-std::shared_ptr<urmem::hook>	Hooks::_hook_rakpeer__ctor;
-std::shared_ptr<urmem::hook>	Hooks::_hook_rakpeer__receive;
-std::shared_ptr<urmem::hook>	Hooks::_hook_rakpeer__send_buffered;
-std::shared_ptr<urmem::hook>	Hooks::_hook_rakpeer__rpc;
-std::shared_ptr<urmem::hook>	Hooks::_hook_rpcmap__add_identifier_with_function;
-std::shared_ptr<urmem::hook>	Hooks::_hook_rpcmap__get_node_from_index;
+std::shared_ptr<urmem::hook>
+Hooks::_hook_get_rak_server_interface,
+Hooks::_hook_rakserver__send,
+Hooks::_hook_rakserver__rpc,
+Hooks::_hook_rakserver__receive,
+Hooks::_hook_rakserver__register_as_remote_procedure_call;
 
-std::array<RPCFunction, MAX_RPC_MAP_SIZE>	Hooks::_rpc_map;
-int											Hooks::_last_rpc_index{};
-void										*Hooks::_rakpeer{};
+std::array<RPCFunction, MAX_RPC_MAP_SIZE>
+Hooks::_original_rpc,
+Hooks::_custom_rpc;
+
+#ifdef _WIN32
+const char *pattern =
+"\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
+"\x00\x00\x50\x64\x89\x25\x00\x00\x00\x00\x51" \
+"\x68\x18\x0E\x00\x00\xE8\xFF\xFF\xFF\xFF\x83" \
+"\xC4\x04\x89\x04\x24\x85\xC0\xC7\x44\x24\xFF" \
+"\x00\x00\x00\x00\x74\x16";
+
+const char *mask = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxx?xxxxxx";
+#else
+const char *pattern =
+"\x55\x89\xE5\x83\xEC\x18\xC7\x04\x24\xFF\xFF" \
+"\xFF\xFF\x89\x75\xFF\x89\x5D\xFF\xE8\xFF\xFF" \
+"\xFF\xFF\x89\x04\x24\x89\xC6\xE8\xFF\xFF\xFF" \
+"\xFF\x89\xF0\x8B\x5D\xFF\x8B\x75\xFF\x89\xEC" \
+"\x5D\xC3";
+
+const char *mask = "xxxxxxxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
+#endif
 
 bool Hooks::Init(void)
 {
-	if (!Addresses::Init())
-		return logprintf("[RakNetManager] Error: addresses not found."), false;
+	urmem::sig_scanner scanner;
 
-	Hooks::_hook_rakpeer__ctor =
-		urmem::hook::create("rakpeer__ctor",
-			Addresses::FUNC_RAKPEER__CTOR, (urmem::address_t)Hooks::HOOK_RakPeer__Ctor);
+	if (scanner.init(urmem::get_func_addr(logprintf)))
+	{
+		urmem::address_t addr{};
 
-	Hooks::_hook_rakpeer__receive =
-		urmem::hook::create("rakpeer__receive",
-			Addresses::FUNC_RAKPEER__RECEIVE, (urmem::address_t)Hooks::HOOK_RakPeer__Receive);
+		if (scanner.find(pattern, mask, addr))
+		{
+			_hook_get_rak_server_interface = std::make_shared<urmem::hook>(addr, urmem::get_func_addr(&HOOK_GetRakServerInterface));
 
-	Hooks::_hook_rakpeer__send_buffered =
-		urmem::hook::create("rakpeer__send_buffered",
-			Addresses::FUNC_RAKPEER__SEND_BUFFERED, (urmem::address_t)Hooks::HOOK_RakPeer__SendBuffered);
+			return true;
+		}
+	}
 
-	Hooks::_hook_rakpeer__rpc =
-		urmem::hook::create("rakpeer__rpc",
-			Addresses::FUNC_RAKPEER__RPC, (urmem::address_t)Hooks::HOOK_RakPeer__RPC);
-
-	Hooks::_hook_rpcmap__add_identifier_with_function =
-		urmem::hook::create("rpcmap__add_identifier_with_function",
-			Addresses::FUNC_RPCMAP__ADD_IDENTIFIER_WITH_FUNCTION,
-			(urmem::address_t)Hooks::HOOK_RPCMap__AddIdentifierWithFunction);
-
-	Hooks::_hook_rpcmap__get_node_from_index =
-		urmem::hook::create("rpcmap__get_node_from_index",
-			Addresses::FUNC_RPCMAP__GET_NODE_FROM_INDEX,
-			(urmem::address_t)Hooks::HOOK_RPCMap__GetNodeFromIndex);
-
-	return true;
+	return false;
 }
 
-#ifdef _WIN32
-void * __thiscall Hooks::HOOK_RakPeer__Ctor(void *_this)
-#else
-void *Hooks::HOOK_RakPeer__Ctor(void *_this)
-#endif
+void * Hooks::HOOK_GetRakServerInterface(void)
 {
-	urmem::hook::context context(Hooks::_hook_rakpeer__ctor);
+	urmem::hook::raii scope(*_hook_get_rak_server_interface);
 
-	Hooks::_rakpeer = _this;
+	auto rakserver = urmem::call_function<urmem::calling_convention::cdeclcall, void *>(
+		_hook_get_rak_server_interface->get_original_addr());
 
-	return context.call_original<void *>(urmem::calling_convention::thiscall, _this);
-};
+	if (Addresses::Init(reinterpret_cast<urmem::address_t>(rakserver)))
+	{
+		_hook_rakserver__send = std::make_shared<urmem::hook>(
+			Addresses::FUNC_RAKSERVER__SEND,
+			urmem::get_func_addr(&HOOK_RakServer__Send));
 
-#ifdef _WIN32
-Packet * __thiscall Hooks::HOOK_RakPeer__Receive(void *_this)
-#else
-Packet *Hooks::HOOK_RakPeer__Receive(void *_this)
-#endif
+		_hook_rakserver__rpc = std::make_shared<urmem::hook>(
+			Addresses::FUNC_RAKSERVER__RPC,
+			urmem::get_func_addr(&HOOK_RakServer__RPC));
+
+		_hook_rakserver__receive = std::make_shared<urmem::hook>(
+			Addresses::FUNC_RAKSERVER__RECEIVE,
+			urmem::get_func_addr(&HOOK_RakServer__Receive));
+
+		_hook_rakserver__register_as_remote_procedure_call = std::make_shared<urmem::hook>(
+			Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
+			urmem::get_func_addr(&HOOK_RakServer__RegisterAsRemoteProcedureCall));
+
+		_original_rpc.fill(nullptr);
+		_custom_rpc.fill(nullptr);
+
+		RPCHandle::Create();
+
+		logprintf("[RNM] Initialized. Version: 2.0.0. Author: urShadow");
+	}
+
+	return rakserver;
+}
+
+bool THISCALL Hooks::HOOK_RakServer__Send(void *_this, RakNet::BitStream *bitStream, int priority,
+	int reliability, char orderingChannel, PlayerID playerId, bool broadcast)
 {
-	urmem::hook::context context(Hooks::_hook_rakpeer__receive);
+	urmem::hook::raii scope(*_hook_rakserver__send);
 
-	Packet *packet = context.call_original<Packet *>(urmem::calling_convention::thiscall, _this);
+	if (bitStream)
+	{
+		auto read_offset = bitStream->GetReadOffset(), write_offset = bitStream->GetWriteOffset();
 
-	if (packet)
-	{	
+		if (!Callbacks::OnServerSendPacket(GetIndexFromPlayerID(playerId), bitStream->GetData()[0], bitStream))
+			return false;
+
+		bitStream->SetReadOffset(read_offset), bitStream->SetWriteOffset(write_offset);
+	}
+
+	return urmem::call_function<urmem::calling_convention::thiscall, bool>(
+		Addresses::FUNC_RAKSERVER__SEND, _this, bitStream, priority, reliability,
+		orderingChannel, playerId, broadcast);
+}
+
+bool THISCALL Hooks::HOOK_RakServer__RPC(void *_this, RPCIndex *uniqueID, RakNet::BitStream *bitStream, int priority,
+	int reliability, char orderingChannel, PlayerID playerId, bool broadcast, bool shiftTimestamp)
+{
+	urmem::hook::raii scope(*_hook_rakserver__rpc);
+
+	if (uniqueID && bitStream)
+	{
+		auto read_offset = bitStream->GetReadOffset(), write_offset = bitStream->GetWriteOffset();
+
+		if (!Callbacks::OnServerSendRPC(GetIndexFromPlayerID(playerId), *uniqueID, bitStream))
+			return false;
+
+		bitStream->SetReadOffset(read_offset), bitStream->SetWriteOffset(write_offset);
+	}
+
+	return urmem::call_function<urmem::calling_convention::thiscall, bool>(
+		Addresses::FUNC_RAKSERVER__RPC, _this, uniqueID, bitStream, priority, reliability,
+		orderingChannel, playerId, broadcast, shiftTimestamp);
+}
+
+Packet * THISCALL Hooks::HOOK_RakServer__Receive(void *_this)
+{
+	urmem::hook::raii scope(*_hook_rakserver__receive);
+
+	Packet *packet = urmem::call_function<urmem::calling_convention::thiscall, Packet *>(
+		Addresses::FUNC_RAKSERVER__RECEIVE, _this);
+
+	if (packet && packet->data)
+	{
 		RakNet::BitStream bitstream(packet->data, packet->length, false);
 
 		if (!Callbacks::OnPlayerReceivedPacket(packet->playerIndex, packet->data[0], &bitstream))
-		{			
-			Hooks::DeallocatePacket(packet);
+		{
+			DeallocatePacket(packet);
 
 			return nullptr;
 		}
@@ -83,143 +148,115 @@ Packet *Hooks::HOOK_RakPeer__Receive(void *_this)
 	return packet;
 }
 
-#ifdef _WIN32
-void __thiscall Hooks::HOOK_RakPeer__SendBuffered(void *_this, unsigned char *data, int numberOfBitsToSend,
-	PacketPriority priority, PacketReliability reliability, char orderingChannel,
-	PlayerID playerId, bool broadcast, int connectionMode)
-#else
-void Hooks::HOOK_RakPeer__SendBuffered(void *_this, unsigned char *data, int numberOfBitsToSend,
-	PacketPriority priority, PacketReliability reliability, char orderingChannel,
-	PlayerID playerId, bool broadcast, int connectionMode)
-#endif
+void * THISCALL Hooks::HOOK_RakServer__RegisterAsRemoteProcedureCall(void *_this, RPCIndex *uniqueID, RPCFunction functionPointer)
 {
-	urmem::hook::context context(Hooks::_hook_rakpeer__send_buffered);
-	
-	if (data && numberOfBitsToSend > 0)
-	{
-		RakNet::BitStream bitstream(data, BITS_TO_BYTES(numberOfBitsToSend), false);
+	urmem::hook::raii scope(*_hook_rakserver__register_as_remote_procedure_call);
 
-		if (!Callbacks::OnServerSendPacket(Hooks::GetIndexFromPlayerID(playerId), data[0], &bitstream)) 
+	if (uniqueID && functionPointer)
+	{
+		_original_rpc[*uniqueID] = functionPointer;
+
+		return urmem::call_function<urmem::calling_convention::thiscall, void *>(
+			Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
+			_this, uniqueID, _custom_rpc[*uniqueID]);
+	}
+
+	return urmem::call_function<urmem::calling_convention::thiscall, void *>(
+		Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
+		_this, uniqueID, functionPointer);
+}
+
+void Hooks::ReceiveRPC(int rpc_id, RPCParameters *p)
+{
+	if (p)
+	{
+		int player_id = GetIndexFromPlayerID(p->sender);
+
+		std::shared_ptr<RakNet::BitStream> bs;
+
+		if (p->input)
+			bs = std::make_shared<RakNet::BitStream>(p->input, BITS_TO_BYTES(p->numberOfBitsOfData), false);
+
+		if (!Callbacks::OnPlayerReceivedRPC(player_id, rpc_id, bs.get()))
+			return;
+
+		try
 		{
-			return;
+			_original_rpc.at(rpc_id)(p);
 		}
-	}
-
-	return context.call_original<void>(urmem::calling_convention::thiscall, _this, data,
-		numberOfBitsToSend, priority, reliability, orderingChannel, playerId, broadcast, connectionMode);
-}
-
-#ifdef _WIN32
-bool __thiscall Hooks::HOOK_RakPeer__RPC(void *_this, unsigned char *uniqueID,
-	unsigned char *data, unsigned int bitLength, PacketPriority priority,
-	PacketReliability reliability, char orderingChannel, PlayerID playerId,
-	bool broadcast, bool shiftTimestamp, NetworkID networkID, void *replyFromTarget)
-#else
-bool Hooks::HOOK_RakPeer__RPC(void *_this, unsigned char *uniqueID,
-	unsigned char *data, unsigned int bitLength, PacketPriority priority,
-	PacketReliability reliability, char orderingChannel, PlayerID playerId,
-	bool broadcast, bool shiftTimestamp, NetworkID networkID, void *replyFromTarget)
-#endif
-{
-	urmem::hook::context context(Hooks::_hook_rakpeer__rpc);
-
-	if (data && bitLength > 0)
-	{		
-		RakNet::BitStream bitstream(data, BITS_TO_BYTES(bitLength), false);
-
-		if (!Callbacks::OnServerSendRPC(Hooks::GetIndexFromPlayerID(playerId), *uniqueID, &bitstream)) {
-			return false;
+		catch (const std::exception &e)
+		{
+			logprintf("[RNM] %s: %s", __FUNCTION__, e.what());
 		}
-	}
-
-	return context.call_original<bool>(urmem::calling_convention::thiscall, _this, uniqueID, data,
-		bitLength, priority, reliability, orderingChannel, playerId, broadcast, shiftTimestamp,
-		networkID, replyFromTarget);
-}
-
-#ifdef _WIN32
-void * __thiscall Hooks::HOOK_RPCMap__AddIdentifierWithFunction(
-	void *_this, unsigned char uniqueIdentifier, void *functionPointer, bool isPointerToMember)
-#else
-void *Hooks::HOOK_RPCMap__AddIdentifierWithFunction(
-	void *_this, unsigned char uniqueIdentifier, void *functionPointer, bool isPointerToMember)
-#endif
-{
-	urmem::hook::context context(Hooks::_hook_rpcmap__add_identifier_with_function);
-
-	Hooks::_rpc_map[uniqueIdentifier] = reinterpret_cast<RPCFunction>(functionPointer);
-
-	return context.call_original<void *>(urmem::calling_convention::thiscall, _this, uniqueIdentifier,
-		reinterpret_cast<void *>(Hooks::HOOK_HandleRPCFunction), isPointerToMember);
-}
-
-#ifdef _WIN32
-void * __thiscall Hooks::HOOK_RPCMap__GetNodeFromIndex(void *_this, unsigned char index)
-#else
-void *Hooks::HOOK_RPCMap__GetNodeFromIndex(void *_this, unsigned char index)
-#endif
-{
-	urmem::hook::context context(Hooks::_hook_rpcmap__get_node_from_index);
-
-	Hooks::_last_rpc_index = static_cast<int>(index);
-
-	return context.call_original<void *>(urmem::calling_convention::thiscall, _this, index);
-}
-
-#ifdef _WIN32
-void __cdecl Hooks::HOOK_HandleRPCFunction(RPCParameters *parameter)
-#else
-void Hooks::HOOK_HandleRPCFunction(RPCParameters *parameter)
-#endif
-{
-	if (parameter)
-	{
-		RakNet::BitStream bitstream(parameter->input, BITS_TO_BYTES(parameter->numberOfBitsOfData), false);
-
-		int playerid = Hooks::GetIndexFromPlayerID(parameter->sender);
-
-		if (!Callbacks::OnPlayerReceivedRPC(playerid, Hooks::_last_rpc_index, &bitstream))
-			return;
-
-		Hooks::_rpc_map[Hooks::_last_rpc_index](parameter);
 	}
 }
 
 int Hooks::GetIndexFromPlayerID(const PlayerID &id)
 {
-	return urmem::memory::call_function<int>(urmem::calling_convention::thiscall,
-		Addresses::FUNC_RAKPEER__GET_INDEX_FROM_PLAYER_ID,
-		Hooks::_rakpeer,
-		id);
+	return urmem::call_function<urmem::calling_convention::thiscall, int>(
+		Addresses::FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID, Addresses::RAKSERVER, id);
 }
 
 PlayerID Hooks::GetPlayerIDFromIndex(int index)
 {
-	return urmem::memory::call_function<PlayerID>(urmem::calling_convention::thiscall,
-		Addresses::FUNC_RAKPEER__GET_PLAYER_ID_FROM_INDEX,
-		Hooks::_rakpeer,
-		index);
+	return urmem::call_function<urmem::calling_convention::thiscall, PlayerID>(
+		Addresses::FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX, Addresses::RAKSERVER, index);
 }
 
 void Hooks::DeallocatePacket(Packet *p)
 {
-	return urmem::memory::call_function(urmem::calling_convention::thiscall,
-		Addresses::FUNC_RAKPEER__DEALLOCATE_PACKET, 
-		Hooks::_rakpeer,
-		p);
+	urmem::call_function<urmem::calling_convention::thiscall>(
+		Addresses::FUNC_RAKSERVER__DEALLOCATE_PACKET, Addresses::RAKSERVER, p);
 }
 
-void Hooks::SendPacket(int playerid, RakNet::BitStream *bs)
+bool Hooks::SendPacket(int player_id, RakNet::BitStream *bs, int priority, int reliability)
 {
-	urmem::hook::context(Hooks::_hook_rakpeer__send_buffered).call_original(urmem::calling_convention::thiscall, _rakpeer,
-		bs->GetData(), bs->GetNumberOfBitsUsed(), PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, '\0',
-		Hooks::GetPlayerIDFromIndex(playerid), playerid == -1, 0);
+	bool enabled = _hook_rakserver__send->is_enabled();
+
+	if (enabled)
+		_hook_rakserver__send->disable();
+
+	auto result = urmem::call_function<urmem::calling_convention::thiscall, bool>(
+		Addresses::FUNC_RAKSERVER__SEND,
+		Addresses::RAKSERVER,
+		bs,
+		priority,
+		reliability,
+		'\0',
+		GetPlayerIDFromIndex(player_id),
+		player_id == -1);
+
+	if (enabled)
+		_hook_rakserver__send->enable();
+
+	return result;
 }
 
-void Hooks::SendRPC(int playerid, int rpcid, RakNet::BitStream *bs)
+bool Hooks::SendRPC(int player_id, int rpc_id, RakNet::BitStream *bs, int priority, int reliability)
 {
-	urmem::hook::context(Hooks::_hook_rakpeer__rpc).call_original<bool>(urmem::calling_convention::thiscall, _rakpeer,
-		&rpcid, bs->GetData(), bs->GetNumberOfBitsUsed(), PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, '\0',
-		Hooks::GetPlayerIDFromIndex(playerid), playerid == -1, false, UNASSIGNED_NETWORK_ID, nullptr);
-}
+	bool enabled = _hook_rakserver__rpc->is_enabled();
 
+	if (enabled)
+		_hook_rakserver__rpc->disable();
+
+	static RPCIndex id{};
+
+	id = static_cast<RPCIndex>(rpc_id);
+
+	auto result = urmem::call_function<urmem::calling_convention::thiscall, bool>(
+		Addresses::FUNC_RAKSERVER__RPC,
+		Addresses::RAKSERVER,
+		&id,
+		bs,
+		priority,
+		reliability,
+		'\0',
+		GetPlayerIDFromIndex(player_id),
+		player_id == -1,
+		false);
+
+	if (enabled)
+		_hook_rakserver__rpc->enable();
+
+	return result;
+}

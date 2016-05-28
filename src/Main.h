@@ -1,23 +1,13 @@
 #ifndef RAKNETMANAGER_MAIN_H_
 #define RAKNETMANAGER_MAIN_H_
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <string.h>
-#include <sys/mman.h>
-#endif
-
 #include "SDK/amx/amx.h"
 #include "SDK/plugincommon.h"
 #include "RakNet/BitStream.h"
 #include "urmem.hpp"
 
-#include <set>
+#include <unordered_map>
 #include <array>
-#include <initializer_list>
-#include <string>
-#include <iostream>
 
 #include "Addresses.h"
 #include "Callbacks.h"

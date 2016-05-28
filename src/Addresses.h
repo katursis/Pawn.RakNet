@@ -5,18 +5,17 @@ class Addresses
 {
 public:
 
-	static bool Init(void);
+	static bool Init(urmem::address_t rakserver);
 
-	static urmem::address_t		FUNC_RAKPEER__CTOR;
-	static urmem::address_t		FUNC_RAKPEER__RECEIVE;
-	static urmem::address_t		FUNC_RAKPEER__SEND_BUFFERED;
-	static urmem::address_t		FUNC_RAKPEER__RPC;
-	static urmem::address_t		FUNC_RAKPEER__GET_INDEX_FROM_PLAYER_ID;
-	static urmem::address_t		FUNC_RAKPEER__GET_PLAYER_ID_FROM_INDEX;
-	static urmem::address_t		FUNC_RAKPEER__DEALLOCATE_PACKET;
-
-	static urmem::address_t		FUNC_RPCMAP__ADD_IDENTIFIER_WITH_FUNCTION;
-	static urmem::address_t		FUNC_RPCMAP__GET_NODE_FROM_INDEX;
+	static urmem::address_t
+		RAKSERVER,
+		FUNC_RAKSERVER__SEND,
+		FUNC_RAKSERVER__RPC,
+		FUNC_RAKSERVER__RECEIVE,
+		FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
+		FUNC_RAKSERVER__DEALLOCATE_PACKET,
+		FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID,
+		FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX;
 };
 
 #endif // RAKNETMANAGER_ADDRESSES_H_

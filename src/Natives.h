@@ -5,7 +5,7 @@ class Natives
 {
 public:
 
-	static int Register(AMX *amx);
+	static void Register(AMX *amx);
 
 private:
 
@@ -32,31 +32,31 @@ private:
 		CBOOL,
 	};
 
-	static cell AMX_NATIVE_CALL SendRPC(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL SendPacket(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_RPC(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_Send(AMX *amx, cell *params);
 
-	static cell AMX_NATIVE_CALL BitStream__New(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__Delete(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_New(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_Delete(AMX *amx, cell *params);
 
-	static cell AMX_NATIVE_CALL BitStream__Reset(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__ResetReadPointer(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__ResetWritePointer(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__IgnoreBits(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_Reset(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_ResetReadPointer(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_ResetWritePointer(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_IgnoreBits(AMX *amx, cell *params);
 
-	static cell AMX_NATIVE_CALL BitStream__SetWriteOffset(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__GetWriteOffset(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__SetReadOffset(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__GetReadOffset(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_SetWriteOffset(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_GetWriteOffset(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_SetReadOffset(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_GetReadOffset(AMX *amx, cell *params);
 
-	static cell AMX_NATIVE_CALL BitStream__GetNumberOfBitsUsed(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__GetNumberOfBytesUsed(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__GetNumberOfUnreadBits(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_GetNumberOfBitsUsed(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_GetNumberOfBytesUsed(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_GetNumberOfUnreadBits(AMX *amx, cell *params);
 
-	static cell AMX_NATIVE_CALL BitStream__WriteValue(AMX *amx, cell *params);
-	static cell AMX_NATIVE_CALL BitStream__ReadValue(AMX *amx, cell *params);	
-	
-	inline static bool check_params(const char *native, const int count, const cell *params);
-	inline static int set_amxstring(AMX *amx, cell amx_addr, const char *source, int max);
+	static cell AMX_NATIVE_CALL n_BS_WriteValue(AMX *amx, cell *params);
+	static cell AMX_NATIVE_CALL n_BS_ReadValue(AMX *amx, cell *params);
+
+	static bool check_params(const char *native, int count, cell *params);
+	static int set_amxstring(AMX *amx, cell amx_addr, const char *source, int max);
 };
 
 #endif // RAKNETMANAGER_NATIVES_H_

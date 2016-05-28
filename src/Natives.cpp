@@ -1,51 +1,56 @@
 #include "Main.h"
 
-int Natives::Register(AMX *amx)
+void Natives::Register(AMX *amx)
 {
-	static std::vector<AMX_NATIVE_INFO> vec_native = {
+	static std::vector<AMX_NATIVE_INFO> natives = {
 
-		{ "RNM_SendRPC", Natives::SendRPC },
-		{ "RNM_SendPacket", Natives::SendPacket },
+		{ "BS_RPC", n_BS_RPC },
+		{ "BS_Send", n_BS_Send },
 
-		{ "BS_New", Natives::BitStream__New },
-		{ "BS_Delete", Natives::BitStream__Delete },
+		{ "BS_New", n_BS_New },
+		{ "BS_Delete", n_BS_Delete },
 
-		{ "BS_Reset", Natives::BitStream__Reset },
-		{ "BS_ResetReadPointer", Natives::BitStream__ResetReadPointer },
-		{ "BS_ResetWritePointer", Natives::BitStream__ResetWritePointer },
-		{ "BS_IgnoreBits", Natives::BitStream__IgnoreBits },
+		{ "BS_Reset", n_BS_Reset },
+		{ "BS_ResetReadPointer", n_BS_ResetReadPointer },
+		{ "BS_ResetWritePointer", n_BS_ResetWritePointer },
+		{ "BS_IgnoreBits", n_BS_IgnoreBits },
 
-		{ "BS_SetWriteOffset", Natives::BitStream__SetWriteOffset },
-		{ "BS_GetWriteOffset", Natives::BitStream__GetWriteOffset },
-		{ "BS_SetReadOffset", Natives::BitStream__SetReadOffset },
-		{ "BS_GetReadOffset", Natives::BitStream__GetReadOffset },
+		{ "BS_SetWriteOffset", n_BS_SetWriteOffset },
+		{ "BS_GetWriteOffset", n_BS_GetWriteOffset },
+		{ "BS_SetReadOffset", n_BS_SetReadOffset },
+		{ "BS_GetReadOffset", n_BS_GetReadOffset },
 
-		{ "BS_GetNumberOfBitsUsed", Natives::BitStream__GetNumberOfBitsUsed },
-		{ "BS_GetNumberOfBytesUsed", Natives::BitStream__GetNumberOfBytesUsed },
-		{ "BS_GetNumberOfUnreadBits", Natives::BitStream__GetNumberOfUnreadBits },
+		{ "BS_GetNumberOfBitsUsed", n_BS_GetNumberOfBitsUsed },
+		{ "BS_GetNumberOfBytesUsed", n_BS_GetNumberOfBytesUsed },
+		{ "BS_GetNumberOfUnreadBits", n_BS_GetNumberOfUnreadBits },
 
-		{ "BS_WriteValue", Natives::BitStream__WriteValue },
-		{ "BS_ReadValue", Natives::BitStream__ReadValue }
+		{ "BS_WriteValue", n_BS_WriteValue },
+		{ "BS_ReadValue", n_BS_ReadValue }
 	};
-		
-	return amx_Register(amx, vec_native.data(), vec_native.size());
+
+	amx_Register(amx, natives.data(), natives.size());
 }
 
-// native SendRPC(playerid, rpcid, BitStream:bs);
-cell AMX_NATIVE_CALL Natives::SendRPC(AMX *amx, cell *params)
+// native BS_RPC(BitStream:bs, player_id, rpc_id, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+cell AMX_NATIVE_CALL Natives::n_BS_RPC(AMX *amx, cell *params)
 {
-	if (!check_params("SendRPC", 3, params))
+	if (!check_params(__FUNCTION__, 5, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[3]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
-		Hooks::SendRPC(params[1], params[2], bitstream);
+		Hooks::SendRPC(
+			static_cast<int>(params[2]),
+			static_cast<int>(params[3]),
+			bs,
+			static_cast<int>(params[4]),
+			static_cast<int>(params[5]));
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (SendRPC): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -53,21 +58,25 @@ cell AMX_NATIVE_CALL Natives::SendRPC(AMX *amx, cell *params)
 	return 1;
 }
 
-// native SendPacket(playerid, BitStream:bs);
-cell AMX_NATIVE_CALL Natives::SendPacket(AMX *amx, cell *params)
+// native BS_Send(BitStream:bs, player_id, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+cell AMX_NATIVE_CALL Natives::n_BS_Send(AMX *amx, cell *params)
 {
-	if (!check_params("SendPacket", 2, params))
+	if (!check_params(__FUNCTION__, 4, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[2]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
-		Hooks::SendPacket(params[1], bitstream);
+		Hooks::SendPacket(
+			static_cast<int>(params[2]),
+			bs,
+			static_cast<int>(params[3]),
+			static_cast<int>(params[4]));
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (SendPacket): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -76,18 +85,18 @@ cell AMX_NATIVE_CALL Natives::SendPacket(AMX *amx, cell *params)
 }
 
 // native BitStream:BS_New();
-cell AMX_NATIVE_CALL Natives::BitStream__New(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_New(AMX *amx, cell *params)
 {
-	if (!check_params("BitStream:BS_New", 0, params))
+	if (!check_params(__FUNCTION__, 0, params))
 		return 0;
 
 	return reinterpret_cast<cell>(new RakNet::BitStream);
 }
 
 // native BS_Delete(&BitStream:bs);
-cell AMX_NATIVE_CALL Natives::BitStream__Delete(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_Delete(AMX *amx, cell *params)
 {
-	if (!check_params("BS_Delete", 1, params))
+	if (!check_params(__FUNCTION__, 1, params))
 		return 0;
 
 	cell *cptr{}; amx_GetAddr(amx, params[1], &cptr);
@@ -99,29 +108,29 @@ cell AMX_NATIVE_CALL Natives::BitStream__Delete(AMX *amx, cell *params)
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_Delete): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
-	}	
+	}
 
 	return 1;
 }
 
 // native BS_Reset(BitStream:bs);
-cell AMX_NATIVE_CALL Natives::BitStream__Reset(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_Reset(AMX *amx, cell *params)
 {
-	if (!check_params("BS_Reset", 1, params))
+	if (!check_params(__FUNCTION__, 1, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
-		bitstream->Reset();
+		bs->Reset();
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_Reset): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -130,20 +139,20 @@ cell AMX_NATIVE_CALL Natives::BitStream__Reset(AMX *amx, cell *params)
 }
 
 // native BS_ResetReadPointer(BitStream:bs);
-cell AMX_NATIVE_CALL Natives::BitStream__ResetReadPointer(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_ResetReadPointer(AMX *amx, cell *params)
 {
-	if (!check_params("BS_ResetReadPointer", 1, params))
+	if (!check_params(__FUNCTION__, 1, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
-		bitstream->ResetReadPointer();
+		bs->ResetReadPointer();
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_ResetReadPointer): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -152,20 +161,20 @@ cell AMX_NATIVE_CALL Natives::BitStream__ResetReadPointer(AMX *amx, cell *params
 }
 
 // native BS_ResetWritePointer(BitStream:bs);
-cell AMX_NATIVE_CALL Natives::BitStream__ResetWritePointer(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_ResetWritePointer(AMX *amx, cell *params)
 {
-	if (!check_params("BS_ResetWritePointer", 1, params))
+	if (!check_params(__FUNCTION__, 1, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
-		bitstream->ResetWritePointer();
+		bs->ResetWritePointer();
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_ResetWritePointer): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -173,21 +182,21 @@ cell AMX_NATIVE_CALL Natives::BitStream__ResetWritePointer(AMX *amx, cell *param
 	return 1;
 }
 
-// native BS_IgnoreBits(BitStream:bs, bitcount);
-cell AMX_NATIVE_CALL Natives::BitStream__IgnoreBits(AMX *amx, cell *params)
+// native BS_IgnoreBits(BitStream:bs, number_of_bits);
+cell AMX_NATIVE_CALL Natives::n_BS_IgnoreBits(AMX *amx, cell *params)
 {
-	if (!check_params("BS_IgnoreBits", 2, params))
+	if (!check_params(__FUNCTION__, 2, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
-		bitstream->IgnoreBits(static_cast<int>(params[2]));
+		bs->IgnoreBits(static_cast<int>(params[2]));
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_IgnoreBits): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -196,20 +205,20 @@ cell AMX_NATIVE_CALL Natives::BitStream__IgnoreBits(AMX *amx, cell *params)
 }
 
 // native BS_SetWriteOffset(BitStream:bs, offset);
-cell AMX_NATIVE_CALL Natives::BitStream__SetWriteOffset(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_SetWriteOffset(AMX *amx, cell *params)
 {
-	if (!check_params("BS_SetWriteOffset", 2, params))
+	if (!check_params(__FUNCTION__, 2, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
-		bitstream->SetWriteOffset(static_cast<int>(params[2]));
+		bs->SetWriteOffset(static_cast<int>(params[2]));
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_SetWriteOffset): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -218,22 +227,22 @@ cell AMX_NATIVE_CALL Natives::BitStream__SetWriteOffset(AMX *amx, cell *params)
 }
 
 // native BS_GetWriteOffset(BitStream:bs, &offset);
-cell AMX_NATIVE_CALL Natives::BitStream__GetWriteOffset(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_GetWriteOffset(AMX *amx, cell *params)
 {
-	if (!check_params("BS_GetWriteOffset", 2, params))
+	if (!check_params(__FUNCTION__, 2, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
 		cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
 
-		*cptr = bitstream->GetWriteOffset();
+		*cptr = static_cast<cell>(bs->GetWriteOffset());
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_GetWriteOffset): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -242,20 +251,20 @@ cell AMX_NATIVE_CALL Natives::BitStream__GetWriteOffset(AMX *amx, cell *params)
 }
 
 // native BS_SetReadOffset(BitStream:bs, offset);
-cell AMX_NATIVE_CALL Natives::BitStream__SetReadOffset(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_SetReadOffset(AMX *amx, cell *params)
 {
-	if (!check_params("BS_SetReadOffset", 2, params))
+	if (!check_params(__FUNCTION__, 2, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
-		bitstream->SetReadOffset(static_cast<int>(params[2]));
+		bs->SetReadOffset(static_cast<int>(params[2]));
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_SetReadOffset): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -264,22 +273,22 @@ cell AMX_NATIVE_CALL Natives::BitStream__SetReadOffset(AMX *amx, cell *params)
 }
 
 // native BS_GetReadOffset(BitStream:bs, &offset);
-cell AMX_NATIVE_CALL Natives::BitStream__GetReadOffset(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_GetReadOffset(AMX *amx, cell *params)
 {
-	if (!check_params("BS_GetReadOffset", 2, params))
+	if (!check_params(__FUNCTION__, 2, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
 		cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
 
-		*cptr = bitstream->GetReadOffset();
+		*cptr = static_cast<cell>(bs->GetReadOffset());
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_GetReadOffset): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -288,22 +297,22 @@ cell AMX_NATIVE_CALL Natives::BitStream__GetReadOffset(AMX *amx, cell *params)
 }
 
 // native BS_GetNumberOfBitsUsed(BitStream:bs, &number);
-cell AMX_NATIVE_CALL Natives::BitStream__GetNumberOfBitsUsed(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_GetNumberOfBitsUsed(AMX *amx, cell *params)
 {
-	if (!check_params("BS_GetNumberOfBitsUsed", 2, params))
+	if (!check_params(__FUNCTION__, 2, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
 		cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
 
-		*cptr = bitstream->GetNumberOfBitsUsed();
+		*cptr = static_cast<cell>(bs->GetNumberOfBitsUsed());
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_GetNumberOfBitsUsed): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -312,22 +321,22 @@ cell AMX_NATIVE_CALL Natives::BitStream__GetNumberOfBitsUsed(AMX *amx, cell *par
 }
 
 // native BS_GetNumberOfBytesUsed(BitStream:bs, &number);
-cell AMX_NATIVE_CALL Natives::BitStream__GetNumberOfBytesUsed(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_GetNumberOfBytesUsed(AMX *amx, cell *params)
 {
-	if (!check_params("BS_GetNumberOfBytesUsed", 2, params))
+	if (!check_params(__FUNCTION__, 2, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
 		cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
 
-		*cptr = bitstream->GetNumberOfBytesUsed();
+		*cptr = static_cast<cell>(bs->GetNumberOfBytesUsed());
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_GetNumberOfBytesUsed): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -336,22 +345,22 @@ cell AMX_NATIVE_CALL Natives::BitStream__GetNumberOfBytesUsed(AMX *amx, cell *pa
 }
 
 // native BS_GetNumberOfUnreadBits(BitStream:bs, &number);
-cell AMX_NATIVE_CALL Natives::BitStream__GetNumberOfUnreadBits(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_GetNumberOfUnreadBits(AMX *amx, cell *params)
 {
-	if (!check_params("BS_GetNumberOfUnreadBits", 2, params))
+	if (!check_params(__FUNCTION__, 2, params))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
+	if (bs)
 	{
 		cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
 
-		*cptr = bitstream->GetNumberOfUnreadBits();
+		*cptr = static_cast<cell>(bs->GetNumberOfUnreadBits());
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_GetNumberOfUnreadBits): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -360,113 +369,14 @@ cell AMX_NATIVE_CALL Natives::BitStream__GetNumberOfUnreadBits(AMX *amx, cell *p
 }
 
 // native BS_WriteValue(BitStream:bs, {Float,_}:...);
-cell AMX_NATIVE_CALL Natives::BitStream__WriteValue(AMX *amx, cell *params)
+cell AMX_NATIVE_CALL Natives::n_BS_WriteValue(AMX *amx, cell *params)
 {
-	if (params[0] < 3 * sizeof(cell))
+	if (params[0] < (3 * sizeof(cell)))
 		return 0;
 
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-	if (bitstream)
-	{
-		cell *cptr_type{}, *cptr_value{};
-		
-		for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i+=2)
-		{
-			amx_GetAddr(amx, params[i + 1], &cptr_type);
-			amx_GetAddr(amx, params[i + 2], &cptr_value);
-
-			auto type = static_cast<BS_ValueType>(*cptr_type);
-
-			switch (type)
-			{
-				case BS_ValueType::INT8:
-					bitstream->Write(static_cast<char>(*cptr_value));
-					break;
-				case BS_ValueType::INT16:
-					bitstream->Write(static_cast<short>(*cptr_value));
-					break;
-				case BS_ValueType::INT32:
-					bitstream->Write(static_cast<int>(*cptr_value));
-					break;
-				case BS_ValueType::UINT8:
-					bitstream->Write(static_cast<unsigned char>(*cptr_value));
-					break;
-				case BS_ValueType::UINT16:
-					bitstream->Write(static_cast<unsigned short>(*cptr_value));
-					break;
-				case BS_ValueType::UINT32:
-					bitstream->Write(static_cast<unsigned int>(*cptr_value));
-					break;
-				case BS_ValueType::FLOAT:
-					bitstream->Write(amx_ctof(*cptr_value));
-					break;
-				case BS_ValueType::BOOL:
-					bitstream->Write(!!(*cptr_value));
-					break;
-				case BS_ValueType::STRING:
-				{
-					int size{}; amx_StrLen(cptr_value, &size);					
-
-					char *str = new char[size + 1]{};
-
-					amx_GetString(str, cptr_value, 0, size + 1);
-
-					bitstream->Write(str, size);
-
-					delete[] str;				
-
-					break;
-				}					
-				case BS_ValueType::CINT8:
-					bitstream->WriteCompressed(static_cast<char>(*cptr_value));
-					break;
-				case BS_ValueType::CINT16:
-					bitstream->WriteCompressed(static_cast<short>(*cptr_value));
-					break;
-				case BS_ValueType::CINT32:
-					bitstream->WriteCompressed(static_cast<int>(*cptr_value));
-					break;
-				case BS_ValueType::CUINT8:
-					bitstream->WriteCompressed(static_cast<unsigned char>(*cptr_value));
-					break;
-				case BS_ValueType::CUINT16:
-					bitstream->WriteCompressed(static_cast<unsigned short>(*cptr_value));
-					break;
-				case BS_ValueType::CUINT32:
-					bitstream->WriteCompressed(static_cast<unsigned int>(*cptr_value));
-					break;
-				case BS_ValueType::CFLOAT:
-					bitstream->WriteCompressed(amx_ctof(*cptr_value));
-					break;
-				case BS_ValueType::CBOOL:
-					bitstream->WriteCompressed(!!(*cptr_value));
-					break;
-				default: 
-					logprintf(">> RakNet Manager (BS_WriteValue): Error type of value");
-					return 0;
-			}
-		}
-	}
-	else
-	{
-		logprintf(">> RakNet Manager (BS_WriteValue): BitStream handle error");
-
-		return 0;
-	}
-
-	return 1;
-}
-
-// native BS_ReadValue(BitStream:bs, {Float,_}:...);
-cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
-{
-	if (params[0] < 3 * sizeof(cell))
-		return 0;
-
-	auto bitstream = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-	if (bitstream)
+	if (bs)
 	{
 		cell *cptr_type{}, *cptr_value{};
 
@@ -479,11 +389,110 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 
 			switch (type)
 			{
-				case BS_ValueType::INT8: 
+				case BS_ValueType::INT8:
+					bs->Write(static_cast<char>(*cptr_value));
+					break;
+				case BS_ValueType::INT16:
+					bs->Write(static_cast<short>(*cptr_value));
+					break;
+				case BS_ValueType::INT32:
+					bs->Write(static_cast<int>(*cptr_value));
+					break;
+				case BS_ValueType::UINT8:
+					bs->Write(static_cast<unsigned char>(*cptr_value));
+					break;
+				case BS_ValueType::UINT16:
+					bs->Write(static_cast<unsigned short>(*cptr_value));
+					break;
+				case BS_ValueType::UINT32:
+					bs->Write(static_cast<unsigned int>(*cptr_value));
+					break;
+				case BS_ValueType::FLOAT:
+					bs->Write(amx_ctof(*cptr_value));
+					break;
+				case BS_ValueType::BOOL:
+					bs->Write(!!(*cptr_value));
+					break;
+				case BS_ValueType::STRING:
 				{
-					char value{}; 
+					int size{}; amx_StrLen(cptr_value, &size);
 
-					bitstream->Read(value);
+					char *str = new char[size + 1]{};
+
+					amx_GetString(str, cptr_value, 0, size + 1);
+
+					bs->Write(str, size);
+
+					delete[] str;
+
+					break;
+				}
+				case BS_ValueType::CINT8:
+					bs->WriteCompressed(static_cast<char>(*cptr_value));
+					break;
+				case BS_ValueType::CINT16:
+					bs->WriteCompressed(static_cast<short>(*cptr_value));
+					break;
+				case BS_ValueType::CINT32:
+					bs->WriteCompressed(static_cast<int>(*cptr_value));
+					break;
+				case BS_ValueType::CUINT8:
+					bs->WriteCompressed(static_cast<unsigned char>(*cptr_value));
+					break;
+				case BS_ValueType::CUINT16:
+					bs->WriteCompressed(static_cast<unsigned short>(*cptr_value));
+					break;
+				case BS_ValueType::CUINT32:
+					bs->WriteCompressed(static_cast<unsigned int>(*cptr_value));
+					break;
+				case BS_ValueType::CFLOAT:
+					bs->WriteCompressed(amx_ctof(*cptr_value));
+					break;
+				case BS_ValueType::CBOOL:
+					bs->WriteCompressed(!!(*cptr_value));
+					break;
+				default:
+					logprintf("[RNM] %s: invalid type of value", __FUNCTION__);
+					return 0;
+			}
+		}
+	}
+	else
+	{
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
+
+		return 0;
+	}
+
+	return 1;
+}
+
+// native BS_ReadValue(BitStream:bs, {Float,_}:...);
+cell AMX_NATIVE_CALL Natives::n_BS_ReadValue(AMX *amx, cell *params)
+{
+	if (params[0] < 3 * sizeof(cell))
+		return 0;
+
+	auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+
+	if (bs)
+	{
+		cell *cptr_type{}, *cptr_value{};
+
+		for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2)
+		{
+			amx_GetAddr(amx, params[i + 1], &cptr_type);
+			amx_GetAddr(amx, params[i + 2], &cptr_value);
+
+			auto type = static_cast<BS_ValueType>(*cptr_type);
+
+			switch (type)
+			{
+				case BS_ValueType::INT8:
+				{
+					char value{};
+
+					bs->Read(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -493,7 +502,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					short value{};
 
-					bitstream->Read(value);
+					bs->Read(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -503,7 +512,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					int value{};
 
-					bitstream->Read(value);
+					bs->Read(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -513,7 +522,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					unsigned char value{};
 
-					bitstream->Read(value);
+					bs->Read(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -523,7 +532,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					unsigned short value{};
 
-					bitstream->Read(value);
+					bs->Read(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -533,7 +542,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					unsigned int value{};
 
-					bitstream->Read(value);
+					bs->Read(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -543,7 +552,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					float value{};
 
-					bitstream->Read(value);
+					bs->Read(value);
 
 					*cptr_value = amx_ftoc(value);
 
@@ -553,7 +562,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					bool value{};
 
-					bitstream->Read(value);
+					bs->Read(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -562,12 +571,12 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				case BS_ValueType::STRING:
 				{
 					cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
-					
+
 					std::size_t size = *cptr_size;
 
 					char *str = new char[size + 1]{};
 
-					bitstream->Read(str, size);									
+					bs->Read(str, size);
 
 					set_amxstring(amx, params[i + 2], str, size);
 
@@ -581,7 +590,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					char value{};
 
-					bitstream->ReadCompressed(value);
+					bs->ReadCompressed(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -591,7 +600,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					short value{};
 
-					bitstream->ReadCompressed(value);
+					bs->ReadCompressed(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -601,7 +610,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					int value{};
 
-					bitstream->ReadCompressed(value);
+					bs->ReadCompressed(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -611,7 +620,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					unsigned char value{};
 
-					bitstream->ReadCompressed(value);
+					bs->ReadCompressed(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -621,7 +630,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					unsigned short value{};
 
-					bitstream->ReadCompressed(value);
+					bs->ReadCompressed(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -631,7 +640,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					unsigned int value{};
 
-					bitstream->ReadCompressed(value);
+					bs->ReadCompressed(value);
 
 					*cptr_value = static_cast<cell>(value);
 
@@ -641,7 +650,7 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					float value{};
 
-					bitstream->ReadCompressed(value);
+					bs->ReadCompressed(value);
 
 					*cptr_value = amx_ftoc(value);
 
@@ -651,21 +660,21 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 				{
 					bool value{};
 
-					bitstream->ReadCompressed(value);
+					bs->ReadCompressed(value);
 
 					*cptr_value = static_cast<cell>(value);
 
 					break;
 				}
 				default:
-					logprintf(">> RakNet Manager (BS_ReadValue): Error type of value");
+					logprintf("[RNM] %s: invalid type of value", __FUNCTION__);
 					return 0;
 			}
 		}
 	}
 	else
 	{
-		logprintf(">> RakNet Manager (BS_ReadValue): BitStream handle error");
+		logprintf("[RNM] %s: invalid BitStream handle", __FUNCTION__);
 
 		return 0;
 	}
@@ -673,19 +682,22 @@ cell AMX_NATIVE_CALL Natives::BitStream__ReadValue(AMX *amx, cell *params)
 	return 1;
 }
 
-inline bool Natives::check_params(const char *native, const int count, const cell *params)
+bool Natives::check_params(const char *native, int count, cell *params)
 {
 	if (params[0] != (count * sizeof(cell)))
-		return logprintf(">> RakNet Manager (%s): Bad parameter count (Count is %d, should be %d)",
-			native, params[0] / sizeof(cell), count), false;
+	{
+		logprintf("[RNM] %s: invalid number of parameters. Should be %d", native, count);
+
+		return false;
+	}
 
 	return true;
 }
 
-inline int Natives::set_amxstring(AMX *amx, cell amx_addr, const char *source, int max)
+int Natives::set_amxstring(AMX *amx, cell amx_addr, const char *source, int max)
 {
 	cell* dest = (cell *)(amx->base + (int)(((AMX_HEADER *)amx->base)->dat + amx_addr));
-	
+
 	cell* start = dest;
 
 	while (max--&&*source)

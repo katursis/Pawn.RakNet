@@ -1,40 +1,40 @@
 # RakNet Manager
 Plugin for SA:MP Server that allows you to work with RakNet in PAWN
-# Examples (0.3.7-R2)
-Sending RPC
+# Examples (0.3.7)
+RPC
 ```pawn
-stock SendChatMessage(senderid, msg[])
+stock SendChatMessage(sender_id, msg[])
 {
   new BitStream:bs = BS_New(), RPC_Chat = 101;
   
-  BS_WriteValue(bs, RNM_INT16, senderid, 
+  BS_WriteValue(bs, RNM_INT16, sender_id, 
                     RNM_INT8, strlen(msg), 
                     RNM_STRING, msg);
                     
-  RNM_SendRPC(senderid, RPC_Chat, bs);
+  BS_RPC(bs, sender_id, RPC_Chat);
   
   BS_Delete(bs);
 }
 ```
-Sending packet
+Packet
 ```pawn
-stock FakeLostConnectionForPlayer(playerid)
+stock FakeLostConnectionForPlayer(player_id)
 {
   new BitStream:bs = BS_New(), ID_CONNECTION_LOST = 33;
   
   BS_WriteValue(bs, RNM_INT8, ID_CONNECTION_LOST);
   
-  RNM_SendPacket(playerid, bs);
+  BS_Send(bs, player_id);
   
   BS_Delete(bs);
 }
 ```
-Intercept incoming onfoot sync of player 
+Intercept received player's data
  ```pawn
 new ID_PLAYER_SYNC = 207;
-public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
+public OnPlayerReceivedPacket(player_id, packet_id, BitStream:bs)
 {
-	if(packetid == ID_PLAYER_SYNC)
+	if(packet_id == ID_PLAYER_SYNC)
 	{
 	new lrkeys, udkeys, sampkeys,
 	Float:pos[3], Float:quaternion[4],
@@ -42,7 +42,7 @@ public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
 	Float:speed[3], Float:surfingoffsets[3],
 	surfingvehid, animationid, animflags;
 	 
-    BS_IgnoreBits(bs, 8); // packet id 1 byte
+    BS_IgnoreBits(bs, 8); // packet id
 	BS_ReadValue(bs, RNM_UINT16, lrkeys,
 					 RNM_UINT16, udkeys,
 				     RNM_UINT16, sampkeys,
@@ -90,19 +90,19 @@ public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
 	return 1;
 }
 ```
-Intercept incoming chat message rpc
+Intercept received player's RPC
 ```pawn
 new RPC_Chat = 101;
-public OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs)
+public OnPlayerReceivedRPC(player_id, rpc_id, BitStream:bs)
 {
-	if(rpcid == RPC_Chat) 
+	if(rpc_id == RPC_Chat) 
 	{
-	new message[256], len;
+	new message[512], len;
 	
 	BS_ReadValue(bs, RNM_UINT8, len,
-					RNM_STRING, message, len);
+					 RNM_STRING, message, len);
 					 
-	printf("chat message from player %d: %s", playerid, message);
+	printf("[%d]: %s", player_id, message);
 	}
 	
 	return 1;

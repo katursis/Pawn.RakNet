@@ -1,79 +1,29 @@
 #include "Main.h"
 
-// forward OnPlayerReceivedPacket(playerid, packetid, BitStream:bs);
-bool Callbacks::OnPlayerReceivedPacket(int playerid, int packetid, RakNet::BitStream *bs)
-{	
-	int result = -1, idx = -1;		
-
-	auto &amx_set = Callbacks::GetAmxSet();
-
-	for (auto &amx : amx_set)
-	{
-		if (amx_FindPublic(amx, "OnPlayerReceivedPacket", &idx) == AMX_ERR_NONE)
-		{
-			bs->ResetReadPointer();
-
-			amx_Push(amx, reinterpret_cast<cell>(bs));
-			amx_Push(amx, packetid);
-			amx_Push(amx, playerid);
-
-			amx_Exec(amx, &result, idx);
-
-			if (!result)
-				return false;
-		}
-	}
-
-	return true;
-}
-
-// forward OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs);
-bool Callbacks::OnPlayerReceivedRPC(int playerid, int rpcid, RakNet::BitStream *bs)
-{	
-	int result = -1, idx = -1;
-	
-	auto &amx_set = Callbacks::GetAmxSet();
-
-	for (auto &amx : amx_set)
-	{
-		if (amx_FindPublic(amx, "OnPlayerReceivedRPC", &idx) == AMX_ERR_NONE)
-		{
-			bs->ResetReadPointer();
-
-			amx_Push(amx, reinterpret_cast<cell>(bs));
-			amx_Push(amx, rpcid);
-			amx_Push(amx, playerid);
-
-			amx_Exec(amx, &result, idx);
-
-			if (!result)
-				return false;
-		}
-	}
-
-	return true;
-}
-
-// forward OnServerSendPacket(playerid, packetid, BitStream:bs);
-bool Callbacks::OnServerSendPacket(int playerid, int packetid, RakNet::BitStream *bs)
+// forward OnPlayerReceivedPacket(player_id, packet_id, BitStream:bs);
+bool Callbacks::OnPlayerReceivedPacket(int player_id, int packet_id, RakNet::BitStream *bs)
 {
-	int result = -1, idx = -1;
+	cell retval{};
 
-	auto &amx_set = Callbacks::GetAmxSet();
+	auto &AMXs = Callbacks::GetAmxMap();
 
-	for (auto &amx : amx_set)
+	for (auto &i : AMXs)
 	{
-		if (amx_FindPublic(amx, "OnServerSendPacket", &idx) == AMX_ERR_NONE)
+		auto amx = i.first;
+		const auto &public_data = i.second._public_on_player_received_packet;
+
+		if (public_data.exists)
 		{
-			bs->ResetReadPointer();
+			if (bs)
+				bs->ResetReadPointer();
 
 			amx_Push(amx, reinterpret_cast<cell>(bs));
-			amx_Push(amx, packetid);		
-			amx_Push(amx, playerid);
+			amx_Push(amx, static_cast<cell>(packet_id));
+			amx_Push(amx, static_cast<cell>(player_id));
 
-			amx_Exec(amx, &result, idx);
+			amx_Exec(amx, &retval, public_data.id);
 
-			if (!result)
+			if (retval == 0)
 				return false;
 		}
 	}
@@ -81,26 +31,92 @@ bool Callbacks::OnServerSendPacket(int playerid, int packetid, RakNet::BitStream
 	return true;
 }
 
-// forward OnServerSendRPC(playerid, rpcid, BitStream:bs);
-bool Callbacks::OnServerSendRPC(int playerid, int rpcid, RakNet::BitStream *bs)
+// forward OnPlayerReceivedRPC(player_id, rpc_id, BitStream:bs);
+bool Callbacks::OnPlayerReceivedRPC(int player_id, int rpc_id, RakNet::BitStream *bs)
 {
-	int result = -1, idx = -1;
+	cell retval{};
 
-	auto &amx_set = Callbacks::GetAmxSet();
+	auto &AMXs = Callbacks::GetAmxMap();
 
-	for (auto &amx : amx_set)
+	for (auto &i : AMXs)
 	{
-		if (amx_FindPublic(amx, "OnServerSendRPC", &idx) == AMX_ERR_NONE)
+		auto amx = i.first;
+		const auto &public_data = i.second._public_on_player_received_rpc;
+
+		if (public_data.exists)
 		{
-			bs->ResetReadPointer();
+			if (bs)
+				bs->ResetReadPointer();
 
 			amx_Push(amx, reinterpret_cast<cell>(bs));
-			amx_Push(amx, rpcid);			
-			amx_Push(amx, playerid);
+			amx_Push(amx, static_cast<cell>(rpc_id));
+			amx_Push(amx, static_cast<cell>(player_id));
 
-			amx_Exec(amx, &result, idx);
+			amx_Exec(amx, &retval, public_data.id);
 
-			if (!result)
+			if (retval == 0)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+// forward OnServerSendPacket(player_id, packet_id, BitStream:bs);
+bool Callbacks::OnServerSendPacket(int player_id, int packet_id, RakNet::BitStream *bs)
+{
+	cell retval{};
+
+	auto &AMXs = Callbacks::GetAmxMap();
+
+	for (auto &i : AMXs)
+	{
+		auto amx = i.first;
+		const auto &public_data = i.second._public_on_server_send_packet;
+
+		if (public_data.exists)
+		{
+			if (bs)
+				bs->ResetReadPointer();
+
+			amx_Push(amx, reinterpret_cast<cell>(bs));
+			amx_Push(amx, static_cast<cell>(packet_id));
+			amx_Push(amx, static_cast<cell>(player_id));
+
+			amx_Exec(amx, &retval, public_data.id);
+
+			if (retval == 0)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+// forward OnServerSendRPC(player_id, rpc_id, BitStream:bs);
+bool Callbacks::OnServerSendRPC(int player_id, int rpc_id, RakNet::BitStream *bs)
+{
+	cell retval{};
+
+	auto &AMXs = Callbacks::GetAmxMap();
+
+	for (auto &i : AMXs)
+	{
+		auto amx = i.first;
+		const auto &public_data = i.second._public_on_server_send_rpc;
+
+		if (public_data.exists)
+		{
+			if (bs)
+				bs->ResetReadPointer();
+
+			amx_Push(amx, reinterpret_cast<cell>(bs));
+			amx_Push(amx, static_cast<cell>(rpc_id));
+			amx_Push(amx, static_cast<cell>(player_id));
+
+			amx_Exec(amx, &retval, public_data.id);
+
+			if (retval == 0)
 				return false;
 		}
 	}
@@ -110,17 +126,31 @@ bool Callbacks::OnServerSendRPC(int playerid, int rpcid, RakNet::BitStream *bs)
 
 void Callbacks::OnAmxLoad(AMX *amx)
 {
-	Callbacks::GetAmxSet().insert(amx);
+	Data data{};
+
+	if (amx_FindPublic(amx, "OnPlayerReceivedPacket", &data._public_on_player_received_packet.id) == AMX_ERR_NONE)
+		data._public_on_player_received_packet.exists = true;
+
+	if (amx_FindPublic(amx, "OnPlayerReceivedRPC", &data._public_on_player_received_rpc.id) == AMX_ERR_NONE)
+		data._public_on_player_received_rpc.exists = true;
+
+	if (amx_FindPublic(amx, "OnServerSendPacket", &data._public_on_server_send_packet.id) == AMX_ERR_NONE)
+		data._public_on_server_send_packet.exists = true;
+
+	if (amx_FindPublic(amx, "OnServerSendRPC", &data._public_on_server_send_rpc.id) == AMX_ERR_NONE)
+		data._public_on_server_send_rpc.exists = true;
+
+	Callbacks::GetAmxMap()[amx] = data;
 }
 
 void Callbacks::OnAmxUnload(AMX *amx)
 {
-	Callbacks::GetAmxSet().erase(amx);
+	Callbacks::GetAmxMap().erase(amx);
 }
 
-inline std::set<AMX *> &Callbacks::GetAmxSet(void)
+std::unordered_map<AMX *, Callbacks::Data> &Callbacks::GetAmxMap(void)
 {
-	static std::set<AMX *> amx_set;
+	static std::unordered_map<AMX *, Callbacks::Data> AMXs;
 
-	return amx_set;
+	return AMXs;
 }
