@@ -19,7 +19,7 @@ const char *pattern =
 "\xC4\x04\x89\x04\x24\x85\xC0\xC7\x44\x24\xFF" \
 "\x00\x00\x00\x00\x74\x16";
 
-const char *mask = "xxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxxxxx?xxxxxx";
+const char *mask = "xxx????xxxxxxxxxxxxxxxx????x????xxxxxxxxxxx?xxxxxx";
 #else
 const char *pattern =
 "\x55\x89\xE5\x83\xEC\x18\xC7\x04\x24\xFF\xFF" \
