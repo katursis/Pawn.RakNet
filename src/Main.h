@@ -4,7 +4,7 @@
 #include "SDK/amx/amx.h"
 #include "SDK/plugincommon.h"
 #include "RakNet/BitStream.h"
-#include "urmem.hpp"
+#include "urmem/urmem.hpp"
 
 #include <unordered_map>
 #include <array>

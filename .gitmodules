@@ -1,0 +1,3 @@
+[submodule "lib/urmem"]
+	path = lib/urmem
+	url = https://github.com/urShadow/urmem
