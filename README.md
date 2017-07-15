@@ -79,16 +79,16 @@ public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
            "speed %.2f %.2f %.2f\n" \
            "surfingoffsets %.2f %.2f %.2f\n" \
            "surfingvehid %d\n" \
-            "anim %d flags %d",
-            lrkeys, udkeys, sampkeys,
-            pos[0], pos[1], pos[2],
-            quaternion[0], quaternion[1], quaternion[2], quaternion[3],
-            health, armor, weaponid, specialaction,
-            speed[0], speed[1], speed[2],
-            surfingoffsets[0], surfingoffsets[1], surfingoffsets[2],
-            surfingvehid, animationid, animflags
-    );
+           "anim %d flags %d",
+           lrkeys, udkeys, sampkeys,
+           pos[0], pos[1], pos[2],
+           quaternion[0], quaternion[1], quaternion[2], quaternion[3],
+           health, armor, weaponid, specialaction,
+           speed[0], speed[1], speed[2],
+           surfingoffsets[0], surfingoffsets[1], surfingoffsets[2],
+           surfingvehid, animationid, animflags);
     }
+  
   return 1;
 }
 ```
