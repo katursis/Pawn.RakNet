@@ -1,4 +1,8 @@
 .vscode/
+.vs/
+bin/
+Release/
+Debug/
 *.o
 *.gch
 *.so
