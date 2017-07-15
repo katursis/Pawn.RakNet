@@ -75,7 +75,7 @@ void * Hooks::HOOK_GetRakServerInterface(void) {
 
     RPCHandle::Create();
 
-    logprintf("[RNM] Initialized. Version: 2.0.0. Author: urShadow");
+    logprintf("[RNM] Initialized. Version: 2.0.1. Author: urShadow");
   }
 
   return rakserver;
