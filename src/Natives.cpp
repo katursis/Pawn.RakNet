@@ -29,7 +29,7 @@ void Natives::Register(AMX *amx) {
   amx_Register(amx, natives.data(), natives.size());
 }
 
-// native BS_RPC(BitStream:bs, player_id, rpc_id, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+// native BS_RPC(BitStream:bs, playerid, rpcid, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
 cell AMX_NATIVE_CALL Natives::n_BS_RPC(AMX *amx, cell *params) {
   if (!check_params(__FUNCTION__, 5, params)) {
     return 0;
@@ -53,7 +53,7 @@ cell AMX_NATIVE_CALL Natives::n_BS_RPC(AMX *amx, cell *params) {
   return 1;
 }
 
-// native BS_Send(BitStream:bs, player_id, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+// native BS_Send(BitStream:bs, playerid, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
 cell AMX_NATIVE_CALL Natives::n_BS_Send(AMX *amx, cell *params) {
   if (!check_params(__FUNCTION__, 4, params)) {
     return 0;
@@ -622,6 +622,7 @@ cell AMX_NATIVE_CALL Natives::n_BS_ReadValue(AMX *amx, cell *params) {
         }
         default:
           logprintf("[RNM] %s: invalid type of value", __FUNCTION__);
+
           return 0;
       }
     }

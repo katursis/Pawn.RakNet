@@ -53,8 +53,8 @@ enum PacketReliability
 // https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
 // player_id == -1 => send to all players (broadcast)
 
-native BS_RPC(BitStream:bs, player_id, rpc_id, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
-native BS_Send(BitStream:bs, player_id, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+native BS_RPC(BitStream:bs, playerid, rpcid, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+native BS_Send(BitStream:bs, playerid, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
 
 native BitStream:BS_New();
 native BS_Delete(&BitStream:bs);
@@ -76,7 +76,7 @@ native BS_GetNumberOfUnreadBits(BitStream:bs, &number);
 native BS_WriteValue(BitStream:bs, {Float,_}:...);
 native BS_ReadValue(BitStream:bs, {Float,_}:...);
 
-forward OnPlayerReceivedPacket(player_id, packet_id, BitStream:bs);
-forward OnPlayerReceivedRPC(player_id, rpc_id, BitStream:bs);
-forward OnServerSendPacket(player_id, packet_id, BitStream:bs);
-forward OnServerSendRPC(player_id, rpc_id, BitStream:bs);
+forward OnPlayerReceivedPacket(playerid, packetid, BitStream:bs);
+forward OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs);
+forward OnServerSendPacket(playerid, packetid, BitStream:bs);
+forward OnServerSendRPC(playerid, rpcid, BitStream:bs);

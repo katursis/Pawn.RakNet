@@ -1,6 +1,6 @@
 #include "Main.h"
 
-// forward OnPlayerReceivedPacket(player_id, packet_id, BitStream:bs);
+// forward OnPlayerReceivedPacket(playerid, packetid, BitStream:bs);
 bool Callbacks::OnPlayerReceivedPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
   cell retval{};
 
@@ -30,7 +30,7 @@ bool Callbacks::OnPlayerReceivedPacket(int player_id, int packet_id, RakNet::Bit
   return true;
 }
 
-// forward OnPlayerReceivedRPC(player_id, rpc_id, BitStream:bs);
+// forward OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs);
 bool Callbacks::OnPlayerReceivedRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
   cell retval{};
 
@@ -60,7 +60,7 @@ bool Callbacks::OnPlayerReceivedRPC(int player_id, int rpc_id, RakNet::BitStream
   return true;
 }
 
-// forward OnServerSendPacket(player_id, packet_id, BitStream:bs);
+// forward OnServerSendPacket(playerid, packetid, BitStream:bs);
 bool Callbacks::OnServerSendPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
   cell retval{};
 
@@ -90,7 +90,7 @@ bool Callbacks::OnServerSendPacket(int player_id, int packet_id, RakNet::BitStre
   return true;
 }
 
-// forward OnServerSendRPC(player_id, rpc_id, BitStream:bs);
+// forward OnServerSendRPC(playerid, rpcid, BitStream:bs);
 bool Callbacks::OnServerSendRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
   cell retval{};
 
