@@ -14,7 +14,7 @@
 #include "Hooks.h"
 #include "Natives.h"
 
-using logprintf_t = void(*)(char* format, ...);
+using logprintf_t = void(*)(const char *format, ...);
 
 extern logprintf_t logprintf;
 
