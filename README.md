@@ -87,7 +87,7 @@ public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
            speed[0], speed[1], speed[2],
            surfingoffsets[0], surfingoffsets[1], surfingoffsets[2],
            surfingvehid, animationid, animflags);
-    }
+  }
   
   return 1;
 }
