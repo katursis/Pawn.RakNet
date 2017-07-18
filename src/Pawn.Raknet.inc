@@ -27,9 +27,50 @@
 
     #define PAWNRAKNET_INCLUDE_VERSION 10
 
+    enum PR_HandlerType
+    {
+        PR_INCOMING_RPC,
+        PR_INCOMING_PACKET,
+        PR_OUTCOMING_RPC,
+        PR_OUTCOMING_PACKET
+    }
+
     #if !defined __cplusplus
         public _pawnraknet_version = PAWNRAKNET_INCLUDE_VERSION;
         #pragma unused _pawnraknet_version
+
+        #define IRPC:%0(%1) \
+        forward pr_rir_%0(); \
+        public pr_rir_%0() \
+            PR_RegHandler(RPC_%0, "pr_ir_"#%0, PR_INCOMING_RPC); \
+        forward pr_ir_%0(%1); \
+        public pr_ir_%0(%1)
+
+        #define IPacket:%0(%1) \
+        forward pr_rip_%0(); \
+        public pr_rip_%0() \
+            PR_RegHandler(ID_%0, "pr_ip_"#%0, PR_INCOMING_PACKET); \
+        forward pr_ip_%0(%1); \
+        public pr_ip_%0(%1)
+
+        #define ORPC:%0(%1) \
+        forward pr_ror_%0(); \
+        public pr_ror_%0() \
+            PR_RegHandler(RPC_%0, "pr_or_"#%0, PR_OUTCOMING_RPC); \
+        forward pr_or_%0(%1); \
+        public pr_or_%0(%1)
+
+        #define OPacket:%0(%1) \
+        forward pr_rop_%0(); \
+        public pr_rop_%0() \
+            PR_RegHandler(ID_%0, "pr_op_"#%0, PR_OUTCOMING_PACKET); \
+        forward pr_op_%0(%1); \
+        public pr_op_%0(%1)
+
+        #define IncomingRPC IRPC
+        #define OutcomingRPC ORPC
+        #define IncomingPacket IPacket
+        #define OutcomingPacket OPacket
 
         enum
         {
@@ -99,6 +140,8 @@
 
         native BS_WriteValue(BitStream:bs, {Float,_}:...);
         native BS_ReadValue(BitStream:bs, {Float,_}:...);
+
+        native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
 
         forward OnIncomingPacket(playerid, packetid, BitStream:bs);
         forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
