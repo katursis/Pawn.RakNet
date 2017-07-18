@@ -33,7 +33,7 @@
         PR_INCOMING_PACKET,
         PR_OUTCOMING_RPC,
         PR_OUTCOMING_PACKET
-    }
+    };
 
     #if !defined __cplusplus
         public _pawnraknet_version = PAWNRAKNET_INCLUDE_VERSION;
