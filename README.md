@@ -34,7 +34,7 @@ stock FakeLostConnectionForPlayer(playerid)
 Intercept received player's data
  ```pawn
 new ID_PLAYER_SYNC = 207;
-public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
+public OnIncomingPacket(playerid, packetid, BitStream:bs)
 {
   if (packetid == ID_PLAYER_SYNC)
   {
@@ -95,7 +95,7 @@ public OnPlayerReceivedPacket(playerid, packetid, BitStream:bs)
 Intercept received player's RPC
 ```pawn
 new RPC_Chat = 101;
-public OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs)
+public OnIncomingRPC(playerid, rpcid, BitStream:bs)
 {
   if (rpcid == RPC_Chat) 
   {

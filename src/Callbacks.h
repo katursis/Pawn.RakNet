@@ -7,17 +7,17 @@ public:
     struct {
       int id;
       bool exists;
-    }	_public_on_player_received_packet,
-      _public_on_player_received_rpc,
-      _public_on_server_send_packet,
-      _public_on_server_send_rpc;
+    }	_public_on_incoming_packet,
+      _public_on_incoming_rpc,
+      _public_on_outcoming_packet,
+      _public_on_outcoming_rpc;
   };
 
-  static bool OnPlayerReceivedPacket(int player_id, int packet_id, RakNet::BitStream *bs);
-  static bool OnPlayerReceivedRPC(int player_id, int rpc_id, RakNet::BitStream *bs);
+  static bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs);
+  static bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs);
 
-  static bool OnServerSendPacket(int player_id, int packet_id, RakNet::BitStream *bs);
-  static bool OnServerSendRPC(int player_id, int rpc_id, RakNet::BitStream *bs);
+  static bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs);
+  static bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs);
 
   static void OnAmxLoad(AMX *amx);
   static void OnAmxUnload(AMX *amx);

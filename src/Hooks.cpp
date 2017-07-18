@@ -90,7 +90,7 @@ bool THISCALL Hooks::HOOK_RakServer__Send(void *_this, RakNet::BitStream *bitStr
   if (bitStream) {
     auto read_offset = bitStream->GetReadOffset(), write_offset = bitStream->GetWriteOffset();
 
-    if (!Callbacks::OnServerSendPacket(GetIndexFromPlayerID(playerId), bitStream->GetData()[0], bitStream)) {
+    if (!Callbacks::OnOutcomingPacket(GetIndexFromPlayerID(playerId), bitStream->GetData()[0], bitStream)) {
       return false;
     }
 
@@ -114,7 +114,7 @@ bool THISCALL Hooks::HOOK_RakServer__RPC(void *_this, RPCIndex *uniqueID,
       read_offset = bitStream->GetReadOffset(),
       write_offset = bitStream->GetWriteOffset();
 
-    if (!Callbacks::OnServerSendRPC(GetIndexFromPlayerID(playerId), *uniqueID, bitStream)) {
+    if (!Callbacks::OnOutcomingRPC(GetIndexFromPlayerID(playerId), *uniqueID, bitStream)) {
       return false;
     }
 
@@ -138,7 +138,7 @@ Packet * THISCALL Hooks::HOOK_RakServer__Receive(void *_this) {
   if (packet && packet->data) {
     RakNet::BitStream bitstream(packet->data, packet->length, false);
 
-    if (!Callbacks::OnPlayerReceivedPacket(packet->playerIndex, packet->data[0], &bitstream)) {
+    if (!Callbacks::OnIncomingPacket(packet->playerIndex, packet->data[0], &bitstream)) {
       DeallocatePacket(packet);
 
       return nullptr;
@@ -173,7 +173,7 @@ void Hooks::ReceiveRPC(int rpc_id, RPCParameters *p) {
     if (p->input)
       bs = std::make_shared<RakNet::BitStream>(p->input, BITS_TO_BYTES(p->numberOfBitsOfData), false);
 
-    if (!Callbacks::OnPlayerReceivedRPC(player_id, rpc_id, bs.get()))
+    if (!Callbacks::OnIncomingRPC(player_id, rpc_id, bs.get()))
       return;
 
     try {

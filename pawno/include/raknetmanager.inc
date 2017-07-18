@@ -76,7 +76,7 @@ native BS_GetNumberOfUnreadBits(BitStream:bs, &number);
 native BS_WriteValue(BitStream:bs, {Float,_}:...);
 native BS_ReadValue(BitStream:bs, {Float,_}:...);
 
-forward OnPlayerReceivedPacket(playerid, packetid, BitStream:bs);
-forward OnPlayerReceivedRPC(playerid, rpcid, BitStream:bs);
-forward OnServerSendPacket(playerid, packetid, BitStream:bs);
-forward OnServerSendRPC(playerid, rpcid, BitStream:bs);
+forward OnIncomingPacket(playerid, packetid, BitStream:bs);
+forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
+forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
+forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
