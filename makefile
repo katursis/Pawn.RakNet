@@ -1,4 +1,4 @@
-OUTFILE = "RNM.so"
+OUTFILE = "pawnraknet.so"
  
 COMPILE_FLAGS=-m32 -c -O3 -w -idirafter "lib"
 LINK_FLAGS=-m32 -shared -O3 -static-libstdc++
