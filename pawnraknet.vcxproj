@@ -9,7 +9,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9CA20179-D892-445A-83A0-D34B74F62BA9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>RNM</RootNamespace>
+    <RootNamespace>pawnraknet</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -53,7 +53,7 @@
       <GenerateDebugInformation>No</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>RNM.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>pawnraknet.def</ModuleDefinitionFile>
       <ProgramDatabaseFile />
       <ImportLibrary />
     </Link>
