@@ -19,6 +19,9 @@
     <Filter Include="Файлы исходного кода\SDK">
       <UniqueIdentifier>{5e53a73b-247b-4d25-af78-0c128bd25e04}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы исходного кода\urmem">
+      <UniqueIdentifier>{e01603a3-f377-4055-b8ea-a06643d2d97b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Callbacks.h">
@@ -38,6 +41,9 @@
     </ClInclude>
     <ClInclude Include="lib\RakNet\BitStream.h">
       <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\urmem\urmem.hpp">
+      <Filter>Файлы исходного кода\urmem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -62,5 +68,10 @@
     <ClCompile Include="lib\SDK\amxplugin.cpp">
       <Filter>Файлы исходного кода\SDK</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Pawn.RakNet.inc">
+      <Filter>Файлы исходного кода</Filter>
+    </None>
   </ItemGroup>
 </Project>
