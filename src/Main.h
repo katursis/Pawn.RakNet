@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <array>
 
+#include "Pawn.RakNet.inc"
+
 #include "Addresses.h"
 #include "Callbacks.h"
 #include "Hooks.h"
