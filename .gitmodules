@@ -1,3 +1,6 @@
 [submodule "lib/urmem"]
 	path = lib/urmem
 	url = https://github.com/urShadow/urmem
+[submodule "lib/crtp_singleton"]
+	path = lib/crtp_singleton
+	url = https://gist.github.com/urShadow/ee2947632cd7eef662352f863a76c8c8
