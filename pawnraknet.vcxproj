@@ -64,20 +64,11 @@
   <ItemGroup>
     <ClInclude Include="lib\RakNet\BitStream.h" />
     <ClInclude Include="lib\urmem\urmem.hpp" />
-    <ClInclude Include="src\Addresses.h" />
-    <ClInclude Include="src\Callbacks.h" />
-    <ClInclude Include="src\Hooks.h" />
-    <ClInclude Include="src\Main.h" />
-    <ClInclude Include="src\Natives.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\RakNet\BitStream.cpp" />
     <ClCompile Include="lib\SDK\amxplugin.cpp" />
-    <ClCompile Include="src\Addresses.cpp" />
-    <ClCompile Include="src\Callbacks.cpp" />
-    <ClCompile Include="src\Hooks.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Natives.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Pawn.RakNet.inc" />
