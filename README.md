@@ -1,4 +1,4 @@
-# RakNet Manager
+# Pawn.RakNet
 Plugin for SA:MP Server that allows you to work with RakNet in Pawn.
 
 Required 0.3z-R1 version or newer.
