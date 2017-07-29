@@ -35,7 +35,7 @@
         PR_OUTCOMING_PACKET
     };
 
-	enum PR_ValueType
+    enum PR_ValueType
     {
         PR_INT8,
         PR_INT16,
