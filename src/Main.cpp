@@ -1299,15 +1299,17 @@ namespace Plugin {
 
         bool exists = Utils::get_public_var(amx, Settings::kPublicVarNameVersion, include_version);
 
-        if (exists && include_version != PAWNRAKNET_INCLUDE_VERSION) {
-            logprintf("[%s] %s: Please update Pawn.RakNet.inc file to the latest version", Settings::kPluginName, __FUNCTION__);
+        if (exists) {
+            if (include_version != PAWNRAKNET_INCLUDE_VERSION) {
+                logprintf("[%s] %s: Please update Pawn.RakNet.inc file to the latest version", Settings::kPluginName, __FUNCTION__);
 
-            return;
+                return;
+            }
+
+            Callbacks::OnAmxLoad(amx);
+
+            Natives::Register(amx);
         }
-
-        Callbacks::OnAmxLoad(amx);
-
-        Natives::Register(amx);
     }
 
     void AmxUnload(AMX *amx) {
