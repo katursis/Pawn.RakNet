@@ -53,6 +53,7 @@ namespace Settings {
     constexpr char
         *kPluginName = "Pawn.RakNet",
         *kPluginVersion = "1.0",
+        *kPublicVarNameVersion = "_pawnraknet_version",
 #ifdef _WIN32
         *kPattern = "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
         "\x00\x00\x50\x64\x89\x25\x00\x00\x00\x00\x51" \
@@ -96,6 +97,20 @@ namespace Utils {
         *dest = 0;
 
         return dest - start;
+    }
+
+    inline bool get_public_var(AMX *amx, const char *name, cell &out) {
+        cell addr{},
+            *phys_addr{};
+
+        if ((amx_FindPubVar(amx, name, &addr) == AMX_ERR_NONE) &&
+            (amx_GetAddr(amx, addr, &phys_addr) == AMX_ERR_NONE)) {
+            out = *phys_addr;
+
+            return true;
+        }
+
+        return false;
     }
 }
 
@@ -1280,6 +1295,16 @@ namespace Plugin {
     }
 
     void AmxLoad(AMX *amx) {
+        cell include_version{};
+
+        bool exists = Utils::get_public_var(amx, Settings::kPublicVarNameVersion, include_version);
+
+        if (exists && include_version != PAWNRAKNET_INCLUDE_VERSION) {
+            logprintf("[%s] %s: Please update Pawn.RakNet.inc file to the latest version", Settings::kPluginName, __FUNCTION__);
+
+            return;
+        }
+
         Callbacks::OnAmxLoad(amx);
 
         Natives::Register(amx);
