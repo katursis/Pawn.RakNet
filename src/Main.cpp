@@ -146,10 +146,10 @@ namespace Callbacks {
         struct {
             int id;
             bool exists;
-        }	_public_on_incoming_packet,
-            _public_on_incoming_rpc,
-            _public_on_outcoming_packet,
-            _public_on_outcoming_rpc;
+        }	public_on_incoming_packet,
+            public_on_incoming_rpc,
+            public_on_outcoming_packet,
+            public_on_outcoming_rpc;
     };
 
     std::unordered_map<AMX *, Callbacks::Data> amx_map;
@@ -160,7 +160,7 @@ namespace Callbacks {
 
         for (const auto &i : amx_map) {
             const auto amx = i.first;
-            const auto &public_data = i.second._public_on_incoming_packet;
+            const auto &public_data = i.second.public_on_incoming_packet;
 
             if (public_data.exists) {
                 if (bs) {
@@ -188,7 +188,7 @@ namespace Callbacks {
 
         for (const auto &i : amx_map) {
             const auto amx = i.first;
-            const auto &public_data = i.second._public_on_incoming_rpc;
+            const auto &public_data = i.second.public_on_incoming_rpc;
 
             if (public_data.exists) {
                 if (bs) {
@@ -216,7 +216,7 @@ namespace Callbacks {
 
         for (const auto &i : amx_map) {
             const auto amx = i.first;
-            const auto &public_data = i.second._public_on_outcoming_packet;
+            const auto &public_data = i.second.public_on_outcoming_packet;
 
             if (public_data.exists) {
                 if (bs) {
@@ -244,7 +244,7 @@ namespace Callbacks {
 
         for (const auto &i : amx_map) {
             const auto amx = i.first;
-            const auto &public_data = i.second._public_on_outcoming_rpc;
+            const auto &public_data = i.second.public_on_outcoming_rpc;
 
             if (public_data.exists) {
                 if (bs) {
@@ -269,20 +269,20 @@ namespace Callbacks {
     void OnAmxLoad(AMX *amx) {
         Data data{};
 
-        if (amx_FindPublic(amx, "OnIncomingPacket", &data._public_on_incoming_packet.id) == AMX_ERR_NONE) {
-            data._public_on_incoming_packet.exists = true;
+        if (amx_FindPublic(amx, "OnIncomingPacket", &data.public_on_incoming_packet.id) == AMX_ERR_NONE) {
+            data.public_on_incoming_packet.exists = true;
         }
 
-        if (amx_FindPublic(amx, "OnIncomingRPC", &data._public_on_incoming_rpc.id) == AMX_ERR_NONE) {
-            data._public_on_incoming_rpc.exists = true;
+        if (amx_FindPublic(amx, "OnIncomingRPC", &data.public_on_incoming_rpc.id) == AMX_ERR_NONE) {
+            data.public_on_incoming_rpc.exists = true;
         }
 
-        if (amx_FindPublic(amx, "OnOutcomingPacket", &data._public_on_outcoming_packet.id) == AMX_ERR_NONE) {
-            data._public_on_outcoming_packet.exists = true;
+        if (amx_FindPublic(amx, "OnOutcomingPacket", &data.public_on_outcoming_packet.id) == AMX_ERR_NONE) {
+            data.public_on_outcoming_packet.exists = true;
         }
 
-        if (amx_FindPublic(amx, "OnOutcomingRPC", &data._public_on_outcoming_rpc.id) == AMX_ERR_NONE) {
-            data._public_on_outcoming_rpc.exists = true;
+        if (amx_FindPublic(amx, "OnOutcomingRPC", &data.public_on_outcoming_rpc.id) == AMX_ERR_NONE) {
+            data.public_on_outcoming_rpc.exists = true;
         }
 
         amx_map[amx] = data;
