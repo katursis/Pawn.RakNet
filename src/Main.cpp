@@ -624,29 +624,7 @@ namespace Hooks {
 };
 
 namespace Natives {
-    enum class BS_ValueType {
-        INT8,
-        INT16,
-        INT32,
-        UINT8,
-        UINT16,
-        UINT32,
-        FLOAT,
-        BOOL,
-        STRING,
-
-        // compressed values
-        CINT8,
-        CINT16,
-        CINT32,
-        CUINT8,
-        CUINT16,
-        CUINT32,
-        CFLOAT,
-        CBOOL,
-    };
-
-    // native BS_RPC(BitStream:bs, playerid, rpcid, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+    // native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
     cell AMX_NATIVE_CALL n_BS_RPC(AMX *amx, cell *params) {
         if (!Utils::check_params(__FUNCTION__, 5, params)) {
             return 0;
@@ -671,7 +649,7 @@ namespace Natives {
         return 1;
     }
 
-    // native BS_Send(BitStream:bs, playerid, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+    // native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
     cell AMX_NATIVE_CALL n_BS_Send(AMX *amx, cell *params) {
         if (!Utils::check_params(__FUNCTION__, 4, params)) {
             return 0;
@@ -961,34 +939,34 @@ namespace Natives {
                 amx_GetAddr(amx, params[i + 1], &cptr_type);
                 amx_GetAddr(amx, params[i + 2], &cptr_value);
 
-                auto type = static_cast<BS_ValueType>(*cptr_type);
+                auto type = static_cast<PR_ValueType>(*cptr_type);
 
                 switch (type) {
-                    case BS_ValueType::INT8:
+                    case PR_INT8:
                         bs->Write(static_cast<char>(*cptr_value));
                         break;
-                    case BS_ValueType::INT16:
+                    case PR_INT16:
                         bs->Write(static_cast<short>(*cptr_value));
                         break;
-                    case BS_ValueType::INT32:
+                    case PR_INT32:
                         bs->Write(static_cast<int>(*cptr_value));
                         break;
-                    case BS_ValueType::UINT8:
+                    case PR_UINT8:
                         bs->Write(static_cast<unsigned char>(*cptr_value));
                         break;
-                    case BS_ValueType::UINT16:
+                    case PR_UINT16:
                         bs->Write(static_cast<unsigned short>(*cptr_value));
                         break;
-                    case BS_ValueType::UINT32:
+                    case PR_UINT32:
                         bs->Write(static_cast<unsigned int>(*cptr_value));
                         break;
-                    case BS_ValueType::FLOAT:
+                    case PR_FLOAT:
                         bs->Write(amx_ctof(*cptr_value));
                         break;
-                    case BS_ValueType::BOOL:
+                    case PR_BOOL:
                         bs->Write(!!(*cptr_value));
                         break;
-                    case BS_ValueType::STRING:
+                    case PR_STRING:
                     {
                         int size{}; amx_StrLen(cptr_value, &size);
 
@@ -1002,28 +980,28 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CINT8:
+                    case PR_CINT8:
                         bs->WriteCompressed(static_cast<char>(*cptr_value));
                         break;
-                    case BS_ValueType::CINT16:
+                    case PR_CINT16:
                         bs->WriteCompressed(static_cast<short>(*cptr_value));
                         break;
-                    case BS_ValueType::CINT32:
+                    case PR_CINT32:
                         bs->WriteCompressed(static_cast<int>(*cptr_value));
                         break;
-                    case BS_ValueType::CUINT8:
+                    case PR_CUINT8:
                         bs->WriteCompressed(static_cast<unsigned char>(*cptr_value));
                         break;
-                    case BS_ValueType::CUINT16:
+                    case PR_CUINT16:
                         bs->WriteCompressed(static_cast<unsigned short>(*cptr_value));
                         break;
-                    case BS_ValueType::CUINT32:
+                    case PR_CUINT32:
                         bs->WriteCompressed(static_cast<unsigned int>(*cptr_value));
                         break;
-                    case BS_ValueType::CFLOAT:
+                    case PR_CFLOAT:
                         bs->WriteCompressed(amx_ctof(*cptr_value));
                         break;
-                    case BS_ValueType::CBOOL:
+                    case PR_CBOOL:
                         bs->WriteCompressed(!!(*cptr_value));
                         break;
                     default:
@@ -1058,10 +1036,10 @@ namespace Natives {
                 amx_GetAddr(amx, params[i + 1], &cptr_type);
                 amx_GetAddr(amx, params[i + 2], &cptr_value);
 
-                auto type = static_cast<BS_ValueType>(*cptr_type);
+                auto type = static_cast<PR_ValueType>(*cptr_type);
 
                 switch (type) {
-                    case BS_ValueType::INT8:
+                    case PR_INT8:
                     {
                         char value{};
 
@@ -1071,7 +1049,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::INT16:
+                    case PR_INT16:
                     {
                         short value{};
 
@@ -1081,7 +1059,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::INT32:
+                    case PR_INT32:
                     {
                         int value{};
 
@@ -1091,7 +1069,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::UINT8:
+                    case PR_UINT8:
                     {
                         unsigned char value{};
 
@@ -1101,7 +1079,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::UINT16:
+                    case PR_UINT16:
                     {
                         unsigned short value{};
 
@@ -1111,7 +1089,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::UINT32:
+                    case PR_UINT32:
                     {
                         unsigned int value{};
 
@@ -1121,7 +1099,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::FLOAT:
+                    case PR_FLOAT:
                     {
                         float value{};
 
@@ -1131,7 +1109,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::BOOL:
+                    case PR_BOOL:
                     {
                         bool value{};
 
@@ -1141,7 +1119,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::STRING:
+                    case PR_STRING:
                     {
                         cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
 
@@ -1159,7 +1137,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CINT8:
+                    case PR_CINT8:
                     {
                         char value{};
 
@@ -1169,7 +1147,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CINT16:
+                    case PR_CINT16:
                     {
                         short value{};
 
@@ -1179,7 +1157,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CINT32:
+                    case PR_CINT32:
                     {
                         int value{};
 
@@ -1189,7 +1167,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CUINT8:
+                    case PR_CUINT8:
                     {
                         unsigned char value{};
 
@@ -1199,7 +1177,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CUINT16:
+                    case PR_CUINT16:
                     {
                         unsigned short value{};
 
@@ -1209,7 +1187,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CUINT32:
+                    case PR_CUINT32:
                     {
                         unsigned int value{};
 
@@ -1219,7 +1197,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CFLOAT:
+                    case PR_CFLOAT:
                     {
                         float value{};
 
@@ -1229,7 +1207,7 @@ namespace Natives {
 
                         break;
                     }
-                    case BS_ValueType::CBOOL:
+                    case PR_CBOOL:
                     {
                         bool value{};
 

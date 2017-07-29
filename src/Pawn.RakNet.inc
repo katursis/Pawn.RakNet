@@ -35,6 +35,47 @@
         PR_OUTCOMING_PACKET
     };
 
+	enum PR_ValueType
+    {
+        PR_INT8,
+        PR_INT16,
+        PR_INT32,
+        PR_UINT8,
+        PR_UINT16,
+        PR_UINT32,
+        PR_FLOAT,
+        PR_BOOL,
+        PR_STRING,
+
+        // compressed
+        PR_CINT8,
+        PR_CINT16,
+        PR_CINT32,
+        PR_CUINT8,
+        PR_CUINT16,
+        PR_CUINT32,
+        PR_CFLOAT,
+        PR_CBOOL,
+    };
+
+    enum PR_PacketPriority
+    {
+        SYSTEM_PRIORITY,
+        HIGH_PRIORITY,
+        MEDIUM_PRIORITY,
+        LOW_PRIORITY,
+        NUMBER_OF_PRIORITIES
+    };
+
+    enum PR_PacketReliability
+    {
+        UNRELIABLE = 6,
+        UNRELIABLE_SEQUENCED,
+        RELIABLE,
+        RELIABLE_ORDERED,
+        RELIABLE_SEQUENCED
+    };
+
     #if !defined __cplusplus
         public _pawnraknet_version = PAWNRAKNET_INCLUDE_VERSION;
         #pragma unused _pawnraknet_version
@@ -72,54 +113,13 @@
         #define IncomingPacket IPacket
         #define OutcomingPacket OPacket
 
-        enum
-        {
-            RNM_INT8,
-            RNM_INT16,
-            RNM_INT32,
-            RNM_UINT8,
-            RNM_UINT16,
-            RNM_UINT32,
-            RNM_FLOAT,
-            RNM_BOOL,
-            RNM_STRING,
-	
-            // compressed values
-            RNM_CINT8,
-            RNM_CINT16,
-            RNM_CINT32,
-            RNM_CUINT8,
-            RNM_CUINT16,
-            RNM_CUINT32,
-            RNM_CFLOAT,
-            RNM_CBOOL,
-        }
-
-        enum PacketPriority
-        {
-            SYSTEM_PRIORITY,
-            HIGH_PRIORITY,
-            MEDIUM_PRIORITY,
-            LOW_PRIORITY,
-            NUMBER_OF_PRIORITIES
-        }
-
-        enum PacketReliability
-        {
-            UNRELIABLE = 6,
-            UNRELIABLE_SEQUENCED,
-            RELIABLE,
-            RELIABLE_ORDERED,
-            RELIABLE_SEQUENCED
-        }
-
         // RPC/Packet ids you can get from:
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
         // player_id == -1 => send to all players (broadcast)
 
-        native BS_RPC(BitStream:bs, playerid, rpcid, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
-        native BS_Send(BitStream:bs, playerid, PacketPriority:priority = HIGH_PRIORITY, PacketReliability:reliability = RELIABLE_ORDERED);
+        native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
+        native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
 
         native BitStream:BS_New();
         native BS_Delete(&BitStream:bs);
