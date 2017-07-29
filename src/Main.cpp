@@ -28,8 +28,9 @@
 #include "RakNet/BitStream.h"
 #include "urmem/urmem.hpp"
 
-#include <unordered_map>
+#include <list>
 #include <array>
+#include <string>
 
 #include "Pawn.RakNet.inc"
 
@@ -157,36 +158,54 @@ namespace Addresses {
 };
 
 namespace Callbacks {
-    struct Data {
-        struct {
-            int id;
-            bool exists;
-        }	public_on_incoming_packet,
-            public_on_incoming_rpc,
-            public_on_outcoming_packet,
-            public_on_outcoming_rpc;
+    struct Public {
+        std::string name;
+        int index;
+        bool exists;
+
+        Public(const std::string &name) :name{ name }, index{ -1 }, exists{ false } {}
     };
 
-    std::unordered_map<AMX *, Callbacks::Data> amx_map;
+    enum Publics {
+        ON_INCOMING_PACKET,
+        ON_INCOMING_RPC,
+        ON_OUTCOMING_PACKET,
+        ON_OUTCOMIMG_RPC,
+        NUMBER_OF_PUBLICS
+    };
+
+    struct Script {
+        AMX *amx;
+
+        std::array<Public, NUMBER_OF_PUBLICS> publics{
+            "OnIncomingPacket",
+            "OnIncomingRPC",
+            "OnOutcomingPacket",
+            "OnOutcomingRPC"
+        };
+
+        explicit Script(AMX *amx) : amx(amx) {}
+    };
+
+    std::list<Script> scripts;
 
     // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
     bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
         cell retval{};
 
-        for (const auto &i : amx_map) {
-            const auto amx = i.first;
-            const auto &public_data = i.second.public_on_incoming_packet;
+        for (const auto &script : scripts) {
+            const auto &pub = script.publics[ON_INCOMING_PACKET];
 
-            if (public_data.exists) {
+            if (pub.exists) {
                 if (bs) {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(amx, reinterpret_cast<cell>(bs));
-                amx_Push(amx, static_cast<cell>(packet_id));
-                amx_Push(amx, static_cast<cell>(player_id));
+                amx_Push(script.amx, reinterpret_cast<cell>(bs));
+                amx_Push(script.amx, static_cast<cell>(packet_id));
+                amx_Push(script.amx, static_cast<cell>(player_id));
 
-                amx_Exec(amx, &retval, public_data.id);
+                amx_Exec(script.amx, &retval, pub.index);
 
                 if (retval == 0) {
                     return false;
@@ -201,20 +220,19 @@ namespace Callbacks {
     bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
         cell retval{};
 
-        for (const auto &i : amx_map) {
-            const auto amx = i.first;
-            const auto &public_data = i.second.public_on_incoming_rpc;
+        for (const auto &script : scripts) {
+            const auto &pub = script.publics[ON_INCOMING_RPC];
 
-            if (public_data.exists) {
+            if (pub.exists) {
                 if (bs) {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(amx, reinterpret_cast<cell>(bs));
-                amx_Push(amx, static_cast<cell>(rpc_id));
-                amx_Push(amx, static_cast<cell>(player_id));
+                amx_Push(script.amx, reinterpret_cast<cell>(bs));
+                amx_Push(script.amx, static_cast<cell>(rpc_id));
+                amx_Push(script.amx, static_cast<cell>(player_id));
 
-                amx_Exec(amx, &retval, public_data.id);
+                amx_Exec(script.amx, &retval, pub.index);
 
                 if (retval == 0) {
                     return false;
@@ -229,20 +247,19 @@ namespace Callbacks {
     bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
         cell retval{};
 
-        for (const auto &i : amx_map) {
-            const auto amx = i.first;
-            const auto &public_data = i.second.public_on_outcoming_packet;
+        for (const auto &script : scripts) {
+            const auto &pub = script.publics[ON_OUTCOMING_PACKET];
 
-            if (public_data.exists) {
+            if (pub.exists) {
                 if (bs) {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(amx, reinterpret_cast<cell>(bs));
-                amx_Push(amx, static_cast<cell>(packet_id));
-                amx_Push(amx, static_cast<cell>(player_id));
+                amx_Push(script.amx, reinterpret_cast<cell>(bs));
+                amx_Push(script.amx, static_cast<cell>(packet_id));
+                amx_Push(script.amx, static_cast<cell>(player_id));
 
-                amx_Exec(amx, &retval, public_data.id);
+                amx_Exec(script.amx, &retval, pub.index);
 
                 if (retval == 0) {
                     return false;
@@ -257,20 +274,19 @@ namespace Callbacks {
     bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
         cell retval{};
 
-        for (const auto &i : amx_map) {
-            const auto amx = i.first;
-            const auto &public_data = i.second.public_on_outcoming_rpc;
+        for (const auto &script : scripts) {
+            const auto &pub = script.publics[ON_OUTCOMIMG_RPC];
 
-            if (public_data.exists) {
+            if (pub.exists) {
                 if (bs) {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(amx, reinterpret_cast<cell>(bs));
-                amx_Push(amx, static_cast<cell>(rpc_id));
-                amx_Push(amx, static_cast<cell>(player_id));
+                amx_Push(script.amx, reinterpret_cast<cell>(bs));
+                amx_Push(script.amx, static_cast<cell>(rpc_id));
+                amx_Push(script.amx, static_cast<cell>(player_id));
 
-                amx_Exec(amx, &retval, public_data.id);
+                amx_Exec(script.amx, &retval, pub.index);
 
                 if (retval == 0) {
                     return false;
@@ -282,33 +298,29 @@ namespace Callbacks {
     }
 
     void OnAmxLoad(AMX *amx) {
-        Data data{};
-
-        if (amx_FindPublic(amx, "OnIncomingPacket", &data.public_on_incoming_packet.id) == AMX_ERR_NONE) {
-            data.public_on_incoming_packet.exists = true;
-        }
-
-        if (amx_FindPublic(amx, "OnIncomingRPC", &data.public_on_incoming_rpc.id) == AMX_ERR_NONE) {
-            data.public_on_incoming_rpc.exists = true;
-        }
-
-        if (amx_FindPublic(amx, "OnOutcomingPacket", &data.public_on_outcoming_packet.id) == AMX_ERR_NONE) {
-            data.public_on_outcoming_packet.exists = true;
-        }
-
-        if (amx_FindPublic(amx, "OnOutcomingRPC", &data.public_on_outcoming_rpc.id) == AMX_ERR_NONE) {
-            data.public_on_outcoming_rpc.exists = true;
-        }
-
-        amx_map[amx] = data;
+        scripts.push_back(Script{ amx });
     }
 
     void OnAmxUnload(AMX *amx) {
-        amx_map.erase(amx);
+        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const Script &script) {
+            return script.amx == amx;
+        });
+
+        if (script != scripts.end()) {
+            scripts.erase(script);
+        }
     }
 
-    void Init() {
-        // code here
+    void Init(AMX *amx_gamemode) {
+        scripts.sort([=](const Script &a, const Script &b) {
+            return a.amx != amx_gamemode; // move gamemode at the end 
+        });
+
+        for (auto &script : scripts) {
+            for (auto &pub : script.publics) {
+                pub.exists = (amx_FindPublic(script.amx, pub.name.c_str(), &pub.index) == AMX_ERR_NONE);
+            }
+        }
     }
 };
 
@@ -419,7 +431,7 @@ namespace Hooks {
                     urmem::hook::type::call
                     );
 
-                Callbacks::Init();
+                Callbacks::Init(amx);
             } else {
                 hook_jmp_amx_exec->enable();
             }
@@ -430,7 +442,7 @@ namespace Hooks {
         static int AMXAPI call_amx_Exec(AMX *amx, cell *retval, int index) {
             urmem::hook::raii scope(*hook_call_amx_exec);
 
-            Callbacks::Init();
+            Callbacks::Init(amx);
 
             return urmem::call_function<urmem::calling_convention::cdeclcall, int>(
                 hook_call_amx_exec->get_original_addr(),
