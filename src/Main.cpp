@@ -291,6 +291,10 @@ namespace Callbacks {
     void OnAmxUnload(AMX *amx) {
         amx_map.erase(amx);
     }
+
+    void Init() {
+        // code here
+    }
 };
 
 namespace Hooks {
@@ -299,7 +303,9 @@ namespace Hooks {
         hook_rakserver__send,
         hook_rakserver__rpc,
         hook_rakserver__receive,
-        hook_rakserver__register_as_remote_procedure_call;
+        hook_rakserver__register_as_remote_procedure_call,
+        hook_jmp_amx_exec,
+        hook_call_amx_exec;
 
     std::array<RPCFunction, MAX_RPC_MAP_SIZE>
         original_rpc,
@@ -381,6 +387,44 @@ namespace Hooks {
 
     class InternalHooks {
     public:
+        static int AMXAPI jmp_amx_Exec(AMX *amx, cell *retval, int index) {
+            hook_jmp_amx_exec->disable();
+
+            const auto result = urmem::call_function<urmem::calling_convention::cdeclcall, int>(
+                hook_jmp_amx_exec->get_original_addr(),
+                amx,
+                retval,
+                index
+                );
+
+            if (index == AMX_EXEC_MAIN) {
+                hook_call_amx_exec = std::make_shared<urmem::hook>(
+                    urmem::get_call_address(),
+                    urmem::get_func_addr(&InternalHooks::call_amx_Exec),
+                    urmem::hook::type::call
+                    );
+
+                Callbacks::Init();
+            } else {
+                hook_jmp_amx_exec->enable();
+            }
+
+            return result;
+        }
+
+        static int AMXAPI call_amx_Exec(AMX *amx, cell *retval, int index) {
+            urmem::hook::raii scope(*hook_call_amx_exec);
+
+            Callbacks::Init();
+
+            return urmem::call_function<urmem::calling_convention::cdeclcall, int>(
+                hook_call_amx_exec->get_original_addr(),
+                amx,
+                retval,
+                index
+                );
+        }
+
         static bool THISCALL RakServer__Send(void *_this, RakNet::BitStream *bitStream,
                                              int priority, int reliability,
                                              char orderingChannel, PlayerID playerId,
@@ -564,6 +608,11 @@ namespace Hooks {
                 hook_get_rak_server_interface = std::make_shared<urmem::hook>(
                     addr,
                     urmem::get_func_addr(&InternalHooks::GetRakServerInterface)
+                    );
+
+                hook_jmp_amx_exec = std::make_shared<urmem::hook>(
+                    urmem::pointer(pAMXFunctions).field<urmem::address_t>(sizeof(urmem::pointer) * PLUGIN_AMX_EXPORT_Exec),
+                    urmem::get_func_addr(&InternalHooks::jmp_amx_Exec)
                     );
 
                 return true;
