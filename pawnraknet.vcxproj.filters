@@ -30,6 +30,12 @@
     <ClInclude Include="lib\urmem\urmem.hpp">
       <Filter>Файлы исходного кода\urmem</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scripts.h">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Settings.h">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
