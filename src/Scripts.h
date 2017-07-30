@@ -110,7 +110,7 @@ public:
     }
 
     // forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
-    bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
+    inline bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
         const auto &pub = _publics[ON_OUTCOMIMG_RPC];
 
         if (!pub->exists()) {
