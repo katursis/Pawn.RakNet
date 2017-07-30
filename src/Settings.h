@@ -1,3 +1,6 @@
+#ifndef SETTINGS_H_
+#define SETTINGS_H_
+
 class Settings {
 public:
     static constexpr char
@@ -22,3 +25,5 @@ public:
         *kMask = "xxxxxxxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
 #endif
 };
+
+#endif  // SETTINGS_H_

@@ -1,3 +1,6 @@
+#ifndef SCRIPTS_H_
+#define SCRIPTS_H_
+
 class Public {
 public:
     explicit Public(const std::string &name, AMX *amx) : _name{ name }, _amx{ amx } {
@@ -194,3 +197,5 @@ private:
 
     std::list<std::unique_ptr<Script>> _scripts;
 };
+
+#endif  // SCRIPTS_H_
