@@ -80,6 +80,9 @@
         public _pawnraknet_version = PAWNRAKNET_INCLUDE_VERSION;
         #pragma unused _pawnraknet_version
 
+        public bool:_pawnraknet_is_gamemode = !defined FILTERSCRIPT;
+        #pragma unused _pawnraknet_is_gamemode
+
         #define IRPC:%0(%1) \
         forward pr_rir_%0(); \
         public pr_rir_%0() \

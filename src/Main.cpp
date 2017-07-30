@@ -55,6 +55,7 @@ namespace Settings {
         *kPluginName = "Pawn.RakNet",
         *kPluginVersion = "1.0",
         *kPublicVarNameVersion = "_pawnraknet_version",
+        *kPublicVarNameIsGamemode = "_pawnraknet_is_gamemode",
 #ifdef _WIN32
         *kPattern = "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
         "\x00\x00\x50\x64\x89\x25\x00\x00\x00\x00\x51" \
@@ -158,169 +159,223 @@ namespace Addresses {
 };
 
 namespace Callbacks {
-    struct Public {
-        std::string name;
-        int index;
-        bool exists;
+    class Public {
+    public:
+        explicit Public(const std::string &name, AMX *amx) : _name{ name }, _amx{ amx } {
+            _exists = (amx_FindPublic(amx, name.c_str(), &_index) == AMX_ERR_NONE);
+        }
 
-        Public(const std::string &name) :name{ name }, index{ -1 }, exists{ false } {}
+        inline bool exists() const {
+            return _exists;
+        }
+
+        inline int get_index() const {
+            return _index;
+        }
+
+    private:
+        std::string _name;
+        int _index;
+        bool _exists;
+        AMX *_amx;
     };
 
-    enum Publics {
-        ON_INCOMING_PACKET,
-        ON_INCOMING_RPC,
-        ON_OUTCOMING_PACKET,
-        ON_OUTCOMIMG_RPC,
-        NUMBER_OF_PUBLICS
-    };
-
-    struct Script {
-        AMX *amx;
-
-        std::array<Public, NUMBER_OF_PUBLICS> publics{
-            "OnIncomingPacket",
-            "OnIncomingRPC",
-            "OnOutcomingPacket",
-            "OnOutcomingRPC"
+    class Script {
+    public:
+        enum Publics {
+            ON_INCOMING_PACKET,
+            ON_INCOMING_RPC,
+            ON_OUTCOMING_PACKET,
+            ON_OUTCOMIMG_RPC,
+            NUMBER_OF_PUBLICS
         };
 
-        explicit Script(AMX *amx) : amx(amx) {}
+        explicit Script(AMX *amx) : _amx(amx) {
+            const auto make_public = [amx](const std::string &name) {
+                return std::make_unique<Public>(name, amx);
+            };
+
+            _publics[ON_INCOMING_PACKET] = make_public("OnIncomingPacket");
+            _publics[ON_INCOMING_RPC] = make_public("OnIncomingRPC");
+            _publics[ON_OUTCOMING_PACKET] = make_public("OnOutcomingPacket");
+            _publics[ON_OUTCOMIMG_RPC] = make_public("OnOutcomingRPC");
+        }
+
+        // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
+        inline bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
+            const auto &pub = _publics[ON_INCOMING_PACKET];
+
+            if (!pub->exists()) {
+                return true;
+            }
+
+            if (bs) {
+                bs->ResetReadPointer();
+            }
+
+            amx_Push(_amx, reinterpret_cast<cell>(bs));
+            amx_Push(_amx, static_cast<cell>(packet_id));
+            amx_Push(_amx, static_cast<cell>(player_id));
+
+            cell retval{};
+
+            amx_Exec(_amx, &retval, pub->get_index());
+
+            return retval == 1;
+        }
+
+        // forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
+        inline bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
+            const auto &pub = _publics[ON_INCOMING_RPC];
+
+            if (!pub->exists()) {
+                return true;
+            }
+
+            if (bs) {
+                bs->ResetReadPointer();
+            }
+
+            amx_Push(_amx, reinterpret_cast<cell>(bs));
+            amx_Push(_amx, static_cast<cell>(rpc_id));
+            amx_Push(_amx, static_cast<cell>(player_id));
+
+            cell retval{};
+
+            amx_Exec(_amx, &retval, pub->get_index());
+
+            return retval == 1;
+        }
+
+        // forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
+        inline bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
+            const auto &pub = _publics[ON_OUTCOMING_PACKET];
+
+            if (!pub->exists()) {
+                return true;
+            }
+
+            if (bs) {
+                bs->ResetReadPointer();
+            }
+
+            amx_Push(_amx, reinterpret_cast<cell>(bs));
+            amx_Push(_amx, static_cast<cell>(packet_id));
+            amx_Push(_amx, static_cast<cell>(player_id));
+
+            cell retval{};
+
+            amx_Exec(_amx, &retval, pub->get_index());
+
+            return retval == 1;
+        }
+
+        // forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
+        bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
+            const auto &pub = _publics[ON_OUTCOMIMG_RPC];
+
+            if (!pub->exists()) {
+                return true;
+            }
+
+            if (bs) {
+                bs->ResetReadPointer();
+            }
+
+            amx_Push(_amx, reinterpret_cast<cell>(bs));
+            amx_Push(_amx, static_cast<cell>(rpc_id));
+            amx_Push(_amx, static_cast<cell>(player_id));
+
+            cell retval{};
+
+            amx_Exec(_amx, &retval, pub->get_index());
+
+            return retval == 1;
+        }
+
+        inline AMX *get_amx() const {
+            return _amx;
+        }
+
+    private:
+        AMX *_amx;
+        std::array<std::unique_ptr<Public>, NUMBER_OF_PUBLICS> _publics{};
     };
 
-    std::list<Script> scripts;
+    class Scripts {
+    public:
+        void load(AMX *amx, bool is_gamemode) {
+            auto script = std::make_unique<Script>(amx);
 
-    // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
+            if (is_gamemode) {
+                _scripts.push_back(std::move(script));
+            } else {
+                _scripts.push_front(std::move(script));
+            }
+        }
+
+        void unload(AMX *amx) {
+            const auto script = std::find_if(_scripts.begin(), _scripts.end(), [amx](const std::unique_ptr<Script> &script) {
+                return script->get_amx() == amx;
+            });
+
+            if (script != _scripts.end()) {
+                _scripts.erase(script);
+            }
+        }
+
+        bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
+            return std::all_of(_scripts.begin(), _scripts.end(), [=](const std::unique_ptr<Script> &script) {
+                return script->OnIncomingPacket(player_id, packet_id, bs);
+            });
+        }
+
+        bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
+            return std::all_of(_scripts.begin(), _scripts.end(), [=](const std::unique_ptr<Script> &script) {
+                return script->OnIncomingRPC(player_id, rpc_id, bs);
+            });
+        }
+
+        bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
+            return std::all_of(_scripts.begin(), _scripts.end(), [=](const std::unique_ptr<Script> &script) {
+                return script->OnOutcomingPacket(player_id, packet_id, bs);
+            });
+        }
+
+        bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
+            return std::all_of(_scripts.begin(), _scripts.end(), [=](const std::unique_ptr<Script> &script) {
+                return script->OnOutcomingRPC(player_id, rpc_id, bs);
+            });
+        }
+
+    private:
+        std::list<std::unique_ptr<Script>> _scripts;
+    };
+
+    Scripts scripts;
+
     bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-        cell retval{};
-
-        for (const auto &script : scripts) {
-            const auto &pub = script.publics[ON_INCOMING_PACKET];
-
-            if (pub.exists) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
-
-                amx_Push(script.amx, reinterpret_cast<cell>(bs));
-                amx_Push(script.amx, static_cast<cell>(packet_id));
-                amx_Push(script.amx, static_cast<cell>(player_id));
-
-                amx_Exec(script.amx, &retval, pub.index);
-
-                if (retval == 0) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return scripts.OnIncomingPacket(player_id, packet_id, bs);
     }
 
-    // forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
     bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-        cell retval{};
-
-        for (const auto &script : scripts) {
-            const auto &pub = script.publics[ON_INCOMING_RPC];
-
-            if (pub.exists) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
-
-                amx_Push(script.amx, reinterpret_cast<cell>(bs));
-                amx_Push(script.amx, static_cast<cell>(rpc_id));
-                amx_Push(script.amx, static_cast<cell>(player_id));
-
-                amx_Exec(script.amx, &retval, pub.index);
-
-                if (retval == 0) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return scripts.OnIncomingRPC(player_id, rpc_id, bs);
     }
 
-    // forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
     bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-        cell retval{};
-
-        for (const auto &script : scripts) {
-            const auto &pub = script.publics[ON_OUTCOMING_PACKET];
-
-            if (pub.exists) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
-
-                amx_Push(script.amx, reinterpret_cast<cell>(bs));
-                amx_Push(script.amx, static_cast<cell>(packet_id));
-                amx_Push(script.amx, static_cast<cell>(player_id));
-
-                amx_Exec(script.amx, &retval, pub.index);
-
-                if (retval == 0) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return scripts.OnOutcomingPacket(player_id, packet_id, bs);
     }
 
-    // forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
     bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-        cell retval{};
-
-        for (const auto &script : scripts) {
-            const auto &pub = script.publics[ON_OUTCOMIMG_RPC];
-
-            if (pub.exists) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
-
-                amx_Push(script.amx, reinterpret_cast<cell>(bs));
-                amx_Push(script.amx, static_cast<cell>(rpc_id));
-                amx_Push(script.amx, static_cast<cell>(player_id));
-
-                amx_Exec(script.amx, &retval, pub.index);
-
-                if (retval == 0) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return scripts.OnOutcomingRPC(player_id, rpc_id, bs);
     }
 
-    void OnAmxLoad(AMX *amx) {
-        scripts.push_back(Script{ amx });
+    void OnAmxLoad(AMX *amx, bool is_gamemode) {
+        scripts.load(amx, is_gamemode);
     }
 
     void OnAmxUnload(AMX *amx) {
-        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const Script &script) {
-            return script.amx == amx;
-        });
-
-        if (script != scripts.end()) {
-            scripts.erase(script);
-        }
-    }
-
-    void Init(AMX *amx_gamemode) {
-        scripts.sort([=](const Script &a, const Script &b) {
-            return a.amx != amx_gamemode; // move gamemode at the end 
-        });
-
-        for (auto &script : scripts) {
-            for (auto &pub : script.publics) {
-                pub.exists = (amx_FindPublic(script.amx, pub.name.c_str(), &pub.index) == AMX_ERR_NONE);
-            }
-        }
+        scripts.unload(amx);
     }
 };
 
@@ -330,9 +385,7 @@ namespace Hooks {
         hook_rakserver__send,
         hook_rakserver__rpc,
         hook_rakserver__receive,
-        hook_rakserver__register_as_remote_procedure_call,
-        hook_jmp_amx_exec,
-        hook_call_amx_exec;
+        hook_rakserver__register_as_remote_procedure_call;
 
     std::array<RPCFunction, MAX_RPC_MAP_SIZE>
         original_rpc,
@@ -414,44 +467,6 @@ namespace Hooks {
 
     class InternalHooks {
     public:
-        static int AMXAPI jmp_amx_Exec(AMX *amx, cell *retval, int index) {
-            hook_jmp_amx_exec->disable();
-
-            const auto result = urmem::call_function<urmem::calling_convention::cdeclcall, int>(
-                hook_jmp_amx_exec->get_original_addr(),
-                amx,
-                retval,
-                index
-                );
-
-            if (index == AMX_EXEC_MAIN) {
-                hook_call_amx_exec = std::make_shared<urmem::hook>(
-                    urmem::get_call_address(),
-                    urmem::get_func_addr(&InternalHooks::call_amx_Exec),
-                    urmem::hook::type::call
-                    );
-
-                Callbacks::Init(amx);
-            } else {
-                hook_jmp_amx_exec->enable();
-            }
-
-            return result;
-        }
-
-        static int AMXAPI call_amx_Exec(AMX *amx, cell *retval, int index) {
-            urmem::hook::raii scope(*hook_call_amx_exec);
-
-            Callbacks::Init(amx);
-
-            return urmem::call_function<urmem::calling_convention::cdeclcall, int>(
-                hook_call_amx_exec->get_original_addr(),
-                amx,
-                retval,
-                index
-                );
-        }
-
         static bool THISCALL RakServer__Send(void *_this, RakNet::BitStream *bitStream,
                                              int priority, int reliability,
                                              char orderingChannel, PlayerID playerId,
@@ -635,11 +650,6 @@ namespace Hooks {
                 hook_get_rak_server_interface = std::make_shared<urmem::hook>(
                     addr,
                     urmem::get_func_addr(&InternalHooks::GetRakServerInterface)
-                    );
-
-                hook_jmp_amx_exec = std::make_shared<urmem::hook>(
-                    urmem::pointer(pAMXFunctions).field<urmem::address_t>(sizeof(urmem::pointer) * PLUGIN_AMX_EXPORT_Exec),
-                    urmem::get_func_addr(&InternalHooks::jmp_amx_Exec)
                     );
 
                 return true;
@@ -1307,9 +1317,10 @@ namespace Plugin {
     }
 
     void AmxLoad(AMX *amx) {
-        cell include_version{};
+        cell include_version{}, is_gamemode{};
 
-        bool exists = Utils::get_public_var(amx, Settings::kPublicVarNameVersion, include_version);
+        bool exists = Utils::get_public_var(amx, Settings::kPublicVarNameVersion, include_version) &&
+            Utils::get_public_var(amx, Settings::kPublicVarNameIsGamemode, is_gamemode);
 
         if (exists) {
             if (include_version != PAWNRAKNET_INCLUDE_VERSION) {
@@ -1318,7 +1329,7 @@ namespace Plugin {
                 return;
             }
 
-            Callbacks::OnAmxLoad(amx);
+            Callbacks::OnAmxLoad(amx, is_gamemode == 1);
 
             Natives::Register(amx);
         }
