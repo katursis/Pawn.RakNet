@@ -35,7 +35,9 @@
 
 #include "Pawn.RakNet.inc"
 
+#include "Logger.h"
 #include "Settings.h"
+#include "Utils.h"
 #include "Scripts.h"
 
 #ifdef THISCALL
@@ -48,53 +50,7 @@
 #define THISCALL
 #endif
 
-using logprintf_t = void(*)(const char *format, ...);
-
-logprintf_t logprintf;
-
 extern void *pAMXFunctions;
-
-namespace Utils {
-    inline bool check_params(const char *native, int count, cell *params) {
-        if (params[0] != (count * sizeof(cell))) {
-            logprintf("[%s] %s: invalid number of parameters. Should be %d", Settings::kPluginName, native, count);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    inline int set_amxstring(AMX *amx, cell amx_addr, const char *source, int max) {
-        cell *dest = reinterpret_cast<cell *>(
-            amx->base + static_cast<int>(reinterpret_cast<AMX_HEADER *>(amx->base)->dat + amx_addr)
-            );
-
-        cell *start = dest;
-
-        while (max-- && *source) {
-            *dest++ = static_cast<cell>(*source++);
-        }
-
-        *dest = 0;
-
-        return dest - start;
-    }
-
-    inline bool get_public_var(AMX *amx, const char *name, cell &out) {
-        cell addr{},
-            *phys_addr{};
-
-        if ((amx_FindPubVar(amx, name, &addr) == AMX_ERR_NONE) &&
-            (amx_GetAddr(amx, addr, &phys_addr) == AMX_ERR_NONE)) {
-            out = *phys_addr;
-
-            return true;
-        }
-
-        return false;
-    }
-}
 
 namespace Addresses {
     urmem::address_t
@@ -127,12 +83,12 @@ namespace Addresses {
             FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX = vmt[59];
 #endif
 
-            logprintf("[%s] Addresses found", Settings::kPluginName);
+            Logger::instance()->Write("[%s] Addresses found", Settings::kPluginName);
 
             return true;
         }
 
-        logprintf("[%s] Addresses not found", Settings::kPluginName);
+        Logger::instance()->Write("[%s] Addresses not found", Settings::kPluginName);
 
         return false;
     }
@@ -330,7 +286,7 @@ namespace Hooks {
                 try {
                     original_rpc.at(rpc_id)(p);
                 } catch (const std::exception &e) {
-                    logprintf("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+                    Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
                 }
             }
         }
@@ -368,7 +324,7 @@ namespace Hooks {
 
                 RPCHandle::Create();
 
-                logprintf("[%s] Initialized", Settings::kPluginName);
+                Logger::instance()->Write("[%s] Initialized", Settings::kPluginName);
             }
 
             return rakserver;
@@ -399,10 +355,10 @@ namespace Hooks {
         static void Run(void) {}
     };
 
-    bool Init(void) {
+    bool Init(void *addr_in_server) {
         urmem::sig_scanner scanner;
 
-        if (scanner.init(urmem::get_func_addr(logprintf))) {
+        if (scanner.init(addr_in_server)) {
             urmem::address_t addr{};
 
             if (scanner.find(Settings::kPattern, Settings::kMask, addr)) {
@@ -437,7 +393,7 @@ namespace Natives {
                 static_cast<int>(params[5])
             );
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -461,7 +417,7 @@ namespace Natives {
                 static_cast<int>(params[4])
             );
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -491,7 +447,7 @@ namespace Natives {
 
             *cptr = 0;
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -510,7 +466,7 @@ namespace Natives {
         if (bs) {
             bs->Reset();
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -529,7 +485,7 @@ namespace Natives {
         if (bs) {
             bs->ResetReadPointer();
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -548,7 +504,7 @@ namespace Natives {
         if (bs) {
             bs->ResetWritePointer();
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -567,7 +523,7 @@ namespace Natives {
         if (bs) {
             bs->IgnoreBits(static_cast<int>(params[2]));
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -586,7 +542,7 @@ namespace Natives {
         if (bs) {
             bs->SetWriteOffset(static_cast<int>(params[2]));
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -607,7 +563,7 @@ namespace Natives {
 
             *cptr = static_cast<cell>(bs->GetWriteOffset());
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -626,7 +582,7 @@ namespace Natives {
         if (bs) {
             bs->SetReadOffset(static_cast<int>(params[2]));
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -647,7 +603,7 @@ namespace Natives {
 
             *cptr = static_cast<cell>(bs->GetReadOffset());
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -668,7 +624,7 @@ namespace Natives {
 
             *cptr = static_cast<cell>(bs->GetNumberOfBitsUsed());
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -689,7 +645,7 @@ namespace Natives {
 
             *cptr = static_cast<cell>(bs->GetNumberOfBytesUsed());
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -710,7 +666,7 @@ namespace Natives {
 
             *cptr = static_cast<cell>(bs->GetNumberOfUnreadBits());
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -721,7 +677,7 @@ namespace Natives {
     // native BS_WriteValue(BitStream:bs, {Float,_}:...);
     cell AMX_NATIVE_CALL n_BS_WriteValue(AMX *amx, cell *params) {
         if (params[0] < (3 * sizeof(cell))) {
-            logprintf("[%s] %s: invalid number of parameters. Should be at least 3", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid number of parameters. Should be at least 3", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -801,13 +757,13 @@ namespace Natives {
                         bs->WriteCompressed(!!(*cptr_value));
                         break;
                     default:
-                        logprintf("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
+                        Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
 
                         return 0;
                 }
             }
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -818,7 +774,7 @@ namespace Natives {
     // native BS_ReadValue(BitStream:bs, {Float,_}:...);
     cell AMX_NATIVE_CALL n_BS_ReadValue(AMX *amx, cell *params) {
         if (params[0] < 3 * sizeof(cell)) {
-            logprintf("[%s] %s: invalid number of parameters. Should be at least 3", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid number of parameters. Should be at least 3", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -1014,13 +970,13 @@ namespace Natives {
                         break;
                     }
                     default:
-                        logprintf("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
+                        Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
 
                         return 0;
                 }
             }
         } else {
-            logprintf("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
@@ -1059,20 +1015,24 @@ namespace Natives {
 };
 
 namespace Plugin {
-    bool Load(void) {
-        if (Hooks::Init()) {
-            logprintf("%s plugin v%s by urShadow loaded", Settings::kPluginName, Settings::kPluginVersion);
+    bool Load(void **ppData) {
+        pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
+
+        Logger::instance()->Init(ppData[PLUGIN_DATA_LOGPRINTF]);
+
+        if (Hooks::Init(ppData[PLUGIN_DATA_LOGPRINTF])) {
+            Logger::instance()->Write("%s plugin v%s by urShadow loaded", Settings::kPluginName, Settings::kPluginVersion);
 
             return true;
         }
 
-        logprintf("[%s] %s: RakServer address not found", Settings::kPluginName, __FUNCTION__);
+        Logger::instance()->Write("[%s] %s: RakServer address not found", Settings::kPluginName, __FUNCTION__);
 
         return false;
     }
 
     void Unload(void) {
-        logprintf("%s plugin v%s by urShadow unloaded", Settings::kPluginName, Settings::kPluginVersion);
+        Logger::instance()->Write("%s plugin v%s by urShadow unloaded", Settings::kPluginName, Settings::kPluginVersion);
     }
 
     void AmxLoad(AMX *amx) {
@@ -1083,7 +1043,7 @@ namespace Plugin {
 
         if (exists) {
             if (include_version != PAWNRAKNET_INCLUDE_VERSION) {
-                logprintf("[%s] %s: Please update Pawn.RakNet.inc file to the latest version", Settings::kPluginName, __FUNCTION__);
+                Logger::instance()->Write("[%s] %s: Please update Pawn.RakNet.inc file to the latest version", Settings::kPluginName, __FUNCTION__);
 
                 return;
             }
@@ -1104,11 +1064,7 @@ PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports() {
 }
 
 PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData) {
-    pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
-
-    logprintf = reinterpret_cast<logprintf_t>(ppData[PLUGIN_DATA_LOGPRINTF]);
-
-    return Plugin::Load();
+    return Plugin::Load(ppData);
 }
 
 PLUGIN_EXPORT void PLUGIN_CALL Unload() {

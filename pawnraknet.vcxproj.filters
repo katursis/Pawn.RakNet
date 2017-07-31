@@ -36,6 +36,12 @@
     <ClInclude Include="src\Settings.h">
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils.h">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logger.h">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
