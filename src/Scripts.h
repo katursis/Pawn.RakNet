@@ -34,7 +34,7 @@ public:
 
     explicit Script(AMX *amx) : _amx(amx) {
         const auto make_public = [amx](const std::string &name) {
-            return std::make_unique<Public>(name, amx);
+            return std::unique_ptr<Public>(new Public{ name, amx });
         };
 
         _publics[ON_INCOMING_PACKET] = make_public("OnIncomingPacket");
@@ -147,7 +147,7 @@ private:
 class Scripts : public Singleton<Scripts> {
 public:
     void Load(AMX *amx, bool is_gamemode) {
-        auto script = std::make_unique<Script>(amx);
+        auto script = std::unique_ptr<Script>(new Script{ amx });
 
         if (is_gamemode) {
             _scripts.push_back(std::move(script));
