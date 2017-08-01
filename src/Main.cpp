@@ -382,23 +382,21 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            Hooks::SendRPC(
-                static_cast<int>(params[2]),
-                static_cast<int>(params[3]),
-                bs,
-                static_cast<int>(params[4]),
-                static_cast<int>(params[5])
-            );
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
 
-        return 1;
+        const int
+            player_id = static_cast<int>(params[2]),
+            rpc_id = static_cast<int>(params[3]),
+            priority = static_cast<int>(params[4]),
+            reliability = static_cast<int>(params[5]);
+
+        return static_cast<cell>(Hooks::SendRPC(player_id, rpc_id, bs, priority, reliability));
     }
 
     // native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
@@ -407,22 +405,20 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            Hooks::SendPacket(
-                static_cast<int>(params[2]),
-                bs,
-                static_cast<int>(params[3]),
-                static_cast<int>(params[4])
-            );
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
 
-        return 1;
+        const int
+            player_id = static_cast<int>(params[2]),
+            priority = static_cast<int>(params[3]),
+            reliability = static_cast<int>(params[4]);
+
+        return static_cast<cell>(Hooks::SendPacket(player_id, bs, priority, reliability));
     }
 
     // native BitStream:BS_New();
@@ -431,7 +427,7 @@ namespace Natives {
             return 0;
         }
 
-        return reinterpret_cast<cell>(new RakNet::BitStream);
+        return reinterpret_cast<cell>(new RakNet::BitStream{});
     }
 
     // native BS_Delete(&BitStream:bs);
@@ -440,17 +436,23 @@ namespace Natives {
             return 0;
         }
 
-        cell *cptr{}; amx_GetAddr(amx, params[1], &cptr);
+        cell *cptr{};
 
-        if (*cptr) {
-            delete reinterpret_cast<RakNet::BitStream *>(*cptr);
+        if (amx_GetAddr(amx, params[1], &cptr) != AMX_ERR_NONE) {
+            Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
 
-            *cptr = 0;
-        } else {
+            return 0;
+        }
+
+        if (!*cptr) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        delete reinterpret_cast<RakNet::BitStream *>(*cptr);
+
+        *cptr = 0;
 
         return 1;
     }
@@ -461,15 +463,15 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            bs->Reset();
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        bs->Reset();
 
         return 1;
     }
@@ -480,15 +482,15 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            bs->ResetReadPointer();
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        bs->ResetReadPointer();
 
         return 1;
     }
@@ -499,15 +501,15 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            bs->ResetWritePointer();
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        bs->ResetWritePointer();
 
         return 1;
     }
@@ -518,15 +520,17 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            bs->IgnoreBits(static_cast<int>(params[2]));
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        const int number_of_bits = static_cast<int>(params[2]);
+
+        bs->IgnoreBits(number_of_bits);
 
         return 1;
     }
@@ -537,15 +541,17 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            bs->SetWriteOffset(static_cast<int>(params[2]));
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        const int offset = static_cast<int>(params[2]);
+
+        bs->SetWriteOffset(offset);
 
         return 1;
     }
@@ -556,17 +562,23 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
-
-            *cptr = static_cast<cell>(bs->GetWriteOffset());
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        cell *cptr{};
+
+        if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
+            Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        *cptr = static_cast<cell>(bs->GetWriteOffset());
 
         return 1;
     }
@@ -577,15 +589,17 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            bs->SetReadOffset(static_cast<int>(params[2]));
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        const int offset = static_cast<int>(params[2]);
+
+        bs->SetReadOffset(offset);
 
         return 1;
     }
@@ -596,17 +610,23 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
-
-            *cptr = static_cast<cell>(bs->GetReadOffset());
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        cell *cptr{};
+
+        if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
+            Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        *cptr = static_cast<cell>(bs->GetReadOffset());
 
         return 1;
     }
@@ -617,17 +637,23 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
-
-            *cptr = static_cast<cell>(bs->GetNumberOfBitsUsed());
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        cell *cptr{};
+
+        if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
+            Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        *cptr = static_cast<cell>(bs->GetNumberOfBitsUsed());
 
         return 1;
     }
@@ -638,17 +664,23 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
-
-            *cptr = static_cast<cell>(bs->GetNumberOfBytesUsed());
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        cell *cptr{};
+
+        if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
+            Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        *cptr = static_cast<cell>(bs->GetNumberOfBytesUsed());
 
         return 1;
     }
@@ -659,113 +691,123 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            cell *cptr{}; amx_GetAddr(amx, params[2], &cptr);
-
-            *cptr = static_cast<cell>(bs->GetNumberOfUnreadBits());
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
+
+        cell *cptr{};
+
+        if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
+            Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        *cptr = static_cast<cell>(bs->GetNumberOfUnreadBits());
 
         return 1;
     }
 
     // native BS_WriteValue(BitStream:bs, {Float,_}:...);
     cell AMX_NATIVE_CALL n_BS_WriteValue(AMX *amx, cell *params) {
-        if (params[0] < (3 * sizeof(cell))) {
+        if (params[0] < (sizeof(cell) * 3)) {
             Logger::instance()->Write("[%s] %s: invalid number of parameters. Should be at least 3", Settings::kPluginName, __FUNCTION__);
 
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            cell *cptr_type{}, *cptr_value{};
-
-            for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
-                amx_GetAddr(amx, params[i + 1], &cptr_type);
-                amx_GetAddr(amx, params[i + 2], &cptr_value);
-
-                auto type = static_cast<PR_ValueType>(*cptr_type);
-
-                switch (type) {
-                    case PR_INT8:
-                        bs->Write(static_cast<char>(*cptr_value));
-                        break;
-                    case PR_INT16:
-                        bs->Write(static_cast<short>(*cptr_value));
-                        break;
-                    case PR_INT32:
-                        bs->Write(static_cast<int>(*cptr_value));
-                        break;
-                    case PR_UINT8:
-                        bs->Write(static_cast<unsigned char>(*cptr_value));
-                        break;
-                    case PR_UINT16:
-                        bs->Write(static_cast<unsigned short>(*cptr_value));
-                        break;
-                    case PR_UINT32:
-                        bs->Write(static_cast<unsigned int>(*cptr_value));
-                        break;
-                    case PR_FLOAT:
-                        bs->Write(amx_ctof(*cptr_value));
-                        break;
-                    case PR_BOOL:
-                        bs->Write(!!(*cptr_value));
-                        break;
-                    case PR_STRING:
-                    {
-                        int size{}; amx_StrLen(cptr_value, &size);
-
-                        char *str = new char[size + 1]{};
-
-                        amx_GetString(str, cptr_value, 0, size + 1);
-
-                        bs->Write(str, size);
-
-                        delete[] str;
-
-                        break;
-                    }
-                    case PR_CINT8:
-                        bs->WriteCompressed(static_cast<char>(*cptr_value));
-                        break;
-                    case PR_CINT16:
-                        bs->WriteCompressed(static_cast<short>(*cptr_value));
-                        break;
-                    case PR_CINT32:
-                        bs->WriteCompressed(static_cast<int>(*cptr_value));
-                        break;
-                    case PR_CUINT8:
-                        bs->WriteCompressed(static_cast<unsigned char>(*cptr_value));
-                        break;
-                    case PR_CUINT16:
-                        bs->WriteCompressed(static_cast<unsigned short>(*cptr_value));
-                        break;
-                    case PR_CUINT32:
-                        bs->WriteCompressed(static_cast<unsigned int>(*cptr_value));
-                        break;
-                    case PR_CFLOAT:
-                        bs->WriteCompressed(amx_ctof(*cptr_value));
-                        break;
-                    case PR_CBOOL:
-                        bs->WriteCompressed(!!(*cptr_value));
-                        break;
-                    default:
-                        Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
-
-                        return 0;
-                }
-            }
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
+        }
+
+        cell *cptr_type{}, *cptr_value{};
+
+        for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
+            if (amx_GetAddr(amx, params[i + 1], &cptr_type) != AMX_ERR_NONE ||
+                amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE) {
+                Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
+
+                return 0;
+            }
+
+            const auto type = static_cast<PR_ValueType>(*cptr_type);
+
+            switch (type) {
+                case PR_STRING:
+                {
+                    int size{}; amx_StrLen(cptr_value, &size);
+
+                    char *str = new char[size + 1]{};
+
+                    amx_GetString(str, cptr_value, 0, size + 1);
+
+                    bs->Write(str, size);
+
+                    delete[] str;
+
+                    break;
+                }
+                case PR_INT8:
+                    bs->Write(static_cast<char>(*cptr_value));
+                    break;
+                case PR_INT16:
+                    bs->Write(static_cast<short>(*cptr_value));
+                    break;
+                case PR_INT32:
+                    bs->Write(static_cast<int>(*cptr_value));
+                    break;
+                case PR_UINT8:
+                    bs->Write(static_cast<unsigned char>(*cptr_value));
+                    break;
+                case PR_UINT16:
+                    bs->Write(static_cast<unsigned short>(*cptr_value));
+                    break;
+                case PR_UINT32:
+                    bs->Write(static_cast<unsigned int>(*cptr_value));
+                    break;
+                case PR_FLOAT:
+                    bs->Write(amx_ctof(*cptr_value));
+                    break;
+                case PR_BOOL:
+                    bs->Write(!!(*cptr_value));
+                    break;
+                case PR_CINT8:
+                    bs->WriteCompressed(static_cast<char>(*cptr_value));
+                    break;
+                case PR_CINT16:
+                    bs->WriteCompressed(static_cast<short>(*cptr_value));
+                    break;
+                case PR_CINT32:
+                    bs->WriteCompressed(static_cast<int>(*cptr_value));
+                    break;
+                case PR_CUINT8:
+                    bs->WriteCompressed(static_cast<unsigned char>(*cptr_value));
+                    break;
+                case PR_CUINT16:
+                    bs->WriteCompressed(static_cast<unsigned short>(*cptr_value));
+                    break;
+                case PR_CUINT32:
+                    bs->WriteCompressed(static_cast<unsigned int>(*cptr_value));
+                    break;
+                case PR_CFLOAT:
+                    bs->WriteCompressed(amx_ctof(*cptr_value));
+                    break;
+                case PR_CBOOL:
+                    bs->WriteCompressed(!!(*cptr_value));
+                    break;
+                default:
+                    Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
+
+                    return 0;
+            }
         }
 
         return 1;
@@ -811,7 +853,7 @@ namespace Natives {
 
     // native BS_ReadValue(BitStream:bs, {Float,_}:...);
     cell AMX_NATIVE_CALL n_BS_ReadValue(AMX *amx, cell *params) {
-        if (params[0] < 3 * sizeof(cell)) {
+        if (params[0] < sizeof(cell) * 3) {
             Logger::instance()->Write("[%s] %s: invalid number of parameters. Should be at least 3", Settings::kPluginName, __FUNCTION__);
 
             return 0;
@@ -819,92 +861,96 @@ namespace Natives {
 
         const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
-        if (bs) {
-            cell *cptr_type{}, *cptr_value{};
-
-            for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
-                amx_GetAddr(amx, params[i + 1], &cptr_type);
-                amx_GetAddr(amx, params[i + 2], &cptr_value);
-
-                const auto type = static_cast<PR_ValueType>(*cptr_type);
-
-                switch (type) {
-                    case PR_STRING:
-                    {
-                        cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
-
-                        std::size_t size = *cptr_size;
-
-                        char *str = new char[size + 1]{};
-
-                        bs->Read(str, size);
-
-                        Utils::set_amxstring(amx, params[i + 2], str, size);
-
-                        delete[] str;
-
-                        ++i;
-
-                        break;
-                    }
-                    case PR_INT8:
-                        *cptr_value = Value<char>::Read(bs);
-                        break;
-                    case PR_INT16:
-                        *cptr_value = Value<short>::Read(bs);
-                        break;
-                    case PR_INT32:
-                        *cptr_value = Value<int>::Read(bs);
-                        break;
-                    case PR_UINT8:
-                        *cptr_value = Value<unsigned char>::Read(bs);
-                        break;
-                    case PR_UINT16:
-                        *cptr_value = Value<unsigned short>::Read(bs);
-                        break;
-                    case PR_UINT32:
-                        *cptr_value = Value<unsigned int>::Read(bs);
-                        break;
-                    case PR_FLOAT:
-                        *cptr_value = Value<float>::Read(bs);
-                        break;
-                    case PR_BOOL:
-                        *cptr_value = Value<bool>::Read(bs);
-                        break;
-                    case PR_CINT8:
-                        *cptr_value = Value<char>::ReadCompressed(bs);
-                        break;
-                    case PR_CINT16:
-                        *cptr_value = Value<short>::ReadCompressed(bs);
-                        break;
-                    case PR_CINT32:
-                        *cptr_value = Value<int>::ReadCompressed(bs);
-                        break;
-                    case PR_CUINT8:
-                        *cptr_value = Value<unsigned char>::ReadCompressed(bs);
-                        break;
-                    case PR_CUINT16:
-                        *cptr_value = Value<unsigned short>::ReadCompressed(bs);
-                        break;
-                    case PR_CUINT32:
-                        *cptr_value = Value<unsigned int>::ReadCompressed(bs);
-                        break;
-                    case PR_CFLOAT:
-                        *cptr_value = Value<float>::ReadCompressed(bs);
-                        break;
-                    case PR_CBOOL:
-                        *cptr_value = Value<bool>::ReadCompressed(bs);
-                        break;
-                    default:
-                        Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
-
-                        return 0;
-                }
-            }
-        } else {
+        if (!bs) {
             Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
 
             return 0;
+        }
+
+        cell *cptr_type{}, *cptr_value{};
+
+        for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
+            if (amx_GetAddr(amx, params[i + 1], &cptr_type) != AMX_ERR_NONE ||
+                amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE) {
+                Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
+
+                return 0;
+            }
+
+            const auto type = static_cast<PR_ValueType>(*cptr_type);
+
+            switch (type) {
+                case PR_STRING:
+                {
+                    cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
+
+                    std::size_t size = *cptr_size;
+
+                    char *str = new char[size + 1]{};
+
+                    bs->Read(str, size);
+
+                    Utils::set_amxstring(amx, params[i + 2], str, size);
+
+                    delete[] str;
+
+                    ++i;
+
+                    break;
+                }
+                case PR_INT8:
+                    *cptr_value = Value<char>::Read(bs);
+                    break;
+                case PR_INT16:
+                    *cptr_value = Value<short>::Read(bs);
+                    break;
+                case PR_INT32:
+                    *cptr_value = Value<int>::Read(bs);
+                    break;
+                case PR_UINT8:
+                    *cptr_value = Value<unsigned char>::Read(bs);
+                    break;
+                case PR_UINT16:
+                    *cptr_value = Value<unsigned short>::Read(bs);
+                    break;
+                case PR_UINT32:
+                    *cptr_value = Value<unsigned int>::Read(bs);
+                    break;
+                case PR_FLOAT:
+                    *cptr_value = Value<float>::Read(bs);
+                    break;
+                case PR_BOOL:
+                    *cptr_value = Value<bool>::Read(bs);
+                    break;
+                case PR_CINT8:
+                    *cptr_value = Value<char>::ReadCompressed(bs);
+                    break;
+                case PR_CINT16:
+                    *cptr_value = Value<short>::ReadCompressed(bs);
+                    break;
+                case PR_CINT32:
+                    *cptr_value = Value<int>::ReadCompressed(bs);
+                    break;
+                case PR_CUINT8:
+                    *cptr_value = Value<unsigned char>::ReadCompressed(bs);
+                    break;
+                case PR_CUINT16:
+                    *cptr_value = Value<unsigned short>::ReadCompressed(bs);
+                    break;
+                case PR_CUINT32:
+                    *cptr_value = Value<unsigned int>::ReadCompressed(bs);
+                    break;
+                case PR_CFLOAT:
+                    *cptr_value = Value<float>::ReadCompressed(bs);
+                    break;
+                case PR_CBOOL:
+                    *cptr_value = Value<bool>::ReadCompressed(bs);
+                    break;
+                default:
+                    Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
+
+                    return 0;
+            }
         }
 
         return 1;
