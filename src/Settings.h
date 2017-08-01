@@ -1,9 +1,8 @@
 #ifndef SETTINGS_H_
 #define SETTINGS_H_
 
-class Settings {
-public:
-    static constexpr char
+namespace Settings {
+    constexpr char
         *kPluginName = "Pawn.RakNet",
         *kPluginVersion = "1.0",
         *kPublicVarNameVersion = "_pawnraknet_version",
@@ -24,6 +23,6 @@ public:
         "\x5D\xC3",
         *kMask = "xxxxxxxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
 #endif
-};
+}
 
 #endif  // SETTINGS_H_

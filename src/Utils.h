@@ -1,9 +1,8 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-class Utils {
-public:
-    static inline bool check_params(const char *native, int count, cell *params) {
+namespace Utils {
+    inline bool check_params(const char *native, int count, cell *params) {
         if (params[0] != (count * sizeof(cell))) {
             Logger::instance()->Write("[%s] %s: invalid number of parameters. Should be %d", Settings::kPluginName, native, count);
 
@@ -13,7 +12,7 @@ public:
         return true;
     }
 
-    static inline int set_amxstring(AMX *amx, cell amx_addr, const char *source, int max) {
+    inline int set_amxstring(AMX *amx, cell amx_addr, const char *source, int max) {
         cell *dest = reinterpret_cast<cell *>(
             amx->base + static_cast<int>(reinterpret_cast<AMX_HEADER *>(amx->base)->dat + amx_addr)
             );
@@ -29,7 +28,7 @@ public:
         return dest - start;
     }
 
-    static inline bool get_public_var(AMX *amx, const char *name, cell &out) {
+    inline bool get_public_var(AMX *amx, const char *name, cell &out) {
         cell addr{},
             *phys_addr{};
 
@@ -42,6 +41,6 @@ public:
 
         return false;
     }
-};
+}
 
 #endif  // UTILS_H_
