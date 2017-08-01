@@ -771,6 +771,44 @@ namespace Natives {
         return 1;
     }
 
+    template<typename T>
+    struct Value {
+        static inline cell Read(RakNet::BitStream *bs) {
+            T value{};
+
+            bs->Read<T>(value);
+
+            return static_cast<cell>(value);
+        }
+
+        static inline cell ReadCompressed(RakNet::BitStream *bs) {
+            T value{};
+
+            bs->ReadCompressed<T>(value);
+
+            return static_cast<cell>(value);
+        }
+    };
+
+    template<>
+    struct Value<float> {
+        static inline cell Read(RakNet::BitStream *bs) {
+            float value{};
+
+            bs->Read<float>(value);
+
+            return amx_ftoc(value);
+        }
+
+        static inline cell ReadCompressed(RakNet::BitStream *bs) {
+            float value{};
+
+            bs->ReadCompressed<float>(value);
+
+            return amx_ftoc(value);
+        }
+    };
+
     // native BS_ReadValue(BitStream:bs, {Float,_}:...);
     cell AMX_NATIVE_CALL n_BS_ReadValue(AMX *amx, cell *params) {
         if (params[0] < 3 * sizeof(cell)) {
@@ -779,7 +817,7 @@ namespace Natives {
             return 0;
         }
 
-        auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
 
         if (bs) {
             cell *cptr_type{}, *cptr_value{};
@@ -788,89 +826,9 @@ namespace Natives {
                 amx_GetAddr(amx, params[i + 1], &cptr_type);
                 amx_GetAddr(amx, params[i + 2], &cptr_value);
 
-                auto type = static_cast<PR_ValueType>(*cptr_type);
+                const auto type = static_cast<PR_ValueType>(*cptr_type);
 
                 switch (type) {
-                    case PR_INT8:
-                    {
-                        char value{};
-
-                        bs->Read(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
-                        break;
-                    }
-                    case PR_INT16:
-                    {
-                        short value{};
-
-                        bs->Read(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
-                        break;
-                    }
-                    case PR_INT32:
-                    {
-                        int value{};
-
-                        bs->Read(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
-                        break;
-                    }
-                    case PR_UINT8:
-                    {
-                        unsigned char value{};
-
-                        bs->Read(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
-                        break;
-                    }
-                    case PR_UINT16:
-                    {
-                        unsigned short value{};
-
-                        bs->Read(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
-                        break;
-                    }
-                    case PR_UINT32:
-                    {
-                        unsigned int value{};
-
-                        bs->Read(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
-                        break;
-                    }
-                    case PR_FLOAT:
-                    {
-                        float value{};
-
-                        bs->Read(value);
-
-                        *cptr_value = amx_ftoc(value);
-
-                        break;
-                    }
-                    case PR_BOOL:
-                    {
-                        bool value{};
-
-                        bs->Read(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
-                        break;
-                    }
                     case PR_STRING:
                     {
                         cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
@@ -889,86 +847,54 @@ namespace Natives {
 
                         break;
                     }
+                    case PR_INT8:
+                        *cptr_value = Value<char>::Read(bs);
+                        break;
+                    case PR_INT16:
+                        *cptr_value = Value<short>::Read(bs);
+                        break;
+                    case PR_INT32:
+                        *cptr_value = Value<int>::Read(bs);
+                        break;
+                    case PR_UINT8:
+                        *cptr_value = Value<unsigned char>::Read(bs);
+                        break;
+                    case PR_UINT16:
+                        *cptr_value = Value<unsigned short>::Read(bs);
+                        break;
+                    case PR_UINT32:
+                        *cptr_value = Value<unsigned int>::Read(bs);
+                        break;
+                    case PR_FLOAT:
+                        *cptr_value = Value<float>::Read(bs);
+                        break;
+                    case PR_BOOL:
+                        *cptr_value = Value<bool>::Read(bs);
+                        break;
                     case PR_CINT8:
-                    {
-                        char value{};
-
-                        bs->ReadCompressed(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
+                        *cptr_value = Value<char>::ReadCompressed(bs);
                         break;
-                    }
                     case PR_CINT16:
-                    {
-                        short value{};
-
-                        bs->ReadCompressed(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
+                        *cptr_value = Value<short>::ReadCompressed(bs);
                         break;
-                    }
                     case PR_CINT32:
-                    {
-                        int value{};
-
-                        bs->ReadCompressed(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
+                        *cptr_value = Value<int>::ReadCompressed(bs);
                         break;
-                    }
                     case PR_CUINT8:
-                    {
-                        unsigned char value{};
-
-                        bs->ReadCompressed(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
+                        *cptr_value = Value<unsigned char>::ReadCompressed(bs);
                         break;
-                    }
                     case PR_CUINT16:
-                    {
-                        unsigned short value{};
-
-                        bs->ReadCompressed(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
+                        *cptr_value = Value<unsigned short>::ReadCompressed(bs);
                         break;
-                    }
                     case PR_CUINT32:
-                    {
-                        unsigned int value{};
-
-                        bs->ReadCompressed(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
+                        *cptr_value = Value<unsigned int>::ReadCompressed(bs);
                         break;
-                    }
                     case PR_CFLOAT:
-                    {
-                        float value{};
-
-                        bs->ReadCompressed(value);
-
-                        *cptr_value = amx_ftoc(value);
-
+                        *cptr_value = Value<float>::ReadCompressed(bs);
                         break;
-                    }
                     case PR_CBOOL:
-                    {
-                        bool value{};
-
-                        bs->ReadCompressed(value);
-
-                        *cptr_value = static_cast<cell>(value);
-
+                        *cptr_value = Value<bool>::ReadCompressed(bs);
                         break;
-                    }
                     default:
                         Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
 
