@@ -595,7 +595,7 @@ namespace Natives {
             static_cast<int>(params[1]),
             public_name.get(),
             static_cast<PR_HandlerType>(params[3])
-            );
+        );
 
         return 1;
     }
