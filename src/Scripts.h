@@ -42,26 +42,6 @@ namespace Scripts {
             _publics[ON_INCOMING_RPC] = make_public("OnIncomingRPC");
             _publics[ON_OUTCOMING_PACKET] = make_public("OnOutcomingPacket");
             _publics[ON_OUTCOMIMG_RPC] = make_public("OnOutcomingRPC");
-
-            int num_publics{};
-
-            amx_NumPublics(amx, &num_publics);
-
-            if (!num_publics) {
-                return;
-            }
-
-            std::regex r(Settings::kRegHandlerPublicRegExp);
-
-            for (int i{}; i < num_publics; i++) {
-                char public_name[32]{};
-
-                amx_GetPublic(amx, i, public_name);
-
-                if (std::regex_match(public_name, r)) {
-                    amx_Exec(amx, nullptr, i);
-                }
-            }
         }
 
         // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
@@ -156,6 +136,28 @@ namespace Scripts {
             return retval == 1;
         }
 
+        void InitHandlersRegistration() {
+            int num_publics{};
+
+            amx_NumPublics(_amx, &num_publics);
+
+            if (!num_publics) {
+                return;
+            }
+
+            std::regex r{ Settings::kRegHandlerPublicRegExp };
+
+            for (int i{}; i < num_publics; i++) {
+                char public_name[32]{};
+
+                amx_GetPublic(_amx, i, public_name);
+
+                if (std::regex_match(public_name, r)) {
+                    amx_Exec(_amx, nullptr, i);
+                }
+            }
+        }
+
         void RegisterHandler(int id, const std::string &public_name, PR_HandlerType type) {
             Logger::instance()->Write("%d %s %d", id, public_name.c_str(), type);
         }
@@ -181,8 +183,12 @@ namespace Scripts {
 
         if (is_gamemode) {
             scripts.push_back(std::move(script));
+
+            scripts.back()->InitHandlersRegistration();
         } else {
             scripts.push_front(std::move(script));
+
+            scripts.front()->InitHandlersRegistration();
         }
     }
 
