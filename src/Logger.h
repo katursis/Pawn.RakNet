@@ -22,4 +22,4 @@ private:
     logprintf_t _logprintf;
 };
 
-#endif  // LOGGER_H_
+#endif // LOGGER_H_

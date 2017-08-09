@@ -7,6 +7,7 @@ namespace Settings {
         *kPluginVersion = "1.0",
         *kPublicVarNameVersion = "_pawnraknet_version",
         *kPublicVarNameIsGamemode = "_pawnraknet_is_gamemode",
+        *kRegHandlerPublicRegExp = R"(^pr_r(?:ir|ip|or|op)_\w+$)",
 #ifdef _WIN32
         *kPattern = "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
         "\x00\x00\x50\x64\x89\x25\x00\x00\x00\x00\x51" \
@@ -25,4 +26,4 @@ namespace Settings {
 #endif
 }
 
-#endif  // SETTINGS_H_
+#endif // SETTINGS_H_

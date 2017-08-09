@@ -582,6 +582,24 @@ namespace Natives {
         return 1;
     }
 
+    // native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
+    cell AMX_NATIVE_CALL n_PR_RegHandler(AMX *amx, cell *params) {
+        if (!Utils::check_params(__FUNCTION__, 3, params)) {
+            return 0;
+        }
+
+        const std::unique_ptr<char[]> public_name{ Utils::get_string(amx, params[2]) };
+
+        Scripts::RegisterHandler(
+            amx,
+            static_cast<int>(params[1]),
+            public_name.get(),
+            static_cast<PR_HandlerType>(params[3])
+            );
+
+        return 1;
+    }
+
     void Register(AMX *amx) {
         const std::vector<AMX_NATIVE_INFO> natives{
             { "BS_RPC", n_BS_RPC },
@@ -605,7 +623,9 @@ namespace Natives {
             { "BS_GetNumberOfUnreadBits", n_BS_GetNumberOfUnreadBits },
 
             { "BS_WriteValue", n_BS_WriteValue },
-            { "BS_ReadValue", n_BS_ReadValue }
+            { "BS_ReadValue", n_BS_ReadValue },
+
+            { "PR_RegHandler", n_PR_RegHandler }
         };
 
         amx_Register(amx, natives.data(), natives.size());

@@ -32,6 +32,7 @@
 #include <list>
 #include <array>
 #include <string>
+#include <regex>
 
 #include "Pawn.RakNet.inc"
 
@@ -78,9 +79,9 @@ namespace Plugin {
                 return;
             }
 
-            Scripts::Load(amx, is_gamemode == 1);
-
             Natives::Register(amx);
+
+            Scripts::Load(amx, is_gamemode == 1);
         }
     }
 

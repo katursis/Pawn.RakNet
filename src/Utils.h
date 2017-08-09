@@ -41,6 +41,25 @@ namespace Utils {
 
         return false;
     }
+
+    inline char *get_string(AMX *amx, cell amx_addr) {
+        int len{};
+        cell *addr{};
+
+        if ((amx_GetAddr(amx, amx_addr, &addr) == AMX_ERR_NONE) &&
+            (amx_StrLen(addr, &len) == AMX_ERR_NONE) &&
+            len) {
+            len++;
+
+            char *str = new (std::nothrow) char[len] {};
+
+            if (str && !amx_GetString(str, addr, 0, len)) {
+                return str;
+            }
+        }
+
+        return nullptr;
+    }
 }
 
-#endif  // UTILS_H_
+#endif // UTILS_H_

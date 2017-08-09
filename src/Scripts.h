@@ -42,6 +42,26 @@ namespace Scripts {
             _publics[ON_INCOMING_RPC] = make_public("OnIncomingRPC");
             _publics[ON_OUTCOMING_PACKET] = make_public("OnOutcomingPacket");
             _publics[ON_OUTCOMIMG_RPC] = make_public("OnOutcomingRPC");
+
+            int num_publics{};
+
+            amx_NumPublics(amx, &num_publics);
+
+            if (!num_publics) {
+                return;
+            }
+
+            std::regex r(Settings::kRegHandlerPublicRegExp);
+
+            for (int i{}; i < num_publics; i++) {
+                char public_name[32]{};
+
+                amx_GetPublic(amx, i, public_name);
+
+                if (std::regex_match(public_name, r)) {
+                    amx_Exec(amx, nullptr, i);
+                }
+            }
         }
 
         // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
@@ -136,13 +156,22 @@ namespace Scripts {
             return retval == 1;
         }
 
+        void RegisterHandler(int id, const std::string &public_name, PR_HandlerType type) {
+            Logger::instance()->Write("%d %s %d", id, public_name.c_str(), type);
+        }
+
         inline AMX *get_amx() const {
             return _amx;
         }
 
     private:
         AMX *_amx;
-        std::array<std::unique_ptr<Public>, NUMBER_OF_PUBLICS> _publics{};
+        std::array<std::unique_ptr<Public>, NUMBER_OF_PUBLICS> _publics;
+
+        std::array<std::unique_ptr<Public>, MAX_PACKET_MAP_SIZE> _publics_incoming_packet;
+        std::array<std::unique_ptr<Public>, MAX_RPC_MAP_SIZE> _publics_incoming_rpc;
+        std::array<std::unique_ptr<Public>, MAX_PACKET_MAP_SIZE> _publics_outcoming_packet;
+        std::array<std::unique_ptr<Public>, MAX_RPC_MAP_SIZE> _publics_outcoming_rpc;
     };
 
     std::list<std::unique_ptr<Script>> scripts;
@@ -164,6 +193,16 @@ namespace Scripts {
 
         if (script != scripts.end()) {
             scripts.erase(script);
+        }
+    }
+
+    void RegisterHandler(AMX *amx, int id, const std::string &public_name, PR_HandlerType type) {
+        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const std::unique_ptr<Script> &script) {
+            return script->get_amx() == amx;
+        });
+
+        if (script != scripts.end()) {
+            (*script)->RegisterHandler(id, public_name, type);
         }
     }
 
@@ -192,4 +231,4 @@ namespace Scripts {
     }
 }
 
-#endif  // SCRIPTS_H_
+#endif // SCRIPTS_H_

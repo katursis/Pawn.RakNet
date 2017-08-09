@@ -32,6 +32,7 @@ struct RPCParameters;
 typedef unsigned short PlayerIndex;
 typedef unsigned char RPCIndex;
 const int MAX_RPC_MAP_SIZE = ((RPCIndex)-1) - 1;
+const int MAX_PACKET_MAP_SIZE = 256;
 
 using RPCFunction = void(*)(RPCParameters *p);
 
