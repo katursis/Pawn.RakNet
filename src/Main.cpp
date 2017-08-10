@@ -40,6 +40,8 @@
 #include "Settings.h"
 #include "Utils.h"
 #include "Scripts.h"
+#include "Addresses.h"
+#include "Functions.h"
 #include "Hooks.h"
 #include "Natives.h"
 

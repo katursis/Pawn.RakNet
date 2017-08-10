@@ -64,6 +64,8 @@
   <ItemGroup>
     <ClInclude Include="lib\RakNet\BitStream.h" />
     <ClInclude Include="lib\urmem\urmem.hpp" />
+    <ClInclude Include="src\Addresses.h" />
+    <ClInclude Include="src\Functions.h" />
     <ClInclude Include="src\Hooks.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\Natives.h" />
