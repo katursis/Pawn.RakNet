@@ -303,8 +303,8 @@ namespace Hooks {
                 custom_rpc.fill(nullptr);
 
                 RPCHandle::Generate();
-
-                Logger::instance()->Write("[%s] Initialized", Settings::kPluginName);
+            } else {
+                Logger::instance()->Write("[%][Error] Invalid RakServer VMT", Settings::kPluginName);
             }
 
             return rakserver;
