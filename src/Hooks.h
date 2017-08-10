@@ -8,7 +8,7 @@
 #ifdef _WIN32
 #define THISCALL __thiscall
 
-enum class RakServerOffsets {
+enum RakServerOffsets {
     SEND = 7,
     RPC = 32,
     RECEIVE = 10,
@@ -285,9 +285,9 @@ namespace Hooks {
                 );
 
             if (const auto vmt = Addresses::Init(reinterpret_cast<urmem::address_t>(rakserver))) {
-                urmem::unprotect_scope scope{ 
-                    reinterpret_cast<urmem::address_t>(&vmt[0]), 
-                    RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL * sizeof(urmem::address_t) 
+                urmem::unprotect_scope scope{
+                    reinterpret_cast<urmem::address_t>(&vmt[0]),
+                    RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL * sizeof(urmem::address_t)
                 };
 
                 vmt[RakServerOffsets::SEND] = urmem::get_func_addr(&RakServer__Send);
