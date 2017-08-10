@@ -590,12 +590,18 @@ namespace Natives {
 
         const std::unique_ptr<char[]> public_name{ Utils::get_string(amx, params[2]) };
 
-        Scripts::RegisterHandler(
-            amx,
-            static_cast<int>(params[1]),
-            public_name.get(),
-            static_cast<PR_HandlerType>(params[3])
-        );
+        try {
+            Scripts::RegisterHandler(
+                amx,
+                static_cast<int>(params[1]),
+                public_name.get(),
+                static_cast<PR_HandlerType>(params[3])
+            );
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+
+            return 0;
+        }
 
         return 1;
     }

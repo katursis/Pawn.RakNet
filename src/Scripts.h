@@ -26,10 +26,10 @@ namespace Scripts {
     class Script {
     public:
         enum Publics {
-            ON_INCOMING_PACKET,
             ON_INCOMING_RPC,
-            ON_OUTCOMING_PACKET,
+            ON_INCOMING_PACKET,
             ON_OUTCOMIMG_RPC,
+            ON_OUTCOMING_PACKET,
             NUMBER_OF_PUBLICS
         };
 
@@ -38,102 +38,182 @@ namespace Scripts {
                 return std::unique_ptr<Public>(new Public{ name, amx });
             };
 
-            _publics[ON_INCOMING_PACKET] = make_public("OnIncomingPacket");
             _publics[ON_INCOMING_RPC] = make_public("OnIncomingRPC");
-            _publics[ON_OUTCOMING_PACKET] = make_public("OnOutcomingPacket");
+            _publics[ON_INCOMING_PACKET] = make_public("OnIncomingPacket");
             _publics[ON_OUTCOMIMG_RPC] = make_public("OnOutcomingRPC");
-        }
-
-        // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
-        inline bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[ON_INCOMING_PACKET];
-
-            if (!pub->exists()) {
-                return true;
-            }
-
-            if (bs) {
-                bs->ResetReadPointer();
-            }
-
-            amx_Push(_amx, reinterpret_cast<cell>(bs));
-            amx_Push(_amx, static_cast<cell>(packet_id));
-            amx_Push(_amx, static_cast<cell>(player_id));
-
-            cell retval{};
-
-            amx_Exec(_amx, &retval, pub->get_index());
-
-            return retval == 1;
+            _publics[ON_OUTCOMING_PACKET] = make_public("OnOutcomingPacket");
         }
 
         // forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
         inline bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
+            cell retval{};
+
             const auto &pub = _publics[ON_INCOMING_RPC];
 
-            if (!pub->exists()) {
-                return true;
+            if (pub->exists()) {
+                if (bs) {
+                    bs->ResetReadPointer();
+                }
+
+                amx_Push(_amx, reinterpret_cast<cell>(bs));
+                amx_Push(_amx, static_cast<cell>(rpc_id));
+                amx_Push(_amx, static_cast<cell>(player_id));
+
+                amx_Exec(_amx, &retval, pub->get_index());
+
+                if (retval == 0) {
+                    return false;
+                }
             }
 
-            if (bs) {
-                bs->ResetReadPointer();
+            // IRPC:<ID>(playerid, BitStream:bs)
+            const auto &handler = _handlers[PR_INCOMING_RPC][rpc_id];
+
+            if (handler && handler->exists()) {
+                if (bs) {
+                    bs->ResetReadPointer();
+                }
+
+                amx_Push(_amx, reinterpret_cast<cell>(bs));
+                amx_Push(_amx, static_cast<cell>(player_id));
+
+                amx_Exec(_amx, &retval, handler->get_index());
+
+                if (retval == 0) {
+                    return false;
+                }
             }
 
-            amx_Push(_amx, reinterpret_cast<cell>(bs));
-            amx_Push(_amx, static_cast<cell>(rpc_id));
-            amx_Push(_amx, static_cast<cell>(player_id));
-
-            cell retval{};
-
-            amx_Exec(_amx, &retval, pub->get_index());
-
-            return retval == 1;
+            return true;
         }
 
-        // forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
-        inline bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[ON_OUTCOMING_PACKET];
-
-            if (!pub->exists()) {
-                return true;
-            }
-
-            if (bs) {
-                bs->ResetReadPointer();
-            }
-
-            amx_Push(_amx, reinterpret_cast<cell>(bs));
-            amx_Push(_amx, static_cast<cell>(packet_id));
-            amx_Push(_amx, static_cast<cell>(player_id));
-
+        // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
+        inline bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
             cell retval{};
 
-            amx_Exec(_amx, &retval, pub->get_index());
+            const auto &pub = _publics[ON_INCOMING_PACKET];
 
-            return retval == 1;
+            if (pub->exists()) {
+                if (bs) {
+                    bs->ResetReadPointer();
+                }
+
+                amx_Push(_amx, reinterpret_cast<cell>(bs));
+                amx_Push(_amx, static_cast<cell>(packet_id));
+                amx_Push(_amx, static_cast<cell>(player_id));
+
+                amx_Exec(_amx, &retval, pub->get_index());
+
+                if (retval == 0) {
+                    return false;
+                }
+            }
+
+            // IPacket:<ID>(playerid, BitStream:bs)
+            const auto &handler = _handlers[PR_INCOMING_PACKET][packet_id];
+
+            if (handler && handler->exists()) {
+                if (bs) {
+                    bs->ResetReadPointer();
+                }
+
+                amx_Push(_amx, reinterpret_cast<cell>(bs));
+                amx_Push(_amx, static_cast<cell>(player_id));
+
+                amx_Exec(_amx, &retval, handler->get_index());
+
+                if (retval == 0) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         // forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
         inline bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[ON_OUTCOMIMG_RPC];
-
-            if (!pub->exists()) {
-                return true;
-            }
-
-            if (bs) {
-                bs->ResetReadPointer();
-            }
-
-            amx_Push(_amx, reinterpret_cast<cell>(bs));
-            amx_Push(_amx, static_cast<cell>(rpc_id));
-            amx_Push(_amx, static_cast<cell>(player_id));
-
             cell retval{};
 
-            amx_Exec(_amx, &retval, pub->get_index());
+            const auto &pub = _publics[ON_OUTCOMIMG_RPC];
 
-            return retval == 1;
+            if (pub->exists()) {
+                if (bs) {
+                    bs->ResetReadPointer();
+                }
+
+                amx_Push(_amx, reinterpret_cast<cell>(bs));
+                amx_Push(_amx, static_cast<cell>(rpc_id));
+                amx_Push(_amx, static_cast<cell>(player_id));
+
+                amx_Exec(_amx, &retval, pub->get_index());
+
+                if (retval == 0) {
+                    return false;
+                }
+            }
+
+            // ORPC:<ID>(playerid, BitStream:bs)
+            const auto &handler = _handlers[PR_OUTCOMING_RPC][rpc_id];
+
+            if (handler && handler->exists()) {
+                if (bs) {
+                    bs->ResetReadPointer();
+                }
+
+                amx_Push(_amx, reinterpret_cast<cell>(bs));
+                amx_Push(_amx, static_cast<cell>(player_id));
+
+                amx_Exec(_amx, &retval, handler->get_index());
+
+                if (retval == 0) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
+        inline bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
+            cell retval{};
+
+            const auto &pub = _publics[ON_OUTCOMING_PACKET];
+
+            if (pub->exists()) {
+                if (bs) {
+                    bs->ResetReadPointer();
+                }
+
+                amx_Push(_amx, reinterpret_cast<cell>(bs));
+                amx_Push(_amx, static_cast<cell>(packet_id));
+                amx_Push(_amx, static_cast<cell>(player_id));
+
+                amx_Exec(_amx, &retval, pub->get_index());
+
+                if (retval == 0) {
+                    return false;
+                }
+            }
+
+            // OPacket:<ID>(playerid, BitStream:bs)
+            const auto &handler = _handlers[PR_OUTCOMING_PACKET][packet_id];
+
+            if (handler && handler->exists()) {
+                if (bs) {
+                    bs->ResetReadPointer();
+                }
+
+                amx_Push(_amx, reinterpret_cast<cell>(bs));
+                amx_Push(_amx, static_cast<cell>(player_id));
+
+                amx_Exec(_amx, &retval, handler->get_index());
+
+                if (retval == 0) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         void InitHandlersRegistration() {
@@ -159,7 +239,7 @@ namespace Scripts {
         }
 
         void RegisterHandler(int id, const std::string &public_name, PR_HandlerType type) {
-            Logger::instance()->Write("%d %s %d", id, public_name.c_str(), type);
+            _handlers.at(type).at(id) = std::unique_ptr<Public>(new Public{ public_name, _amx });
         }
 
         inline AMX *get_amx() const {
@@ -169,11 +249,7 @@ namespace Scripts {
     private:
         AMX *_amx;
         std::array<std::unique_ptr<Public>, NUMBER_OF_PUBLICS> _publics;
-
-        std::array<std::unique_ptr<Public>, MAX_PACKET_MAP_SIZE> _publics_incoming_packet;
-        std::array<std::unique_ptr<Public>, MAX_RPC_MAP_SIZE> _publics_incoming_rpc;
-        std::array<std::unique_ptr<Public>, MAX_PACKET_MAP_SIZE> _publics_outcoming_packet;
-        std::array<std::unique_ptr<Public>, MAX_RPC_MAP_SIZE> _publics_outcoming_rpc;
+        std::array<std::array<std::unique_ptr<Public>, MAX_RPC_MAP_SIZE>, PR_NUMBER_OF_HANDLER_TYPES> _handlers;
     };
 
     std::list<std::unique_ptr<Script>> scripts;

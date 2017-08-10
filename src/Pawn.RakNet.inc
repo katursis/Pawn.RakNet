@@ -32,7 +32,8 @@
         PR_INCOMING_RPC,
         PR_INCOMING_PACKET,
         PR_OUTCOMING_RPC,
-        PR_OUTCOMING_PACKET
+        PR_OUTCOMING_PACKET,
+        PR_NUMBER_OF_HANDLER_TYPES
     };
 
     enum PR_ValueType
