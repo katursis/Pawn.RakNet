@@ -22,7 +22,7 @@ namespace Natives {
             priority = static_cast<int>(params[4]),
             reliability = static_cast<int>(params[5]);
 
-        return static_cast<cell>(Hooks::SendRPC(player_id, rpc_id, bs, priority, reliability));
+        return static_cast<cell>(Functions::SendRPC(player_id, rpc_id, bs, priority, reliability));
     }
 
     // native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
@@ -44,7 +44,7 @@ namespace Natives {
             priority = static_cast<int>(params[3]),
             reliability = static_cast<int>(params[4]);
 
-        return static_cast<cell>(Hooks::SendPacket(player_id, bs, priority, reliability));
+        return static_cast<cell>(Functions::SendPacket(player_id, bs, priority, reliability));
     }
 
     // native BitStream:BS_New();

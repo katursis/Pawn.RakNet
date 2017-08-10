@@ -7,68 +7,63 @@
 
 #ifdef _WIN32
 #define THISCALL __thiscall
+
+enum class RakServerOffsets {
+    SEND = 7,
+    RPC = 32,
+    RECEIVE = 10,
+    REGISTER_AS_REMOTE_PROCEDURE_CALL = 29,
+    DEALLOCATE_PACKET = 12,
+    GET_INDEX_FROM_PLAYER_ID = 57,
+    GET_PLAYER_ID_FROM_INDEX = 58
+};
 #else
 #define THISCALL
+
+enum RakServerOffsets {
+    SEND = 9,
+    RPC = 35,
+    RECEIVE = 11,
+    REGISTER_AS_REMOTE_PROCEDURE_CALL = 30,
+    DEALLOCATE_PACKET = 13,
+    GET_INDEX_FROM_PLAYER_ID = 58,
+    GET_PLAYER_ID_FROM_INDEX = 59
+};
 #endif
 
-namespace Hooks {
-    namespace Addresses {
-        urmem::address_t
-            RAKSERVER,
-            FUNC_RAKSERVER__SEND,
-            FUNC_RAKSERVER__RPC,
-            FUNC_RAKSERVER__RECEIVE,
-            FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
-            FUNC_RAKSERVER__DEALLOCATE_PACKET,
-            FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID,
-            FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX;
+namespace Addresses {
+    urmem::address_t
+        PTR_RAKSERVER,
+        FUNC_RAKSERVER__SEND,
+        FUNC_RAKSERVER__RPC,
+        FUNC_RAKSERVER__RECEIVE,
+        FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
+        FUNC_RAKSERVER__DEALLOCATE_PACKET,
+        FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID,
+        FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX;
 
-        bool Init(urmem::address_t rakserver) {
-            if (const auto vmt = urmem::pointer(RAKSERVER = rakserver).field<urmem::address_t *>(0)) {
-#ifdef _WIN32
-                FUNC_RAKSERVER__SEND = vmt[7];
-                FUNC_RAKSERVER__RPC = vmt[32];
-                FUNC_RAKSERVER__RECEIVE = vmt[10];
-                FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL = vmt[29];
-                FUNC_RAKSERVER__DEALLOCATE_PACKET = vmt[12];
-                FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID = vmt[57];
-                FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX = vmt[58];
-#else
-                FUNC_RAKSERVER__SEND = vmt[9];
-                FUNC_RAKSERVER__RPC = vmt[35];
-                FUNC_RAKSERVER__RECEIVE = vmt[11];
-                FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL = vmt[30];
-                FUNC_RAKSERVER__DEALLOCATE_PACKET = vmt[13];
-                FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID = vmt[58];
-                FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX = vmt[59];
-#endif
+    urmem::address_t * Init(urmem::address_t rakserver) {
+        if (const auto vmt = urmem::pointer(PTR_RAKSERVER = rakserver).field<urmem::address_t *>(0)) {
+            FUNC_RAKSERVER__SEND = vmt[RakServerOffsets::SEND];
+            FUNC_RAKSERVER__RPC = vmt[RakServerOffsets::RPC];
+            FUNC_RAKSERVER__RECEIVE = vmt[RakServerOffsets::RECEIVE];
+            FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL = vmt[RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL];
+            FUNC_RAKSERVER__DEALLOCATE_PACKET = vmt[RakServerOffsets::DEALLOCATE_PACKET];
+            FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID = vmt[RakServerOffsets::GET_INDEX_FROM_PLAYER_ID];
+            FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX = vmt[RakServerOffsets::GET_PLAYER_ID_FROM_INDEX];
 
-                Logger::instance()->Write("[%s] Addresses found", Settings::kPluginName);
-
-                return true;
-            }
-
-            Logger::instance()->Write("[%s] Addresses not found", Settings::kPluginName);
-
-            return false;
+            return vmt;
         }
+
+        return nullptr;
     }
+};
 
-    std::shared_ptr<urmem::hook>
-        hook_get_rak_server_interface,
-        hook_rakserver__send,
-        hook_rakserver__rpc,
-        hook_rakserver__receive,
-        hook_rakserver__register_as_remote_procedure_call;
-
-    std::array<RPCFunction, MAX_RPC_MAP_SIZE>
-        original_rpc,
-        custom_rpc;
-
+namespace Functions {
     int GetIndexFromPlayerID(const PlayerID &id) {
         return urmem::call_function<urmem::calling_convention::thiscall, int>(
             Addresses::FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID,
-            Addresses::RAKSERVER,
+            Addresses::PTR_RAKSERVER,
             id
             );
     }
@@ -76,7 +71,7 @@ namespace Hooks {
     PlayerID GetPlayerIDFromIndex(int index) {
         return urmem::call_function<urmem::calling_convention::thiscall, PlayerID>(
             Addresses::FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX,
-            Addresses::RAKSERVER,
+            Addresses::PTR_RAKSERVER,
             index
             );
     }
@@ -84,21 +79,15 @@ namespace Hooks {
     void DeallocatePacket(Packet *p) {
         urmem::call_function<urmem::calling_convention::thiscall>(
             Addresses::FUNC_RAKSERVER__DEALLOCATE_PACKET,
-            Addresses::RAKSERVER,
+            Addresses::PTR_RAKSERVER,
             p
             );
     }
 
     bool SendPacket(int player_id, RakNet::BitStream *bs, int priority, int reliability) {
-        const bool enabled = hook_rakserver__send->is_enabled();
-
-        if (enabled) {
-            hook_rakserver__send->disable();
-        }
-
-        const auto result = urmem::call_function<urmem::calling_convention::thiscall, bool>(
+        return urmem::call_function<urmem::calling_convention::thiscall, bool>(
             Addresses::FUNC_RAKSERVER__SEND,
-            Addresses::RAKSERVER,
+            Addresses::PTR_RAKSERVER,
             bs,
             priority,
             reliability,
@@ -106,28 +95,16 @@ namespace Hooks {
             GetPlayerIDFromIndex(player_id),
             player_id == -1
             );
-
-        if (enabled) {
-            hook_rakserver__send->enable();
-        }
-
-        return result;
     }
 
     bool SendRPC(int player_id, int rpc_id, RakNet::BitStream *bs, int priority, int reliability) {
-        const bool enabled = hook_rakserver__rpc->is_enabled();
-
-        if (enabled) {
-            hook_rakserver__rpc->disable();
-        }
-
         static RPCIndex id{};
 
         id = static_cast<RPCIndex>(rpc_id);
 
-        const auto result = urmem::call_function<urmem::calling_convention::thiscall, bool>(
+        return urmem::call_function<urmem::calling_convention::thiscall, bool>(
             Addresses::FUNC_RAKSERVER__RPC,
-            Addresses::RAKSERVER,
+            Addresses::PTR_RAKSERVER,
             &id,
             bs,
             priority,
@@ -137,13 +114,15 @@ namespace Hooks {
             player_id == -1,
             false
             );
-
-        if (enabled) {
-            hook_rakserver__rpc->enable();
-        }
-
-        return result;
     }
+};
+
+namespace Hooks {
+    std::shared_ptr<urmem::hook> hook_get_rak_server_interface;
+
+    std::array<RPCFunction, MAX_RPC_MAP_SIZE>
+        original_rpc,
+        custom_rpc;
 
     class InternalHooks {
     public:
@@ -156,15 +135,13 @@ namespace Hooks {
             PlayerID playerId,
             bool broadcast
         ) {
-            const urmem::hook::raii scope(*hook_rakserver__send);
-
             if (bitStream) {
                 const int
                     read_offset = bitStream->GetReadOffset(),
                     write_offset = bitStream->GetWriteOffset(),
                     packet_id = static_cast<int>(bitStream->GetData()[0]);
 
-                if (!Scripts::OnOutcomingPacket(GetIndexFromPlayerID(playerId), packet_id, bitStream)) {
+                if (!Scripts::OnOutcomingPacket(Functions::GetIndexFromPlayerID(playerId), packet_id, bitStream)) {
                     return false;
                 }
 
@@ -196,15 +173,13 @@ namespace Hooks {
             bool broadcast,
             bool shiftTimestamp
         ) {
-            const urmem::hook::raii scope(*hook_rakserver__rpc);
-
             if (uniqueID && bitStream) {
                 const int
                     read_offset = bitStream->GetReadOffset(),
                     write_offset = bitStream->GetWriteOffset(),
                     rpc_id = static_cast<int>(*uniqueID);
 
-                if (!Scripts::OnOutcomingRPC(GetIndexFromPlayerID(playerId), rpc_id, bitStream)) {
+                if (!Scripts::OnOutcomingRPC(Functions::GetIndexFromPlayerID(playerId), rpc_id, bitStream)) {
                     return false;
                 }
 
@@ -228,8 +203,6 @@ namespace Hooks {
         }
 
         static  Packet * THISCALL RakServer__Receive(void *_this) {
-            const urmem::hook::raii scope(*hook_rakserver__receive);
-
             Packet *packet = urmem::call_function<urmem::calling_convention::thiscall, Packet *>(
                 Addresses::FUNC_RAKSERVER__RECEIVE,
                 _this
@@ -243,7 +216,7 @@ namespace Hooks {
                     packet_id = static_cast<int>(packet->data[0]);
 
                 if (!Scripts::OnIncomingPacket(player_id, packet_id, &bitstream)) {
-                    DeallocatePacket(packet);
+                    Functions::DeallocatePacket(packet);
 
                     return nullptr;
                 }
@@ -257,8 +230,6 @@ namespace Hooks {
             RPCIndex *uniqueID,
             RPCFunction functionPointer
         ) {
-            const urmem::hook::raii scope(*hook_rakserver__register_as_remote_procedure_call);
-
             if (uniqueID && functionPointer) {
                 const int rpc_id = static_cast<int>(*uniqueID);
 
@@ -285,7 +256,7 @@ namespace Hooks {
                 return;
             }
 
-            const int player_id = GetIndexFromPlayerID(p->sender);
+            const int player_id = Functions::GetIndexFromPlayerID(p->sender);
 
             std::unique_ptr<RakNet::BitStream> bs;
 
@@ -313,32 +284,21 @@ namespace Hooks {
                 hook_get_rak_server_interface->get_original_addr()
                 );
 
-            if (Addresses::Init(reinterpret_cast<urmem::address_t>(rakserver))) {
-                hook_rakserver__send = std::make_shared<urmem::hook>(
-                    Addresses::FUNC_RAKSERVER__SEND,
-                    urmem::get_func_addr(&RakServer__Send)
-                    );
+            if (const auto vmt = Addresses::Init(reinterpret_cast<urmem::address_t>(rakserver))) {
+                urmem::unprotect_scope scope{ 
+                    reinterpret_cast<urmem::address_t>(&vmt[0]), 
+                    RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL * sizeof(urmem::address_t) 
+                };
 
-                hook_rakserver__rpc = std::make_shared<urmem::hook>(
-                    Addresses::FUNC_RAKSERVER__RPC,
-                    urmem::get_func_addr(&RakServer__RPC)
-                    );
-
-                hook_rakserver__receive = std::make_shared<urmem::hook>(
-                    Addresses::FUNC_RAKSERVER__RECEIVE,
-                    urmem::get_func_addr(&RakServer__Receive)
-                    );
-
-                hook_rakserver__register_as_remote_procedure_call = std::make_shared<urmem::hook>(
-                    Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
-                    urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall)
-                    );
+                vmt[RakServerOffsets::SEND] = urmem::get_func_addr(&RakServer__Send);
+                vmt[RakServerOffsets::RPC] = urmem::get_func_addr(&RakServer__RPC);
+                vmt[RakServerOffsets::RECEIVE] = urmem::get_func_addr(&RakServer__Receive);
+                vmt[RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL] = urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall);
 
                 original_rpc.fill(nullptr);
-
                 custom_rpc.fill(nullptr);
 
-                RPCHandle::Create();
+                RPCHandle::Generate();
 
                 Logger::instance()->Write("[%s] Initialized", Settings::kPluginName);
             }
@@ -347,7 +307,7 @@ namespace Hooks {
         }
 
         struct RPCHandle {
-            static void Create(void) {
+            static void Generate(void) {
                 Generator<0>::Run();
             }
 
