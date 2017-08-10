@@ -281,26 +281,28 @@ namespace Hooks {
         }
 
         static void ReceiveRPC(int rpc_id, RPCParameters *p) {
-            if (p) {
-                const int player_id = GetIndexFromPlayerID(p->sender);
+            if (!p) {
+                return;
+            }
 
-                std::unique_ptr<RakNet::BitStream> bs;
+            const int player_id = GetIndexFromPlayerID(p->sender);
 
-                if (p->input) {
-                    bs = std::unique_ptr<RakNet::BitStream>(
-                        new RakNet::BitStream{ p->input, BITS_TO_BYTES(p->numberOfBitsOfData), false }
-                    );
-                }
+            std::unique_ptr<RakNet::BitStream> bs;
 
-                if (!Scripts::OnIncomingRPC(player_id, rpc_id, bs.get())) {
-                    return;
-                }
+            if (p->input) {
+                bs = std::unique_ptr<RakNet::BitStream>(
+                    new RakNet::BitStream{ p->input, BITS_TO_BYTES(p->numberOfBitsOfData), false }
+                );
+            }
 
-                if (original_rpc[rpc_id]) {
-                    original_rpc[rpc_id](p);
-                } else {
-                    Logger::instance()->Write("[%s] %s: unknown rpc_id (%d)", Settings::kPluginName, __FUNCTION__, rpc_id);
-                }
+            if (!Scripts::OnIncomingRPC(player_id, rpc_id, bs.get())) {
+                return;
+            }
+
+            if (original_rpc[rpc_id]) {
+                original_rpc[rpc_id](p);
+            } else {
+                Logger::instance()->Write("[%s] %s: unknown rpc_id (%d)", Settings::kPluginName, __FUNCTION__, rpc_id);
             }
         }
 
