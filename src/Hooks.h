@@ -285,15 +285,19 @@ namespace Hooks {
                 );
 
             if (const auto vmt = Addresses::Init(reinterpret_cast<urmem::address_t>(rakserver))) {
-                urmem::unprotect_scope scope{
-                    reinterpret_cast<urmem::address_t>(&vmt[0]),
-                    RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL * sizeof(urmem::address_t)
+                const auto install_hook = [vmt](RakServerOffsets offset, urmem::address_t dest) {
+                    urmem::unprotect_scope scope{
+                        reinterpret_cast<urmem::address_t>(&vmt[offset]),
+                        sizeof(urmem::address_t)
+                    };
+
+                    vmt[offset] = dest;
                 };
 
-                vmt[RakServerOffsets::SEND] = urmem::get_func_addr(&RakServer__Send);
-                vmt[RakServerOffsets::RPC] = urmem::get_func_addr(&RakServer__RPC);
-                vmt[RakServerOffsets::RECEIVE] = urmem::get_func_addr(&RakServer__Receive);
-                vmt[RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL] = urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall);
+                install_hook(RakServerOffsets::SEND, urmem::get_func_addr(&RakServer__Send));
+                install_hook(RakServerOffsets::RPC, urmem::get_func_addr(&RakServer__RPC));
+                install_hook(RakServerOffsets::RECEIVE, urmem::get_func_addr(&RakServer__Receive));
+                install_hook(RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL, urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall));
 
                 original_rpc.fill(nullptr);
                 custom_rpc.fill(nullptr);
