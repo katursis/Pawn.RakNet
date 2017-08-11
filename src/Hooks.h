@@ -155,10 +155,10 @@ namespace Hooks {
                 return;
             }
 
-            if (original_rpc[rpc_id]) {
-                original_rpc[rpc_id](p);
-            } else {
-                Logger::instance()->Write("[%s] %s: unknown rpc_id (%d)", Settings::kPluginName, __FUNCTION__, rpc_id);
+            try {
+                original_rpc.at(rpc_id)(p);
+            } catch (const std::exception &e) {
+                Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
             }
         }
 
