@@ -189,7 +189,7 @@ namespace Hooks {
 
                 RPCHandle::Generate();
             } else {
-                Logger::instance()->Write("[%] Invalid RakServer VMT", Settings::kPluginName);
+                Logger::instance()->Write("[%s] Invalid RakServer VMT", Settings::kPluginName);
             }
 
             return rakserver;
