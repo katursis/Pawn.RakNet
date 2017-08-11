@@ -26,7 +26,12 @@ namespace Functions {
             );
     }
 
-    bool SendPacket(int player_id, RakNet::BitStream *bs, int priority, int reliability) {
+    bool SendPacket(
+        int player_id,
+        RakNet::BitStream *bs,
+        int priority,
+        int reliability
+        ) {
         return urmem::call_function<urmem::calling_convention::thiscall, bool>(
             Addresses::FUNC_RAKSERVER__SEND,
             Addresses::PTR_RAKSERVER,
@@ -39,7 +44,13 @@ namespace Functions {
             );
     }
 
-    bool SendRPC(int player_id, int rpc_id, RakNet::BitStream *bs, int priority, int reliability) {
+    bool SendRPC(
+        int player_id,
+        int rpc_id,
+        RakNet::BitStream *bs,
+        int priority,
+        int reliability
+        ) {
         static RPCIndex id{};
 
         id = static_cast<RPCIndex>(rpc_id);
