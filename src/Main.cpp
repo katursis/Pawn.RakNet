@@ -28,6 +28,7 @@
 #include "RakNet/BitStream.h"
 #include "urmem/urmem.hpp"
 #include "crtp_singleton/crtp_singleton.hpp"
+#include "cpptoml/include/cpptoml.h"
 
 #include <list>
 #include <array>
