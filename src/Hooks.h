@@ -155,10 +155,14 @@ namespace Hooks {
                 return;
             }
 
-            try {
-                original_rpc.at(rpc_id)(p);
-            } catch (const std::exception &e) {
-                Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            if (Settings::safe_receive_rpc_hook) {
+                try {
+                    original_rpc.at(rpc_id)(p);
+                } catch (const std::exception &e) {
+                    Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+                }
+            } else {
+                original_rpc[rpc_id](p);
             }
         }
 
@@ -179,15 +183,29 @@ namespace Hooks {
                     vmt[offset] = dest;
                 };
 
-                install_hook(RakServerOffsets::SEND, urmem::get_func_addr(&RakServer__Send));
-                install_hook(RakServerOffsets::RPC, urmem::get_func_addr(&RakServer__RPC));
-                install_hook(RakServerOffsets::RECEIVE, urmem::get_func_addr(&RakServer__Receive));
-                install_hook(RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL, urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall));
+                if (Settings::intercept_outcoming_packet) {
+                    install_hook(RakServerOffsets::SEND, urmem::get_func_addr(&RakServer__Send));
+                }
 
-                original_rpc.fill(nullptr);
-                custom_rpc.fill(nullptr);
+                if (Settings::intercept_outcoming_rpc) {
+                    install_hook(RakServerOffsets::RPC, urmem::get_func_addr(&RakServer__RPC));
+                }
 
-                RPCHandle::Generate();
+                if (Settings::intercept_incoming_packet) {
+                    install_hook(RakServerOffsets::RECEIVE, urmem::get_func_addr(&RakServer__Receive));
+                }
+
+                if (Settings::intercept_incoming_rpc) {
+                    install_hook(
+                        RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL, 
+                        urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall)
+                    );
+
+                    original_rpc.fill(nullptr);
+                    custom_rpc.fill(nullptr);
+
+                    RPCHandle::Generate();
+                }
             } else {
                 Logger::instance()->Write("[%s] Invalid RakServer VMT", Settings::kPluginName);
             }

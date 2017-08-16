@@ -5,6 +5,7 @@ namespace Settings {
     constexpr char
         *kPluginName = "Pawn.RakNet",
         *kPluginVersion = "1.0",
+        *kConfigFile = "plugins/pawnraknet.cfg",
         *kPublicVarNameVersion = "_pawnraknet_version",
         *kPublicVarNameIsGamemode = "_pawnraknet_is_gamemode",
         *kRegHandlerPublicRegExp = R"(^pr_r(?:ir|ip|or|op)_\w+$)",
@@ -24,6 +25,32 @@ namespace Settings {
         "\x5D\xC3",
         *kMask = "xxxxxxxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
 #endif
+    bool 
+        intercept_incoming_rpc{},
+        intercept_incoming_packet{},
+        intercept_outcoming_rpc{},
+        intercept_outcoming_packet{},
+        
+        use_caching{},
+        
+        safe_receive_rpc_hook{};
+
+    void Read(const std::string &path) {
+        try {
+            const auto config = cpptoml::parse_file(path);
+
+            intercept_incoming_rpc = config->get_as<bool>("InterceptIncomingRPC").value_or(true);
+            intercept_incoming_packet = config->get_as<bool>("InterceptIncomingPacket").value_or(true);
+            intercept_outcoming_rpc = config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
+            intercept_outcoming_packet = config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
+
+            use_caching = config->get_as<bool>("UseCaching").value_or(true);
+
+            safe_receive_rpc_hook = config->get_as<bool>("SafeReceiveRPCHook").value_or(true);
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", kPluginName, __FUNCTION__, e.what());
+        }
+    }
 }
 
 #endif // SETTINGS_H_

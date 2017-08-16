@@ -5,22 +5,26 @@ namespace Scripts {
     class Public {
     public:
         explicit Public(const std::string &name, AMX *amx) : _name{ name }, _amx{ amx } {
-            _exists = (amx_FindPublic(amx, name.c_str(), &_index) == AMX_ERR_NONE);
+            _exists = (amx_FindPublic(_amx, _name.c_str(), &_index) == AMX_ERR_NONE);
         }
 
         inline bool exists() const {
             return _exists;
         }
 
-        inline int get_index() const {
+        inline int get_index() {
+            if (!Settings::use_caching) {
+                amx_FindPublic(_amx, _name.c_str(), &_index);
+            }
+
             return _index;
         }
 
     private:
-        std::string _name;
+        AMX *_amx;
+        const std::string _name;
         int _index;
         bool _exists;
-        AMX *_amx;
     };
 
     class Script {
