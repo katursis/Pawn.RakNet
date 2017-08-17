@@ -31,9 +31,7 @@ namespace Settings {
         intercept_outcoming_rpc{},
         intercept_outcoming_packet{},
         
-        use_caching{},
-        
-        safe_receive_rpc_hook{};
+        use_caching{};
 
     void Read(const std::string &path) {
         try {
@@ -45,8 +43,6 @@ namespace Settings {
             intercept_outcoming_packet = config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
 
             use_caching = config->get_as<bool>("UseCaching").value_or(true);
-
-            safe_receive_rpc_hook = config->get_as<bool>("SafeReceiveRPCHook").value_or(true);
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", kPluginName, __FUNCTION__, e.what());
         }

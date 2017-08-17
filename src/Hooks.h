@@ -155,15 +155,7 @@ namespace Hooks {
                 return;
             }
 
-            if (Settings::safe_receive_rpc_hook) {
-                try {
-                    original_rpc.at(rpc_id)(p);
-                } catch (const std::exception &e) {
-                    Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
-                }
-            } else {
-                original_rpc[rpc_id](p);
-            }
+            original_rpc[rpc_id](p);
         }
 
         static void * GetRakServerInterface(void) {
