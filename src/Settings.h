@@ -33,7 +33,7 @@ namespace Settings {
         
         use_caching{};
 
-    void Read(const std::string &path) {
+    bool Read(const std::string &path) {
         try {
             const auto config = cpptoml::parse_file(path);
 
@@ -45,7 +45,11 @@ namespace Settings {
             use_caching = config->get_as<bool>("UseCaching").value_or(true);
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", kPluginName, __FUNCTION__, e.what());
+
+            return false;
         }
+
+        return true;
     }
 }
 

@@ -54,7 +54,9 @@ namespace Plugin {
 
         Logger::instance()->Init(ppData[PLUGIN_DATA_LOGPRINTF]);
 
-        Settings::Read(Settings::kConfigFile);
+        if (!Settings::Read(Settings::kConfigFile)) {
+            return false;
+        }
 
         if (!Hooks::Init(ppData[PLUGIN_DATA_LOGPRINTF])) {
             Logger::instance()->Write("[%s] %s: RakServer address not found", Settings::kPluginName, __FUNCTION__);
