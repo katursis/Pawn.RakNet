@@ -56,25 +56,24 @@
         PR_CUINT16,
         PR_CUINT32,
         PR_CFLOAT,
-        PR_CBOOL,
+        PR_CBOOL
     };
 
     enum PR_PacketPriority
     {
-        SYSTEM_PRIORITY,
-        HIGH_PRIORITY,
-        MEDIUM_PRIORITY,
-        LOW_PRIORITY,
-        NUMBER_OF_PRIORITIES
+        PR_SYSTEM_PRIORITY,
+        PR_HIGH_PRIORITY,
+        PR_MEDIUM_PRIORITY,
+        PR_LOW_PRIORITY
     };
 
     enum PR_PacketReliability
     {
-        UNRELIABLE = 6,
-        UNRELIABLE_SEQUENCED,
-        RELIABLE,
-        RELIABLE_ORDERED,
-        RELIABLE_SEQUENCED
+        PR_UNRELIABLE = 6,
+        PR_UNRELIABLE_SEQUENCED,
+        PR_RELIABLE,
+        PR_RELIABLE_ORDERED,
+        PR_RELIABLE_SEQUENCED
     };
 
     #if !defined __cplusplus
@@ -122,8 +121,8 @@
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
         // player_id == -1 => send to all players (broadcast)
 
-        native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
-        native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
+        native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
+        native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
         native BitStream:BS_New();
         native BS_Delete(&BitStream:bs);
