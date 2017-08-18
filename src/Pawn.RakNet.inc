@@ -116,6 +116,24 @@
         #define IncomingPacket IPacket
         #define OutcomingPacket OPacket
 
+        enum PR_PlayerSync
+        {
+            lrKeys,
+            udKeys,
+            sampKeys,
+            Float:position[3],
+            Float:quaternion[4],
+            health, 
+            armor, 
+            weaponId, 
+            specialAction,
+            Float:speed[3], 
+            Float:surfingOffsets[3],
+            surfingVehicleId, 
+            animationId, 
+            animFlags
+        }
+
         // RPC/Packet ids you can get from:
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
@@ -181,6 +199,34 @@
         #define BS_WriteCompressedUint32(%0,%1) BS_WriteValue(%0, PR_CUINT32, %1)
         #define BS_WriteCompressedFloat(%0,%1) BS_WriteValue(%0, PR_CFLOAT, %1)
         #define BS_WriteCompressedBool(%0,%1) BS_WriteValue(%0, PR_CBOOL, %1)
+
+        #define BS_ReadPlayerSync(%0,%1) \
+            BS_ReadValue( \
+                %0, \
+                PR_UINT16, %1[lrKeys], \
+                PR_UINT16, %1[udKeys], \
+                PR_UINT16, %1[sampKeys], \
+                PR_FLOAT, %1[position][0], \
+                PR_FLOAT, %1[position][1], \
+                PR_FLOAT, %1[position][2], \
+                PR_FLOAT, %1[quaternion][0], \
+                PR_FLOAT, %1[quaternion][1], \
+                PR_FLOAT, %1[quaternion][2], \
+                PR_FLOAT, %1[quaternion][3], \
+                PR_UINT8, %1[health], \
+                PR_UINT8, %1[armor], \
+                PR_UINT8, %1[weaponId], \
+                PR_UINT8, %1[specialAction], \
+                PR_FLOAT, %1[speed][0], \
+                PR_FLOAT, %1[speed][1], \
+                PR_FLOAT, %1[speed][2], \
+                PR_FLOAT, %1[surfingOffsets][0], \
+                PR_FLOAT, %1[surfingOffsets][1], \
+                PR_FLOAT, %1[surfingOffsets][2], \
+                PR_UINT16, %1[surfingVehicleId], \
+                PR_INT16, %1[animationId], \
+                PR_INT16, %1[animFlags] \
+            )
 
         native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
 
