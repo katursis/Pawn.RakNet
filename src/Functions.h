@@ -31,7 +31,7 @@ namespace Functions {
         RakNet::BitStream *bs,
         int priority,
         int reliability
-        ) {
+    ) {
         return urmem::call_function<urmem::calling_convention::thiscall, bool>(
             Addresses::FUNC_RAKSERVER__SEND,
             Addresses::PTR_RAKSERVER,
@@ -50,7 +50,7 @@ namespace Functions {
         RakNet::BitStream *bs,
         int priority,
         int reliability
-        ) {
+    ) {
         static RPCIndex id{};
 
         id = static_cast<RPCIndex>(rpc_id);

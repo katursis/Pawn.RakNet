@@ -25,12 +25,12 @@ namespace Settings {
         "\x5D\xC3",
         *kMask = "xxxxxxxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
 #endif
-    bool 
+    bool
         intercept_incoming_rpc{},
         intercept_incoming_packet{},
         intercept_outcoming_rpc{},
         intercept_outcoming_packet{},
-        
+
         use_caching{};
 
     bool Read(const std::string &path) {

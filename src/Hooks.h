@@ -189,7 +189,7 @@ namespace Hooks {
 
                 if (Settings::intercept_incoming_rpc) {
                     install_hook(
-                        RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL, 
+                        RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL,
                         urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall)
                     );
 

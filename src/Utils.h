@@ -42,7 +42,7 @@ namespace Utils {
         return false;
     }
 
-    inline char *get_string(AMX *amx, cell amx_addr) {
+    inline char * get_string(AMX *amx, cell amx_addr) {
         int len{};
         cell *addr{};
 
