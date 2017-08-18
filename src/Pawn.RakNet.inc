@@ -132,7 +132,7 @@
             surfingVehicleId, 
             animationId, 
             animFlags
-        }
+        };
 
         enum PR_VehicleSync
         {
@@ -151,7 +151,7 @@
             landingGearState,
             trailerId,
             Float:trainSpeed
-        }
+        };
 
         // RPC/Packet ids you can get from:
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
