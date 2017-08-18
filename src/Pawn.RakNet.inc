@@ -134,6 +134,25 @@
             animFlags
         }
 
+        enum PR_VehicleSync
+        {
+            vehicleId,
+            lrKeys,
+            udKeys,
+            sampKeys,
+            Float:quaternion[4],
+            Float:position[3],
+            Float:speed[3],
+            Float:vehicleHealth,
+            playerHealth,
+            armor, 
+            weaponId,
+            siren,
+            landingGearState,
+            trailerId,
+            Float:trainSpeed
+        }
+
         // RPC/Packet ids you can get from:
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
@@ -226,6 +245,33 @@
                 PR_UINT16, %1[surfingVehicleId], \
                 PR_INT16, %1[animationId], \
                 PR_INT16, %1[animFlags] \
+            )
+
+        #define BS_ReadVehicleSync(%0,%1) \
+            BS_ReadValue( \
+                %0, \
+                PR_UINT16, %1[vehicleId], \
+                PR_UINT16, %1[lrKeys], \
+                PR_UINT16, %1[udKeys], \
+                PR_UINT16, %1[sampKeys], \
+                PR_FLOAT, %1[quaternion][0], \
+                PR_FLOAT, %1[quaternion][1], \
+                PR_FLOAT, %1[quaternion][2], \
+                PR_FLOAT, %1[quaternion][3], \
+                PR_FLOAT, %1[position][0], \
+                PR_FLOAT, %1[position][1], \
+                PR_FLOAT, %1[position][2], \
+                PR_FLOAT, %1[speed][0], \
+                PR_FLOAT, %1[speed][1], \
+                PR_FLOAT, %1[speed][2], \
+                PR_FLOAT, %1[vehicleHealth], \
+                PR_UINT8, %1[playerHealth], \
+                PR_UINT8, %1[armor], \
+                PR_UINT8, %1[weaponId], \
+                PR_UINT8, %1[siren], \
+                PR_UINT8, %1[landingGearState], \
+                PR_UINT16, %1[trailerId], \
+                PR_FLOAT, %1[trainSpeed] \
             )
 
         native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
