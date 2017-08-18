@@ -219,60 +219,64 @@
         #define BS_WriteCompressedFloat(%0,%1) BS_WriteValue(%0, PR_CFLOAT, %1)
         #define BS_WriteCompressedBool(%0,%1) BS_WriteValue(%0, PR_CBOOL, %1)
 
-        #define BS_ReadPlayerSync(%0,%1) \
-            BS_ReadValue( \
-                %0, \
-                PR_UINT16, %1[lrKeys], \
-                PR_UINT16, %1[udKeys], \
-                PR_UINT16, %1[sampKeys], \
-                PR_FLOAT, %1[position][0], \
-                PR_FLOAT, %1[position][1], \
-                PR_FLOAT, %1[position][2], \
-                PR_FLOAT, %1[quaternion][0], \
-                PR_FLOAT, %1[quaternion][1], \
-                PR_FLOAT, %1[quaternion][2], \
-                PR_FLOAT, %1[quaternion][3], \
-                PR_UINT8, %1[health], \
-                PR_UINT8, %1[armor], \
-                PR_UINT8, %1[weaponId], \
-                PR_UINT8, %1[specialAction], \
-                PR_FLOAT, %1[speed][0], \
-                PR_FLOAT, %1[speed][1], \
-                PR_FLOAT, %1[speed][2], \
-                PR_FLOAT, %1[surfingOffsets][0], \
-                PR_FLOAT, %1[surfingOffsets][1], \
-                PR_FLOAT, %1[surfingOffsets][2], \
-                PR_UINT16, %1[surfingVehicleId], \
-                PR_INT16, %1[animationId], \
-                PR_INT16, %1[animFlags] \
-            )
+        stock BS_ReadPlayerSync(BitStream:bs, data[PR_PlayerSync])
+        {
+            BS_ReadValue(
+                bs,
+                PR_UINT16, data[lrKeys],
+                PR_UINT16, data[udKeys],
+                PR_UINT16, data[sampKeys],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2],
+                PR_FLOAT, data[quaternion][0],
+                PR_FLOAT, data[quaternion][1],
+                PR_FLOAT, data[quaternion][2],
+                PR_FLOAT, data[quaternion][3],
+                PR_UINT8, data[health],
+                PR_UINT8, data[armor],
+                PR_UINT8, data[weaponId],
+                PR_UINT8, data[specialAction],
+                PR_FLOAT, data[speed][0],
+                PR_FLOAT, data[speed][1],
+                PR_FLOAT, data[speed][2],
+                PR_FLOAT, data[surfingOffsets][0],
+                PR_FLOAT, data[surfingOffsets][1],
+                PR_FLOAT, data[surfingOffsets][2],
+                PR_UINT16, data[surfingVehicleId],
+                PR_INT16, data[animationId],
+                PR_INT16, data[animFlags]
+            );
+        }
 
-        #define BS_ReadVehicleSync(%0,%1) \
-            BS_ReadValue( \
-                %0, \
-                PR_UINT16, %1[vehicleId], \
-                PR_UINT16, %1[lrKeys], \
-                PR_UINT16, %1[udKeys], \
-                PR_UINT16, %1[sampKeys], \
-                PR_FLOAT, %1[quaternion][0], \
-                PR_FLOAT, %1[quaternion][1], \
-                PR_FLOAT, %1[quaternion][2], \
-                PR_FLOAT, %1[quaternion][3], \
-                PR_FLOAT, %1[position][0], \
-                PR_FLOAT, %1[position][1], \
-                PR_FLOAT, %1[position][2], \
-                PR_FLOAT, %1[speed][0], \
-                PR_FLOAT, %1[speed][1], \
-                PR_FLOAT, %1[speed][2], \
-                PR_FLOAT, %1[vehicleHealth], \
-                PR_UINT8, %1[playerHealth], \
-                PR_UINT8, %1[armor], \
-                PR_UINT8, %1[weaponId], \
-                PR_UINT8, %1[siren], \
-                PR_UINT8, %1[landingGearState], \
-                PR_UINT16, %1[trailerId], \
-                PR_FLOAT, %1[trainSpeed] \
-            )
+        stock BS_ReadVehicleSync(BitStream:bs, data[PR_VehicleSync])
+        {
+            BS_ReadValue(
+                bs,
+                PR_UINT16, data[vehicleId],
+                PR_UINT16, data[lrKeys],
+                PR_UINT16, data[udKeys],
+                PR_UINT16, data[sampKeys],
+                PR_FLOAT, data[quaternion][0],
+                PR_FLOAT, data[quaternion][1],
+                PR_FLOAT, data[quaternion][2],
+                PR_FLOAT, data[quaternion][3],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2],
+                PR_FLOAT, data[speed][0],
+                PR_FLOAT, data[speed][1],
+                PR_FLOAT, data[speed][2],
+                PR_FLOAT, data[vehicleHealth],
+                PR_UINT8, data[playerHealth],
+                PR_UINT8, data[armor],
+                PR_UINT8, data[weaponId],
+                PR_UINT8, data[siren],
+                PR_UINT8, data[landingGearState],
+                PR_UINT16, data[trailerId],
+                PR_FLOAT, data[trainSpeed]
+            );
+        }
 
         native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
 
