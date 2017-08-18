@@ -141,8 +141,8 @@
         native BS_GetNumberOfBytesUsed(BitStream:bs, &number);
         native BS_GetNumberOfUnreadBits(BitStream:bs, &number);
 
-        native BS_WriteValue(BitStream:bs, {Float,_}:...);
-        native BS_ReadValue(BitStream:bs, {Float,_}:...);
+        native BS_WriteValue(BitStream:bs, {PR_ValueType, Float, _}:...);
+        native BS_ReadValue(BitStream:bs, {PR_ValueType, Float, _}:...);
 
         #define BS_ReadInt8(%0,%1) BS_ReadValue(%0, PR_INT8, %1)
         #define BS_ReadInt16(%0,%1) BS_ReadValue(%0, PR_INT16, %1)
