@@ -409,6 +409,148 @@
             );
         }
 
+        stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT16, data[lrKeys],
+                PR_UINT16, data[udKeys],
+                PR_UINT16, data[sampKeys],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2],
+                PR_FLOAT, data[quaternion][0],
+                PR_FLOAT, data[quaternion][1],
+                PR_FLOAT, data[quaternion][2],
+                PR_FLOAT, data[quaternion][3],
+                PR_UINT8, data[health],
+                PR_UINT8, data[armor],
+                PR_UINT8, data[weaponId],
+                PR_UINT8, data[specialAction],
+                PR_FLOAT, data[speed][0],
+                PR_FLOAT, data[speed][1],
+                PR_FLOAT, data[speed][2],
+                PR_FLOAT, data[surfingOffsets][0],
+                PR_FLOAT, data[surfingOffsets][1],
+                PR_FLOAT, data[surfingOffsets][2],
+                PR_UINT16, data[surfingVehicleId],
+                PR_INT16, data[animationId],
+                PR_INT16, data[animFlags]
+            );
+        }
+
+        stock BS_WriteInCarSync(BitStream:bs, data[PR_InCarSync])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT16, data[vehicleId],
+                PR_UINT16, data[lrKeys],
+                PR_UINT16, data[udKeys],
+                PR_UINT16, data[sampKeys],
+                PR_FLOAT, data[quaternion][0],
+                PR_FLOAT, data[quaternion][1],
+                PR_FLOAT, data[quaternion][2],
+                PR_FLOAT, data[quaternion][3],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2],
+                PR_FLOAT, data[speed][0],
+                PR_FLOAT, data[speed][1],
+                PR_FLOAT, data[speed][2],
+                PR_FLOAT, data[vehicleHealth],
+                PR_UINT8, data[playerHealth],
+                PR_UINT8, data[armor],
+                PR_UINT8, data[weaponId],
+                PR_UINT8, data[siren],
+                PR_UINT8, data[landingGearState],
+                PR_UINT16, data[trailerId],
+                PR_FLOAT, data[trainSpeed]
+            );
+        }
+
+        stock BS_WritePassengerSync(BitStream:bs, data[PR_PassengerSync])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT16, data[vehicleId],
+                PR_UINT8, data[seatId],
+                PR_UINT8, data[currentWeapon],
+                PR_UINT8, data[playerHealth],
+                PR_UINT8, data[playerArmor],
+                PR_UINT16, data[lrKeys],
+                PR_UINT16, data[udKeys],
+                PR_UINT16, data[sampKeys],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2]
+            );
+        }
+
+        stock BS_WriteUnoccupiedSync(BitStream:bs, data[PR_UnoccupiedSync])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT16, data[vehicleId],
+                PR_UINT8, data[seatId],
+                PR_FLOAT, data[roll][0],
+                PR_FLOAT, data[roll][1],
+                PR_FLOAT, data[roll][2],
+                PR_FLOAT, data[direction][0],
+                PR_FLOAT, data[direction][1],
+                PR_FLOAT, data[direction][2],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2],
+                PR_FLOAT, data[moveSpeed][0],
+                PR_FLOAT, data[moveSpeed][1],
+                PR_FLOAT, data[moveSpeed][2],
+                PR_FLOAT, data[turnSpeed][0],
+                PR_FLOAT, data[turnSpeed][1],
+                PR_FLOAT, data[turnSpeed][2],
+                PR_FLOAT, data[vehicleHealth]
+            );
+        }
+
+        stock BS_WriteAimSync(BitStream:bs, data[PR_AimSync])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT8, data[camMode],
+                PR_FLOAT, data[aimf1][0],
+                PR_FLOAT, data[aimf1][1],
+                PR_FLOAT, data[aimf1][2],
+                PR_FLOAT, data[aimPos][0],
+                PR_FLOAT, data[aimPos][1],
+                PR_FLOAT, data[aimPos][2],
+                PR_FLOAT, data[aimZ],
+
+                // read bit fields in reverse order
+                PR_BITS, data[weaponState], 2,
+                PR_BITS, data[camExtZoom], 6,
+
+                PR_UINT8, data[unk]
+            );
+        }
+
+        stock BS_WriteBulletSync(BitStream:bs, data[PR_BulletSync])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT8, data[type],
+                PR_UINT16, data[targetId],
+                PR_FLOAT, data[origin][0],
+                PR_FLOAT, data[origin][1],
+                PR_FLOAT, data[origin][2],
+                PR_FLOAT, data[target][0],
+                PR_FLOAT, data[target][1],
+                PR_FLOAT, data[target][2],
+                PR_FLOAT, data[center][0],
+                PR_FLOAT, data[center][1],
+                PR_FLOAT, data[center][2],
+                PR_UINT8, data[weaponId]
+            );
+        }
+
         native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
 
         forward OnIncomingPacket(playerid, packetid, BitStream:bs);
