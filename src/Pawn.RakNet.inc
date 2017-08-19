@@ -56,7 +56,9 @@
         PR_CUINT16,
         PR_CUINT32,
         PR_CFLOAT,
-        PR_CBOOL
+        PR_CBOOL,
+
+        PR_BITS
     };
 
     enum PR_PacketPriority

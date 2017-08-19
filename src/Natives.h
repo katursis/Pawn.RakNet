@@ -367,8 +367,7 @@ namespace Natives {
             const auto type = static_cast<PR_ValueType>(*cptr_type);
 
             switch (type) {
-                case PR_STRING:
-                {
+                case PR_STRING: {
                     int size{}; amx_StrLen(cptr_value, &size);
 
                     char *str = new char[size + 1]{};
@@ -506,8 +505,7 @@ namespace Natives {
             const auto type = static_cast<PR_ValueType>(*cptr_type);
 
             switch (type) {
-                case PR_STRING:
-                {
+                case PR_STRING: {
                     cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
 
                     std::size_t size = *cptr_size;
@@ -572,6 +570,23 @@ namespace Natives {
                 case PR_CBOOL:
                     *cptr_value = Value<bool>::ReadCompressed(bs);
                     break;
+                case PR_BITS: {
+                    cell *cptr_number_of_bits{}; amx_GetAddr(amx, params[i + 3], &cptr_number_of_bits);
+
+                    int number_of_bits = static_cast<int>(*cptr_number_of_bits);
+
+                    if (number_of_bits <= 0 || number_of_bits > (sizeof(cell) * 8)) {
+                        Logger::instance()->Write("[%s] %s: invalid number of bits", Settings::kPluginName, __FUNCTION__);
+
+                        return 0;
+                    }
+
+                    bs->ReadBits(reinterpret_cast<unsigned char *>(cptr_value), number_of_bits, true);
+
+                    ++i;
+
+                    break;
+                }
                 default:
                     Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
 
