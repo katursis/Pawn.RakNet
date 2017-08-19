@@ -168,6 +168,18 @@
             Float:position[3]
         };
 
+        enum PR_UnoccupiedSync
+        {
+            vehicleId,
+            seatId,
+            Float:roll[3],
+            Float:direction[3],
+            Float:position[3],
+            Float:moveSpeed[3],
+            Float:turnSpeed[3],
+            Float:vehicleHealth
+        };
+
         enum PR_AimSync
         {
             camMode,
@@ -329,6 +341,31 @@
                 PR_FLOAT, data[position][0],
                 PR_FLOAT, data[position][1],
                 PR_FLOAT, data[position][2]
+            );
+        }
+
+        stock BS_ReadUnoccupiedSync(BitStream:bs, data[PR_UnoccupiedSync])
+        {
+            BS_ReadValue(
+                bs,
+                PR_UINT16, data[vehicleId],
+                PR_UINT8, data[seatId],
+                PR_FLOAT, data[roll][0],
+                PR_FLOAT, data[roll][1],
+                PR_FLOAT, data[roll][2],
+                PR_FLOAT, data[direction][0],
+                PR_FLOAT, data[direction][1],
+                PR_FLOAT, data[direction][2],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2],
+                PR_FLOAT, data[moveSpeed][0],
+                PR_FLOAT, data[moveSpeed][1],
+                PR_FLOAT, data[moveSpeed][2],
+                PR_FLOAT, data[turnSpeed][0],
+                PR_FLOAT, data[turnSpeed][1],
+                PR_FLOAT, data[turnSpeed][2],
+                PR_FLOAT, data[vehicleHealth]
             );
         }
 
