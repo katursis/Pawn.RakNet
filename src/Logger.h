@@ -1,12 +1,6 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
-class logger_exception : std::exception {
-    const char * what() const noexcept {
-        return "Logger was not initialized";
-    }
-};
-
 class Logger : public Singleton<Logger> {
 public:
     using logprintf_t = void(*)(const char *format, ...);
@@ -18,7 +12,7 @@ public:
     template<typename ... ARGS>
     void Write(const std::string &fmt, ARGS ... args) {
         if (!_logprintf) {
-            throw logger_exception{};
+            throw std::runtime_error{ "Logger was not initialized" };
         }
 
         _logprintf(fmt.c_str(), args...);

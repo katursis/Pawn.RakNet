@@ -244,6 +244,10 @@ namespace Scripts {
 
         void RegisterHandler(int id, const std::string &public_name, PR_HandlerType type) {
             _handlers.at(type).at(id) = std::unique_ptr<Public>(new Public{ public_name, _amx });
+
+            if (!_handlers[type][id]->exists()) {
+                throw std::runtime_error{ "Public " + public_name + " not exists" };
+            }
         }
 
         inline AMX *get_amx() const {
