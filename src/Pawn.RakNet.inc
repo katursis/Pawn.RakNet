@@ -118,7 +118,7 @@
         #define IncomingPacket IPacket
         #define OutcomingPacket OPacket
 
-        enum PR_PlayerSync
+        enum PR_OnFootSync
         {
             lrKeys,
             udKeys,
@@ -136,7 +136,7 @@
             animFlags
         };
 
-        enum PR_VehicleSync
+        enum PR_InCarSync
         {
             vehicleId,
             lrKeys,
@@ -242,7 +242,7 @@
         #define BS_WriteCompressedFloat(%0,%1) BS_WriteValue(%0, PR_CFLOAT, %1)
         #define BS_WriteCompressedBool(%0,%1) BS_WriteValue(%0, PR_CBOOL, %1)
 
-        stock BS_ReadPlayerSync(BitStream:bs, data[PR_PlayerSync])
+        stock BS_ReadOnFootSync(BitStream:bs, data[PR_OnFootSync])
         {
             BS_ReadValue(
                 bs,
@@ -272,7 +272,7 @@
             );
         }
 
-        stock BS_ReadVehicleSync(BitStream:bs, data[PR_VehicleSync])
+        stock BS_ReadInCarSync(BitStream:bs, data[PR_InCarSync])
         {
             BS_ReadValue(
                 bs,
