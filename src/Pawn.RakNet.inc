@@ -155,6 +155,17 @@
             Float:trainSpeed
         };
 
+        enum PR_AimSync
+        {
+            camMode,
+            Float:aimf1[3],
+            Float:aimPos[3],
+            Float:aimZ,
+            camExtZoom,
+            weaponState,
+            unk
+        };
+
         enum PR_BulletSync
         {
             type,
@@ -287,6 +298,27 @@
                 PR_UINT8, data[landingGearState],
                 PR_UINT16, data[trailerId],
                 PR_FLOAT, data[trainSpeed]
+            );
+        }
+
+        stock BS_ReadAimSync(BitStream:bs, data[PR_AimSync])
+        {
+            BS_ReadValue(
+                bs,
+                PR_UINT8, data[camMode],
+                PR_FLOAT, data[aimf1][0],
+                PR_FLOAT, data[aimf1][1],
+                PR_FLOAT, data[aimf1][2],
+                PR_FLOAT, data[aimPos][0],
+                PR_FLOAT, data[aimPos][1],
+                PR_FLOAT, data[aimPos][2],
+                PR_FLOAT, data[aimZ],
+
+                // read bit fields in reverse order
+                PR_BITS, data[weaponState], 2,
+                PR_BITS, data[camExtZoom], 6,
+
+                PR_UINT8, data[unk]
             );
         }
 
