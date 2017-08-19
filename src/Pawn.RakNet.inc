@@ -155,6 +155,19 @@
             Float:trainSpeed
         };
 
+        enum PR_PassengerSync
+        {
+            vehicleId,
+            seatId,
+            currentWeapon,
+            playerHealth,
+            playerArmor,
+            lrKeys,
+            udKeys,
+            sampKeys,
+            Float:position[3]
+        };
+
         enum PR_AimSync
         {
             camMode,
@@ -298,6 +311,24 @@
                 PR_UINT8, data[landingGearState],
                 PR_UINT16, data[trailerId],
                 PR_FLOAT, data[trainSpeed]
+            );
+        }
+
+        stock BS_ReadPassengerSync(BitStream:bs, data[PR_PassengerSync])
+        {
+            BS_ReadValue(
+                bs,
+                PR_UINT16, data[vehicleId],
+                PR_UINT8, data[seatId],
+                PR_UINT8, data[currentWeapon],
+                PR_UINT8, data[playerHealth],
+                PR_UINT8, data[playerArmor],
+                PR_UINT16, data[lrKeys],
+                PR_UINT16, data[udKeys],
+                PR_UINT16, data[sampKeys],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2]
             );
         }
 
