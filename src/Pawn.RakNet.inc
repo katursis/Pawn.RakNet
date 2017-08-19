@@ -201,10 +201,12 @@
             weaponId
         };
 
-        // RPC/Packet ids you can get from:
-        // https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
-        // https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
-        // player_id == -1 => send to all players (broadcast)
+        /*
+         * RPC list: https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
+         * Packet list: https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
+         *
+         * playerid == -1 => send to all players (broadcast)
+         */
 
         native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
         native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
@@ -552,6 +554,10 @@
         }
 
         native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
+
+        /*
+         * playerid == -1 => send to all players (broadcast)
+         */
 
         forward OnIncomingPacket(playerid, packetid, BitStream:bs);
         forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
