@@ -153,6 +153,16 @@
             Float:trainSpeed
         };
 
+        enum PR_BulletSync
+        {
+            type,
+            targetId,
+            Float:origin[3],
+            Float:target[3],
+            Float:center[3],
+            weaponId
+        };
+
         // RPC/Packet ids you can get from:
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
         // https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
@@ -275,6 +285,25 @@
                 PR_UINT8, data[landingGearState],
                 PR_UINT16, data[trailerId],
                 PR_FLOAT, data[trainSpeed]
+            );
+        }
+
+        stock BS_ReadBulletSync(BitStream:bs, data[PR_BulletSync])
+        {
+            BS_ReadValue(
+                bs,
+                PR_UINT8, data[type],
+                PR_UINT16, data[targetId],
+                PR_FLOAT, data[origin][0],
+                PR_FLOAT, data[origin][1],
+                PR_FLOAT, data[origin][2],
+                PR_FLOAT, data[target][0],
+                PR_FLOAT, data[target][1],
+                PR_FLOAT, data[target][2],
+                PR_FLOAT, data[center][0],
+                PR_FLOAT, data[center][1],
+                PR_FLOAT, data[center][2],
+                PR_UINT8, data[weaponId]
             );
         }
 
