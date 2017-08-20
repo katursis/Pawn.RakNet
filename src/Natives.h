@@ -380,6 +380,19 @@ namespace Natives {
 
                     break;
                 }
+                case PR_CSTRING: {
+                    int size{}; amx_StrLen(cptr_value, &size);
+
+                    char *str = new char[size + 1]{};
+
+                    amx_GetString(str, cptr_value, 0, size + 1);
+
+                    stringCompressor->EncodeString(str, size, bs);
+
+                    delete[] str;
+
+                    break;
+                }
                 case PR_INT8:
                     bs->Write(static_cast<char>(*cptr_value));
                     break;
@@ -513,6 +526,23 @@ namespace Natives {
                     char *str = new char[size + 1]{};
 
                     bs->Read(str, size);
+
+                    Utils::set_amxstring(amx, params[i + 2], str, size);
+
+                    delete[] str;
+
+                    ++i;
+
+                    break;
+                }
+                case PR_CSTRING: {
+                    cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
+
+                    std::size_t size = *cptr_size;
+
+                    char *str = new char[size + 1]{};
+
+                    stringCompressor->DecodeString(str, size, bs);
 
                     Utils::set_amxstring(amx, params[i + 2], str, size);
 

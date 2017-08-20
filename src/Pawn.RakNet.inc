@@ -57,6 +57,7 @@
         PR_CUINT32,
         PR_CFLOAT,
         PR_CBOOL,
+        PR_CSTRING,
 
         PR_BITS
     };
