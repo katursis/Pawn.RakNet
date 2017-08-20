@@ -387,7 +387,7 @@ namespace Natives {
 
                     amx_GetString(str, cptr_value, 0, size + 1);
 
-                    stringCompressor->EncodeString(str, size, bs);
+                    stringCompressor->EncodeString(str, size + 1, bs);
 
                     delete[] str;
 
