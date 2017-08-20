@@ -441,6 +441,23 @@ namespace Natives {
                 case PR_CBOOL:
                     bs->WriteCompressed(!!(*cptr_value));
                     break;
+                case PR_BITS: {
+                    cell *cptr_number_of_bits{}; amx_GetAddr(amx, params[i + 3], &cptr_number_of_bits);
+
+                    int number_of_bits = static_cast<int>(*cptr_number_of_bits);
+
+                    if (number_of_bits <= 0 || number_of_bits > (sizeof(cell) * 8)) {
+                        Logger::instance()->Write("[%s] %s: invalid number of bits", Settings::kPluginName, __FUNCTION__);
+
+                        return 0;
+                    }
+
+                    bs->WriteBits(reinterpret_cast<unsigned char *>(cptr_value), number_of_bits, true);
+
+                    ++i;
+
+                    break;
+                }
                 default:
                     Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
 
