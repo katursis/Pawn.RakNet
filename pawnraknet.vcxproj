@@ -63,6 +63,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="lib\RakNet\BitStream.h" />
+    <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTree.h" />
+    <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTreeNode.h" />
+    <ClInclude Include="lib\RakNet\DS_LinkedList.h" />
+    <ClInclude Include="lib\RakNet\DS_List.h" />
+    <ClInclude Include="lib\RakNet\DS_Map.h" />
+    <ClInclude Include="lib\RakNet\DS_OrderedList.h" />
+    <ClInclude Include="lib\RakNet\DS_Queue.h" />
+    <ClInclude Include="lib\RakNet\NetworkTypes.h" />
+    <ClInclude Include="lib\RakNet\StringCompressor.h" />
     <ClInclude Include="lib\urmem\urmem.hpp" />
     <ClInclude Include="src\Addresses.h" />
     <ClInclude Include="src\Functions.h" />
@@ -75,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\RakNet\BitStream.cpp" />
+    <ClCompile Include="lib\RakNet\DS_HuffmanEncodingTree.cpp" />
+    <ClCompile Include="lib\RakNet\StringCompressor.cpp" />
     <ClCompile Include="lib\SDK\amxplugin.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>

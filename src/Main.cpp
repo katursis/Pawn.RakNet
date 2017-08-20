@@ -26,6 +26,7 @@
 #include "SDK/plugincommon.h"
 
 #include "RakNet/BitStream.h"
+#include "RakNet/StringCompressor.h"
 #include "urmem/urmem.hpp"
 #include "crtp_singleton/crtp_singleton.hpp"
 #include "cpptoml/include/cpptoml.h"
@@ -63,6 +64,8 @@ namespace Plugin {
 
             return false;
         }
+
+        StringCompressor::AddReference();
 
         Logger::instance()->Write("%s plugin v%s by urShadow loaded", Settings::kPluginName, Settings::kPluginVersion);
 

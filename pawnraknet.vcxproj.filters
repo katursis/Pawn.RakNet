@@ -54,6 +54,33 @@
     <ClInclude Include="src\Functions.h">
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
+    <ClInclude Include="lib\RakNet\StringCompressor.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_Map.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_OrderedList.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_List.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTree.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTreeNode.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_LinkedList.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\NetworkTypes.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_Queue.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -64,6 +91,12 @@
     </ClCompile>
     <ClCompile Include="lib\SDK\amxplugin.cpp">
       <Filter>Файлы исходного кода\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\RakNet\StringCompressor.cpp">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\RakNet\DS_HuffmanEncodingTree.cpp">
+      <Filter>Файлы исходного кода\RakNet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
