@@ -527,7 +527,7 @@
                 PR_FLOAT, data[aimPos][2],
                 PR_FLOAT, data[aimZ],
 
-                // read bit fields in reverse order
+                // write bit fields in reverse order
                 PR_BITS, data[weaponState], 2,
                 PR_BITS, data[camExtZoom], 6,
 
