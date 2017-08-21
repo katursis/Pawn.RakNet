@@ -156,6 +156,15 @@
             Float:trainSpeed
         };
 
+        enum PR_TrailerSync
+        {
+            trailerId,
+            Float:position[3],
+            Float:quaternion[4],
+            Float:speed[3],
+            Float:spin[3]
+        };
+
         enum PR_PassengerSync
         {
             vehicleId,
@@ -329,6 +338,27 @@
             );
         }
 
+        stock BS_ReadTrailerSync(BitStream:bs, data[PR_TrailerSync])
+        {
+            BS_ReadValue(
+                bs,
+                PR_UINT16, data[trailerId],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2],
+                PR_FLOAT, data[quaternion][0],
+                PR_FLOAT, data[quaternion][1],
+                PR_FLOAT, data[quaternion][2],
+                PR_FLOAT, data[quaternion][3],
+                PR_FLOAT, data[speed][0],
+                PR_FLOAT, data[speed][1],
+                PR_FLOAT, data[speed][2],
+                PR_FLOAT, data[spin][0],
+                PR_FLOAT, data[spin][1],
+                PR_FLOAT, data[spin][2]
+            );
+        }
+
         stock BS_ReadPassengerSync(BitStream:bs, data[PR_PassengerSync])
         {
             BS_ReadValue(
@@ -468,6 +498,27 @@
                 PR_UINT8, data[landingGearState],
                 PR_UINT16, data[trailerId],
                 PR_FLOAT, data[trainSpeed]
+            );
+        }
+
+        stock BS_WriteTrailerSync(BitStream:bs, data[PR_TrailerSync])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT16, data[trailerId],
+                PR_FLOAT, data[position][0],
+                PR_FLOAT, data[position][1],
+                PR_FLOAT, data[position][2],
+                PR_FLOAT, data[quaternion][0],
+                PR_FLOAT, data[quaternion][1],
+                PR_FLOAT, data[quaternion][2],
+                PR_FLOAT, data[quaternion][3],
+                PR_FLOAT, data[speed][0],
+                PR_FLOAT, data[speed][1],
+                PR_FLOAT, data[speed][2],
+                PR_FLOAT, data[spin][0],
+                PR_FLOAT, data[spin][1],
+                PR_FLOAT, data[spin][2]
             );
         }
 
