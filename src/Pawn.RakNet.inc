@@ -171,6 +171,7 @@
         {
             vehicleId,
             seatId,
+            driveBy,
             weaponId,
             additionalKey,
             playerHealth,
@@ -369,7 +370,8 @@
             BS_ReadValue(
                 bs,
                 PR_UINT16, data[vehicleId],
-                PR_UINT8, data[seatId],
+                PR_BITS, data[driveBy], 2,
+                PR_BITS, data[seatId], 6,
                 PR_BITS, data[additionalKey], 2,
                 PR_BITS, data[weaponId], 6,
                 PR_UINT8, data[playerHealth],
@@ -535,7 +537,8 @@
             BS_WriteValue(
                 bs,
                 PR_UINT16, data[vehicleId],
-                PR_UINT8, data[seatId],
+                PR_BITS, data[driveBy], 2,
+                PR_BITS, data[seatId], 6,
                 PR_BITS, data[additionalKey], 2,
                 PR_BITS, data[weaponId], 6,
                 PR_UINT8, data[playerHealth],
