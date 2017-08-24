@@ -15,7 +15,7 @@ namespace Utils {
     inline int set_amxstring(AMX *amx, cell amx_addr, const char *source, int max) {
         cell *dest = reinterpret_cast<cell *>(
             amx->base + static_cast<int>(reinterpret_cast<AMX_HEADER *>(amx->base)->dat + amx_addr)
-            );
+        );
 
         cell *start = dest;
 
@@ -29,11 +29,13 @@ namespace Utils {
     }
 
     inline bool get_public_var(AMX *amx, const char *name, cell &out) {
-        cell addr{},
+        cell
+            addr{},
             *phys_addr{};
 
         if ((amx_FindPubVar(amx, name, &addr) == AMX_ERR_NONE) &&
-            (amx_GetAddr(amx, addr, &phys_addr) == AMX_ERR_NONE)) {
+            (amx_GetAddr(amx, addr, &phys_addr) == AMX_ERR_NONE)
+        ) {
             out = *phys_addr;
 
             return true;
@@ -48,7 +50,8 @@ namespace Utils {
 
         if ((amx_GetAddr(amx, amx_addr, &addr) == AMX_ERR_NONE) &&
             (amx_StrLen(addr, &len) == AMX_ERR_NONE) &&
-            len) {
+            len
+        ) {
             len++;
 
             char *str = new (std::nothrow) char[len] {};

@@ -358,7 +358,8 @@ namespace Natives {
 
         for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
             if (amx_GetAddr(amx, params[i + 1], &cptr_type) != AMX_ERR_NONE ||
-                amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE) {
+                amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE
+            ) {
                 Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
 
                 return 0;
@@ -526,7 +527,8 @@ namespace Natives {
 
         for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
             if (amx_GetAddr(amx, params[i + 1], &cptr_type) != AMX_ERR_NONE ||
-                amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE) {
+                amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE
+            ) {
                 Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
 
                 return 0;

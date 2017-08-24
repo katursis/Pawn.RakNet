@@ -44,7 +44,7 @@ namespace Hooks {
                 orderingChannel,
                 playerId,
                 broadcast
-                );
+            );
         }
 
         static bool THISCALL RakServer__RPC(
@@ -84,7 +84,7 @@ namespace Hooks {
                 playerId,
                 broadcast,
                 shiftTimestamp
-                );
+            );
         }
 
         static  Packet * THISCALL RakServer__Receive(void *_this) {
@@ -122,7 +122,7 @@ namespace Hooks {
                     _this,
                     uniqueID,
                     custom_rpc[rpc_id]
-                    );
+                );
             }
 
             return urmem::call_function<urmem::calling_convention::thiscall, void *>(
@@ -130,7 +130,7 @@ namespace Hooks {
                 _this,
                 uniqueID,
                 functionPointer
-                );
+            );
         }
 
         static void ReceiveRPC(int rpc_id, RPCParameters *p) {
@@ -160,7 +160,7 @@ namespace Hooks {
 
             const auto rakserver = urmem::call_function<urmem::calling_convention::cdeclcall, void *>(
                 hook_get_rak_server_interface->get_original_addr()
-                );
+            );
 
             if (const auto vmt = Addresses::Init(reinterpret_cast<urmem::address_t>(rakserver))) {
                 const auto install_hook = [vmt](RakServerOffsets offset, urmem::address_t dest) {
@@ -237,7 +237,7 @@ namespace Hooks {
                 hook_get_rak_server_interface = std::make_shared<urmem::hook>(
                     addr,
                     urmem::get_func_addr(&InternalHooks::GetRakServerInterface)
-                    );
+                );
 
                 return true;
             }

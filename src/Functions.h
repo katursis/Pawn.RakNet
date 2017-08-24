@@ -7,7 +7,7 @@ namespace Functions {
             Addresses::FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID,
             Addresses::PTR_RAKSERVER,
             id
-            );
+        );
     }
 
     PlayerID GetPlayerIDFromIndex(int index) {
@@ -15,7 +15,7 @@ namespace Functions {
             Addresses::FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX,
             Addresses::PTR_RAKSERVER,
             index
-            );
+        );
     }
 
     void DeallocatePacket(Packet *p) {
@@ -23,7 +23,7 @@ namespace Functions {
             Addresses::FUNC_RAKSERVER__DEALLOCATE_PACKET,
             Addresses::PTR_RAKSERVER,
             p
-            );
+        );
     }
 
     bool SendPacket(
@@ -41,7 +41,7 @@ namespace Functions {
             '\0',
             GetPlayerIDFromIndex(player_id),
             player_id == -1
-            );
+        );
     }
 
     bool SendRPC(
@@ -66,7 +66,7 @@ namespace Functions {
             GetPlayerIDFromIndex(player_id),
             player_id == -1,
             false
-            );
+        );
     }
 };
 
