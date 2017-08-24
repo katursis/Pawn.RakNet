@@ -121,98 +121,98 @@
 
         enum PR_OnFootSync
         {
-            lrKeys,
-            udKeys,
-            sampKeys,
-            Float:position[3],
-            Float:quaternion[4],
-            health, 
-            armor, 
-            weaponId, 
-            additionalKey,
-            specialAction,
-            Float:speed[3], 
-            Float:surfingOffsets[3],
-            surfingVehicleId, 
-            animationId, 
-            animFlags
+            PR_lrKeys,
+            PR_udKeys,
+            PR_sampKeys,
+            Float:PR_position[3],
+            Float:PR_quaternion[4],
+            PR_health, 
+            PR_armor, 
+            PR_weaponId, 
+            PR_additionalKey,
+            PR_specialAction,
+            Float:PR_speed[3], 
+            Float:PR_surfingOffsets[3],
+            PR_surfingVehicleId, 
+            PR_animationId, 
+            PR_animFlags
         };
 
         enum PR_InCarSync
         {
-            vehicleId,
-            lrKeys,
-            udKeys,
-            sampKeys,
-            Float:quaternion[4],
-            Float:position[3],
-            Float:speed[3],
-            Float:vehicleHealth,
-            playerHealth,
-            armor, 
-            weaponId,
-            additionalKey,
-            siren,
-            landingGearState,
-            trailerId,
-            Float:trainSpeed
+            PR_vehicleId,
+            PR_lrKeys,
+            PR_udKeys,
+            PR_sampKeys,
+            Float:PR_quaternion[4],
+            Float:PR_position[3],
+            Float:PR_speed[3],
+            Float:PR_vehicleHealth,
+            PR_playerHealth,
+            PR_armor, 
+            PR_weaponId,
+            PR_additionalKey,
+            PR_siren,
+            PR_landingGearState,
+            PR_trailerId,
+            Float:PR_trainSpeed
         };
 
         enum PR_TrailerSync
         {
-            trailerId,
-            Float:position[3],
-            Float:quaternion[4],
-            Float:speed[3],
-            Float:spin[3]
+            PR_trailerId,
+            Float:PR_position[3],
+            Float:PR_quaternion[4],
+            Float:PR_speed[3],
+            Float:PR_spin[3]
         };
 
         enum PR_PassengerSync
         {
-            vehicleId,
-            seatId,
-            driveBy,
-            weaponId,
-            additionalKey,
-            playerHealth,
-            playerArmor,
-            lrKeys,
-            udKeys,
-            sampKeys,
-            Float:position[3]
+            PR_vehicleId,
+            PR_seatId,
+            PR_driveBy,
+            PR_weaponId,
+            PR_additionalKey,
+            PR_playerHealth,
+            PR_playerArmor,
+            PR_lrKeys,
+            PR_udKeys,
+            PR_sampKeys,
+            Float:PR_position[3]
         };
 
         enum PR_UnoccupiedSync
         {
-            vehicleId,
-            seatId,
-            Float:roll[3],
-            Float:direction[3],
-            Float:position[3],
-            Float:moveSpeed[3],
-            Float:turnSpeed[3],
-            Float:vehicleHealth
+            PR_vehicleId,
+            PR_seatId,
+            Float:PR_roll[3],
+            Float:PR_direction[3],
+            Float:PR_position[3],
+            Float:PR_moveSpeed[3],
+            Float:PR_turnSpeed[3],
+            Float:PR_vehicleHealth
         };
 
         enum PR_AimSync
         {
-            camMode,
-            Float:aimf1[3],
-            Float:aimPos[3],
-            Float:aimZ,
-            camExtZoom,
-            weaponState,
-            unk
+            PR_camMode,
+            Float:PR_aimf1[3],
+            Float:PR_aimPos[3],
+            Float:PR_aimZ,
+            PR_camExtZoom,
+            PR_weaponState,
+            PR_unk
         };
 
         enum PR_BulletSync
         {
-            type,
-            targetId,
-            Float:origin[3],
-            Float:target[3],
-            Float:center[3],
-            weaponId
+            PR_type,
+            PR_targetId,
+            Float:PR_origin[3],
+            Float:PR_target[3],
+            Float:PR_center[3],
+            PR_weaponId
         };
 
         /*
@@ -287,30 +287,30 @@
         {
             BS_ReadValue(
                 bs,
-                PR_UINT16, data[lrKeys],
-                PR_UINT16, data[udKeys],
-                PR_UINT16, data[sampKeys],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2],
-                PR_FLOAT, data[quaternion][0],
-                PR_FLOAT, data[quaternion][1],
-                PR_FLOAT, data[quaternion][2],
-                PR_FLOAT, data[quaternion][3],
-                PR_UINT8, data[health],
-                PR_UINT8, data[armor],
-                PR_BITS, data[additionalKey], 2,
-                PR_BITS, data[weaponId], 6,
-                PR_UINT8, data[specialAction],
-                PR_FLOAT, data[speed][0],
-                PR_FLOAT, data[speed][1],
-                PR_FLOAT, data[speed][2],
-                PR_FLOAT, data[surfingOffsets][0],
-                PR_FLOAT, data[surfingOffsets][1],
-                PR_FLOAT, data[surfingOffsets][2],
-                PR_UINT16, data[surfingVehicleId],
-                PR_INT16, data[animationId],
-                PR_INT16, data[animFlags]
+                PR_UINT16, data[PR_lrKeys],
+                PR_UINT16, data[PR_udKeys],
+                PR_UINT16, data[PR_sampKeys],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2],
+                PR_FLOAT, data[PR_quaternion][0],
+                PR_FLOAT, data[PR_quaternion][1],
+                PR_FLOAT, data[PR_quaternion][2],
+                PR_FLOAT, data[PR_quaternion][3],
+                PR_UINT8, data[PR_health],
+                PR_UINT8, data[PR_armor],
+                PR_BITS, data[PR_additionalKey], 2,
+                PR_BITS, data[PR_weaponId], 6,
+                PR_UINT8, data[PR_specialAction],
+                PR_FLOAT, data[PR_speed][0],
+                PR_FLOAT, data[PR_speed][1],
+                PR_FLOAT, data[PR_speed][2],
+                PR_FLOAT, data[PR_surfingOffsets][0],
+                PR_FLOAT, data[PR_surfingOffsets][1],
+                PR_FLOAT, data[PR_surfingOffsets][2],
+                PR_UINT16, data[PR_surfingVehicleId],
+                PR_INT16, data[PR_animationId],
+                PR_INT16, data[PR_animFlags]
             );
         }
 
@@ -318,29 +318,29 @@
         {
             BS_ReadValue(
                 bs,
-                PR_UINT16, data[vehicleId],
-                PR_UINT16, data[lrKeys],
-                PR_UINT16, data[udKeys],
-                PR_UINT16, data[sampKeys],
-                PR_FLOAT, data[quaternion][0],
-                PR_FLOAT, data[quaternion][1],
-                PR_FLOAT, data[quaternion][2],
-                PR_FLOAT, data[quaternion][3],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2],
-                PR_FLOAT, data[speed][0],
-                PR_FLOAT, data[speed][1],
-                PR_FLOAT, data[speed][2],
-                PR_FLOAT, data[vehicleHealth],
-                PR_UINT8, data[playerHealth],
-                PR_UINT8, data[armor],
-                PR_BITS, data[additionalKey], 2,
-                PR_BITS, data[weaponId], 6,
-                PR_UINT8, data[siren],
-                PR_UINT8, data[landingGearState],
-                PR_UINT16, data[trailerId],
-                PR_FLOAT, data[trainSpeed]
+                PR_UINT16, data[PR_vehicleId],
+                PR_UINT16, data[PR_lrKeys],
+                PR_UINT16, data[PR_udKeys],
+                PR_UINT16, data[PR_sampKeys],
+                PR_FLOAT, data[PR_quaternion][0],
+                PR_FLOAT, data[PR_quaternion][1],
+                PR_FLOAT, data[PR_quaternion][2],
+                PR_FLOAT, data[PR_quaternion][3],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2],
+                PR_FLOAT, data[PR_speed][0],
+                PR_FLOAT, data[PR_speed][1],
+                PR_FLOAT, data[PR_speed][2],
+                PR_FLOAT, data[PR_vehicleHealth],
+                PR_UINT8, data[PR_playerHealth],
+                PR_UINT8, data[PR_armor],
+                PR_BITS, data[PR_additionalKey], 2,
+                PR_BITS, data[PR_weaponId], 6,
+                PR_UINT8, data[PR_siren],
+                PR_UINT8, data[PR_landingGearState],
+                PR_UINT16, data[PR_trailerId],
+                PR_FLOAT, data[PR_trainSpeed]
             );
         }
 
@@ -348,20 +348,20 @@
         {
             BS_ReadValue(
                 bs,
-                PR_UINT16, data[trailerId],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2],
-                PR_FLOAT, data[quaternion][0],
-                PR_FLOAT, data[quaternion][1],
-                PR_FLOAT, data[quaternion][2],
-                PR_FLOAT, data[quaternion][3],
-                PR_FLOAT, data[speed][0],
-                PR_FLOAT, data[speed][1],
-                PR_FLOAT, data[speed][2],
-                PR_FLOAT, data[spin][0],
-                PR_FLOAT, data[spin][1],
-                PR_FLOAT, data[spin][2]
+                PR_UINT16, data[PR_trailerId],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2],
+                PR_FLOAT, data[PR_quaternion][0],
+                PR_FLOAT, data[PR_quaternion][1],
+                PR_FLOAT, data[PR_quaternion][2],
+                PR_FLOAT, data[PR_quaternion][3],
+                PR_FLOAT, data[PR_speed][0],
+                PR_FLOAT, data[PR_speed][1],
+                PR_FLOAT, data[PR_speed][2],
+                PR_FLOAT, data[PR_spin][0],
+                PR_FLOAT, data[PR_spin][1],
+                PR_FLOAT, data[PR_spin][2]
             );
         }
 
@@ -369,19 +369,19 @@
         {
             BS_ReadValue(
                 bs,
-                PR_UINT16, data[vehicleId],
-                PR_BITS, data[driveBy], 2,
-                PR_BITS, data[seatId], 6,
-                PR_BITS, data[additionalKey], 2,
-                PR_BITS, data[weaponId], 6,
-                PR_UINT8, data[playerHealth],
-                PR_UINT8, data[playerArmor],
-                PR_UINT16, data[lrKeys],
-                PR_UINT16, data[udKeys],
-                PR_UINT16, data[sampKeys],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2]
+                PR_UINT16, data[PR_vehicleId],
+                PR_BITS, data[PR_driveBy], 2,
+                PR_BITS, data[PR_seatId], 6,
+                PR_BITS, data[PR_additionalKey], 2,
+                PR_BITS, data[PR_weaponId], 6,
+                PR_UINT8, data[PR_playerHealth],
+                PR_UINT8, data[PR_playerArmor],
+                PR_UINT16, data[PR_lrKeys],
+                PR_UINT16, data[PR_udKeys],
+                PR_UINT16, data[PR_sampKeys],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2]
             );
         }
 
@@ -389,24 +389,24 @@
         {
             BS_ReadValue(
                 bs,
-                PR_UINT16, data[vehicleId],
-                PR_UINT8, data[seatId],
-                PR_FLOAT, data[roll][0],
-                PR_FLOAT, data[roll][1],
-                PR_FLOAT, data[roll][2],
-                PR_FLOAT, data[direction][0],
-                PR_FLOAT, data[direction][1],
-                PR_FLOAT, data[direction][2],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2],
-                PR_FLOAT, data[moveSpeed][0],
-                PR_FLOAT, data[moveSpeed][1],
-                PR_FLOAT, data[moveSpeed][2],
-                PR_FLOAT, data[turnSpeed][0],
-                PR_FLOAT, data[turnSpeed][1],
-                PR_FLOAT, data[turnSpeed][2],
-                PR_FLOAT, data[vehicleHealth]
+                PR_UINT16, data[PR_vehicleId],
+                PR_UINT8, data[PR_seatId],
+                PR_FLOAT, data[PR_roll][0],
+                PR_FLOAT, data[PR_roll][1],
+                PR_FLOAT, data[PR_roll][2],
+                PR_FLOAT, data[PR_direction][0],
+                PR_FLOAT, data[PR_direction][1],
+                PR_FLOAT, data[PR_direction][2],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2],
+                PR_FLOAT, data[PR_moveSpeed][0],
+                PR_FLOAT, data[PR_moveSpeed][1],
+                PR_FLOAT, data[PR_moveSpeed][2],
+                PR_FLOAT, data[PR_turnSpeed][0],
+                PR_FLOAT, data[PR_turnSpeed][1],
+                PR_FLOAT, data[PR_turnSpeed][2],
+                PR_FLOAT, data[PR_vehicleHealth]
             );
         }
 
@@ -414,20 +414,20 @@
         {
             BS_ReadValue(
                 bs,
-                PR_UINT8, data[camMode],
-                PR_FLOAT, data[aimf1][0],
-                PR_FLOAT, data[aimf1][1],
-                PR_FLOAT, data[aimf1][2],
-                PR_FLOAT, data[aimPos][0],
-                PR_FLOAT, data[aimPos][1],
-                PR_FLOAT, data[aimPos][2],
-                PR_FLOAT, data[aimZ],
+                PR_UINT8, data[PR_camMode],
+                PR_FLOAT, data[PR_aimf1][0],
+                PR_FLOAT, data[PR_aimf1][1],
+                PR_FLOAT, data[PR_aimf1][2],
+                PR_FLOAT, data[PR_aimPos][0],
+                PR_FLOAT, data[PR_aimPos][1],
+                PR_FLOAT, data[PR_aimPos][2],
+                PR_FLOAT, data[PR_aimZ],
 
                 // read bit fields in reverse order
-                PR_BITS, data[weaponState], 2,
-                PR_BITS, data[camExtZoom], 6,
+                PR_BITS, data[PR_weaponState], 2,
+                PR_BITS, data[PR_camExtZoom], 6,
 
-                PR_UINT8, data[unk]
+                PR_UINT8, data[PR_unk]
             );
         }
 
@@ -435,18 +435,18 @@
         {
             BS_ReadValue(
                 bs,
-                PR_UINT8, data[type],
-                PR_UINT16, data[targetId],
-                PR_FLOAT, data[origin][0],
-                PR_FLOAT, data[origin][1],
-                PR_FLOAT, data[origin][2],
-                PR_FLOAT, data[target][0],
-                PR_FLOAT, data[target][1],
-                PR_FLOAT, data[target][2],
-                PR_FLOAT, data[center][0],
-                PR_FLOAT, data[center][1],
-                PR_FLOAT, data[center][2],
-                PR_UINT8, data[weaponId]
+                PR_UINT8, data[PR_type],
+                PR_UINT16, data[PR_targetId],
+                PR_FLOAT, data[PR_origin][0],
+                PR_FLOAT, data[PR_origin][1],
+                PR_FLOAT, data[PR_origin][2],
+                PR_FLOAT, data[PR_target][0],
+                PR_FLOAT, data[PR_target][1],
+                PR_FLOAT, data[PR_target][2],
+                PR_FLOAT, data[PR_center][0],
+                PR_FLOAT, data[PR_center][1],
+                PR_FLOAT, data[PR_center][2],
+                PR_UINT8, data[PR_weaponId]
             );
         }
 
@@ -454,30 +454,30 @@
         {
             BS_WriteValue(
                 bs,
-                PR_UINT16, data[lrKeys],
-                PR_UINT16, data[udKeys],
-                PR_UINT16, data[sampKeys],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2],
-                PR_FLOAT, data[quaternion][0],
-                PR_FLOAT, data[quaternion][1],
-                PR_FLOAT, data[quaternion][2],
-                PR_FLOAT, data[quaternion][3],
-                PR_UINT8, data[health],
-                PR_UINT8, data[armor],
-                PR_BITS, data[additionalKey], 2,
-                PR_BITS, data[weaponId], 6,
-                PR_UINT8, data[specialAction],
-                PR_FLOAT, data[speed][0],
-                PR_FLOAT, data[speed][1],
-                PR_FLOAT, data[speed][2],
-                PR_FLOAT, data[surfingOffsets][0],
-                PR_FLOAT, data[surfingOffsets][1],
-                PR_FLOAT, data[surfingOffsets][2],
-                PR_UINT16, data[surfingVehicleId],
-                PR_INT16, data[animationId],
-                PR_INT16, data[animFlags]
+                PR_UINT16, data[PR_lrKeys],
+                PR_UINT16, data[PR_udKeys],
+                PR_UINT16, data[PR_sampKeys],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2],
+                PR_FLOAT, data[PR_quaternion][0],
+                PR_FLOAT, data[PR_quaternion][1],
+                PR_FLOAT, data[PR_quaternion][2],
+                PR_FLOAT, data[PR_quaternion][3],
+                PR_UINT8, data[PR_health],
+                PR_UINT8, data[PR_armor],
+                PR_BITS, data[PR_additionalKey], 2,
+                PR_BITS, data[PR_weaponId], 6,
+                PR_UINT8, data[PR_specialAction],
+                PR_FLOAT, data[PR_speed][0],
+                PR_FLOAT, data[PR_speed][1],
+                PR_FLOAT, data[PR_speed][2],
+                PR_FLOAT, data[PR_surfingOffsets][0],
+                PR_FLOAT, data[PR_surfingOffsets][1],
+                PR_FLOAT, data[PR_surfingOffsets][2],
+                PR_UINT16, data[PR_surfingVehicleId],
+                PR_INT16, data[PR_animationId],
+                PR_INT16, data[PR_animFlags]
             );
         }
 
@@ -485,29 +485,29 @@
         {
             BS_WriteValue(
                 bs,
-                PR_UINT16, data[vehicleId],
-                PR_UINT16, data[lrKeys],
-                PR_UINT16, data[udKeys],
-                PR_UINT16, data[sampKeys],
-                PR_FLOAT, data[quaternion][0],
-                PR_FLOAT, data[quaternion][1],
-                PR_FLOAT, data[quaternion][2],
-                PR_FLOAT, data[quaternion][3],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2],
-                PR_FLOAT, data[speed][0],
-                PR_FLOAT, data[speed][1],
-                PR_FLOAT, data[speed][2],
-                PR_FLOAT, data[vehicleHealth],
-                PR_UINT8, data[playerHealth],
-                PR_UINT8, data[armor],
-                PR_BITS, data[additionalKey], 2,
-                PR_BITS, data[weaponId], 6,
-                PR_UINT8, data[siren],
-                PR_UINT8, data[landingGearState],
-                PR_UINT16, data[trailerId],
-                PR_FLOAT, data[trainSpeed]
+                PR_UINT16, data[PR_vehicleId],
+                PR_UINT16, data[PR_lrKeys],
+                PR_UINT16, data[PR_udKeys],
+                PR_UINT16, data[PR_sampKeys],
+                PR_FLOAT, data[PR_quaternion][0],
+                PR_FLOAT, data[PR_quaternion][1],
+                PR_FLOAT, data[PR_quaternion][2],
+                PR_FLOAT, data[PR_quaternion][3],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2],
+                PR_FLOAT, data[PR_speed][0],
+                PR_FLOAT, data[PR_speed][1],
+                PR_FLOAT, data[PR_speed][2],
+                PR_FLOAT, data[PR_vehicleHealth],
+                PR_UINT8, data[PR_playerHealth],
+                PR_UINT8, data[PR_armor],
+                PR_BITS, data[PR_additionalKey], 2,
+                PR_BITS, data[PR_weaponId], 6,
+                PR_UINT8, data[PR_siren],
+                PR_UINT8, data[PR_landingGearState],
+                PR_UINT16, data[PR_trailerId],
+                PR_FLOAT, data[PR_trainSpeed]
             );
         }
 
@@ -515,20 +515,20 @@
         {
             BS_WriteValue(
                 bs,
-                PR_UINT16, data[trailerId],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2],
-                PR_FLOAT, data[quaternion][0],
-                PR_FLOAT, data[quaternion][1],
-                PR_FLOAT, data[quaternion][2],
-                PR_FLOAT, data[quaternion][3],
-                PR_FLOAT, data[speed][0],
-                PR_FLOAT, data[speed][1],
-                PR_FLOAT, data[speed][2],
-                PR_FLOAT, data[spin][0],
-                PR_FLOAT, data[spin][1],
-                PR_FLOAT, data[spin][2]
+                PR_UINT16, data[PR_trailerId],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2],
+                PR_FLOAT, data[PR_quaternion][0],
+                PR_FLOAT, data[PR_quaternion][1],
+                PR_FLOAT, data[PR_quaternion][2],
+                PR_FLOAT, data[PR_quaternion][3],
+                PR_FLOAT, data[PR_speed][0],
+                PR_FLOAT, data[PR_speed][1],
+                PR_FLOAT, data[PR_speed][2],
+                PR_FLOAT, data[PR_spin][0],
+                PR_FLOAT, data[PR_spin][1],
+                PR_FLOAT, data[PR_spin][2]
             );
         }
 
@@ -536,19 +536,19 @@
         {
             BS_WriteValue(
                 bs,
-                PR_UINT16, data[vehicleId],
-                PR_BITS, data[driveBy], 2,
-                PR_BITS, data[seatId], 6,
-                PR_BITS, data[additionalKey], 2,
-                PR_BITS, data[weaponId], 6,
-                PR_UINT8, data[playerHealth],
-                PR_UINT8, data[playerArmor],
-                PR_UINT16, data[lrKeys],
-                PR_UINT16, data[udKeys],
-                PR_UINT16, data[sampKeys],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2]
+                PR_UINT16, data[PR_vehicleId],
+                PR_BITS, data[PR_driveBy], 2,
+                PR_BITS, data[PR_seatId], 6,
+                PR_BITS, data[PR_additionalKey], 2,
+                PR_BITS, data[PR_weaponId], 6,
+                PR_UINT8, data[PR_playerHealth],
+                PR_UINT8, data[PR_playerArmor],
+                PR_UINT16, data[PR_lrKeys],
+                PR_UINT16, data[PR_udKeys],
+                PR_UINT16, data[PR_sampKeys],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2]
             );
         }
 
@@ -556,24 +556,24 @@
         {
             BS_WriteValue(
                 bs,
-                PR_UINT16, data[vehicleId],
-                PR_UINT8, data[seatId],
-                PR_FLOAT, data[roll][0],
-                PR_FLOAT, data[roll][1],
-                PR_FLOAT, data[roll][2],
-                PR_FLOAT, data[direction][0],
-                PR_FLOAT, data[direction][1],
-                PR_FLOAT, data[direction][2],
-                PR_FLOAT, data[position][0],
-                PR_FLOAT, data[position][1],
-                PR_FLOAT, data[position][2],
-                PR_FLOAT, data[moveSpeed][0],
-                PR_FLOAT, data[moveSpeed][1],
-                PR_FLOAT, data[moveSpeed][2],
-                PR_FLOAT, data[turnSpeed][0],
-                PR_FLOAT, data[turnSpeed][1],
-                PR_FLOAT, data[turnSpeed][2],
-                PR_FLOAT, data[vehicleHealth]
+                PR_UINT16, data[PR_vehicleId],
+                PR_UINT8, data[PR_seatId],
+                PR_FLOAT, data[PR_roll][0],
+                PR_FLOAT, data[PR_roll][1],
+                PR_FLOAT, data[PR_roll][2],
+                PR_FLOAT, data[PR_direction][0],
+                PR_FLOAT, data[PR_direction][1],
+                PR_FLOAT, data[PR_direction][2],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2],
+                PR_FLOAT, data[PR_moveSpeed][0],
+                PR_FLOAT, data[PR_moveSpeed][1],
+                PR_FLOAT, data[PR_moveSpeed][2],
+                PR_FLOAT, data[PR_turnSpeed][0],
+                PR_FLOAT, data[PR_turnSpeed][1],
+                PR_FLOAT, data[PR_turnSpeed][2],
+                PR_FLOAT, data[PR_vehicleHealth]
             );
         }
 
@@ -581,20 +581,20 @@
         {
             BS_WriteValue(
                 bs,
-                PR_UINT8, data[camMode],
-                PR_FLOAT, data[aimf1][0],
-                PR_FLOAT, data[aimf1][1],
-                PR_FLOAT, data[aimf1][2],
-                PR_FLOAT, data[aimPos][0],
-                PR_FLOAT, data[aimPos][1],
-                PR_FLOAT, data[aimPos][2],
-                PR_FLOAT, data[aimZ],
+                PR_UINT8, data[PR_camMode],
+                PR_FLOAT, data[PR_aimf1][0],
+                PR_FLOAT, data[PR_aimf1][1],
+                PR_FLOAT, data[PR_aimf1][2],
+                PR_FLOAT, data[PR_aimPos][0],
+                PR_FLOAT, data[PR_aimPos][1],
+                PR_FLOAT, data[PR_aimPos][2],
+                PR_FLOAT, data[PR_aimZ],
 
                 // write bit fields in reverse order
-                PR_BITS, data[weaponState], 2,
-                PR_BITS, data[camExtZoom], 6,
+                PR_BITS, data[PR_weaponState], 2,
+                PR_BITS, data[PR_camExtZoom], 6,
 
-                PR_UINT8, data[unk]
+                PR_UINT8, data[PR_unk]
             );
         }
 
@@ -602,18 +602,18 @@
         {
             BS_WriteValue(
                 bs,
-                PR_UINT8, data[type],
-                PR_UINT16, data[targetId],
-                PR_FLOAT, data[origin][0],
-                PR_FLOAT, data[origin][1],
-                PR_FLOAT, data[origin][2],
-                PR_FLOAT, data[target][0],
-                PR_FLOAT, data[target][1],
-                PR_FLOAT, data[target][2],
-                PR_FLOAT, data[center][0],
-                PR_FLOAT, data[center][1],
-                PR_FLOAT, data[center][2],
-                PR_UINT8, data[weaponId]
+                PR_UINT8, data[PR_type],
+                PR_UINT16, data[PR_targetId],
+                PR_FLOAT, data[PR_origin][0],
+                PR_FLOAT, data[PR_origin][1],
+                PR_FLOAT, data[PR_origin][2],
+                PR_FLOAT, data[PR_target][0],
+                PR_FLOAT, data[PR_target][1],
+                PR_FLOAT, data[PR_target][2],
+                PR_FLOAT, data[PR_center][0],
+                PR_FLOAT, data[PR_center][1],
+                PR_FLOAT, data[PR_center][2],
+                PR_UINT8, data[PR_weaponId]
             );
         }
 
