@@ -88,23 +88,20 @@ namespace Hooks {
         }
 
         static  Packet * THISCALL RakServer__Receive(void *_this) {
-            Packet *packet = urmem::call_function<urmem::calling_convention::thiscall, Packet *>(
-                Addresses::FUNC_RAKSERVER__RECEIVE,
-                _this
-                );
+            Packet *packet{};
 
-            if (packet && packet->data) {
+            while (packet = urmem::call_function<urmem::calling_convention::thiscall, Packet *>(Addresses::FUNC_RAKSERVER__RECEIVE, _this)) {
                 RakNet::BitStream bitstream(packet->data, packet->length, false);
 
                 const int
                     player_id = static_cast<int>(packet->playerIndex),
                     packet_id = static_cast<int>(packet->data[0]);
 
-                if (!Scripts::OnIncomingPacket(player_id, packet_id, &bitstream)) {
-                    Functions::DeallocatePacket(packet);
-
-                    return nullptr;
+                if (Scripts::OnIncomingPacket(player_id, packet_id, &bitstream)) {
+                    break;
                 }
+
+                Functions::DeallocatePacket(packet);
             }
 
             return packet;
