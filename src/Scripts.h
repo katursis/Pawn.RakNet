@@ -5,7 +5,7 @@ namespace Scripts {
     class Public {
     public:
         explicit Public(const std::string &name, AMX *amx) : _name{ name }, _amx{ amx } {
-            _exists = (amx_FindPublic(_amx, _name.c_str(), &_index) == AMX_ERR_NONE);
+            _exists = (amx_FindPublic(_amx, _name.c_str(), &_index) == AMX_ERR_NONE && _index >= 0);
         }
 
         inline bool exists() const {
