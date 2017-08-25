@@ -32,7 +32,7 @@ namespace Hooks {
             PlayerID playerId,
             bool broadcast
         ) {
-            if (bitStream) {
+            if (bitStream && bitStream->GetNumberOfBytesUsed()) {
                 const int
                     read_offset = bitStream->GetReadOffset(),
                     write_offset = bitStream->GetWriteOffset(),
@@ -70,7 +70,7 @@ namespace Hooks {
             bool broadcast,
             bool shiftTimestamp
         ) {
-            if (uniqueID && bitStream) {
+            if (uniqueID && bitStream && bitStream->GetNumberOfBytesUsed()) {
                 const int
                     read_offset = bitStream->GetReadOffset(),
                     write_offset = bitStream->GetWriteOffset(),
