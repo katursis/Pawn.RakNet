@@ -117,12 +117,7 @@ namespace Hooks {
 
                 original_rpc[rpc_id] = functionPointer;
 
-                return urmem::call_function<urmem::calling_convention::thiscall, void *>(
-                    Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
-                    _this,
-                    uniqueID,
-                    custom_rpc[rpc_id]
-                );
+                functionPointer = custom_rpc[rpc_id];
             }
 
             return urmem::call_function<urmem::calling_convention::thiscall, void *>(
