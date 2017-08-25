@@ -128,9 +128,9 @@ namespace Hooks {
             );
         }
 
-        static void ReceiveRPC(int rpc_id, RPCParameters *p) {
+        static bool ReceiveRPC(int rpc_id, RPCParameters *p) {
             if (!p) {
-                return;
+                return false;
             }
 
             const int player_id = Functions::GetIndexFromPlayerID(p->sender);
@@ -143,11 +143,7 @@ namespace Hooks {
                 );
             }
 
-            if (!Scripts::OnIncomingRPC(player_id, rpc_id, bs.get())) {
-                return;
-            }
-
-            original_rpc[rpc_id](p);
+            return Scripts::OnIncomingRPC(player_id, rpc_id, bs.get());
         }
 
         static void * GetRakServerInterface(void) {
@@ -205,7 +201,9 @@ namespace Hooks {
             template<size_t ID>
             struct Generator {
                 static void Handle(RPCParameters *p) {
-                    ReceiveRPC(ID, p);
+                    if (ReceiveRPC(ID, p)) {
+                        original_rpc[ID](p);
+                    }
                 }
 
                 static void Run(void) {
