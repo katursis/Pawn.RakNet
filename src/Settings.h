@@ -42,7 +42,7 @@ namespace Settings {
             intercept_outcoming_rpc = config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
             intercept_outcoming_packet = config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
 
-            use_caching = config->get_as<bool>("UseCaching").value_or(true);
+            use_caching = config->get_as<bool>("UseCaching").value_or(false);
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", kPluginName, __FUNCTION__, e.what());
 
