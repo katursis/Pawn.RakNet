@@ -38,6 +38,8 @@
 
 #include "Pawn.RakNet.inc"
 
+extern void *pAMXFunctions;
+
 #include "Logger.h"
 #include "Settings.h"
 #include "Utils.h"
@@ -46,8 +48,6 @@
 #include "Functions.h"
 #include "Hooks.h"
 #include "Natives.h"
-
-extern void *pAMXFunctions;
 
 namespace Plugin {
     bool Load(void **ppData) {
@@ -96,10 +96,6 @@ namespace Plugin {
             Scripts::Load(amx, is_gamemode == 1);
         }
     }
-
-    void AmxUnload(AMX *amx) {
-        Scripts::Unload(amx);
-    }
 };
 
 PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports() {
@@ -116,8 +112,4 @@ PLUGIN_EXPORT void PLUGIN_CALL Unload() {
 
 PLUGIN_EXPORT void PLUGIN_CALL AmxLoad(AMX *amx) {
     Plugin::AmxLoad(amx);
-}
-
-PLUGIN_EXPORT void PLUGIN_CALL AmxUnload(AMX *amx) {
-    Plugin::AmxUnload(amx);
 }

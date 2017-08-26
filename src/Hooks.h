@@ -3,7 +3,8 @@
 
 namespace Hooks {
     std::shared_ptr<urmem::hook>
-        hook_get_rak_server_interface;
+        hook_get_rak_server_interface,
+        hook_amx_cleanup;
 
     std::array<RPCFunction, MAX_RPC_MAP_SIZE>
         original_rpc,
@@ -193,6 +194,19 @@ namespace Hooks {
             return rakserver;
         }
 
+        static int AMXAPI amx_Cleanup(AMX *amx) {
+            const urmem::hook::raii scope(*hook_amx_cleanup);
+
+            Scripts::Unload(amx);
+
+            const auto amx_err_code = urmem::call_function<urmem::calling_convention::cdeclcall, int>(
+                hook_amx_cleanup->get_original_addr(),
+                amx
+            );
+
+            return amx_err_code;
+        }
+
         struct RPCHandle {
             static void Generate(void) {
                 Generator<0>::Run();
@@ -230,6 +244,11 @@ namespace Hooks {
                 hook_get_rak_server_interface = std::make_shared<urmem::hook>(
                     addr,
                     urmem::get_func_addr(&InternalHooks::GetRakServerInterface)
+                );
+
+                hook_amx_cleanup = std::make_shared<urmem::hook>(
+                    reinterpret_cast<urmem::address_t *>(pAMXFunctions)[PLUGIN_AMX_EXPORT_Cleanup],
+                    urmem::get_func_addr(&InternalHooks::amx_Cleanup)
                 );
 
                 return true;
