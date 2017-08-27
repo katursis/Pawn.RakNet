@@ -121,9 +121,9 @@
 
         enum PR_OnFootSync
         {
-            PR_lrKeys,
-            PR_udKeys,
-            PR_sampKeys,
+            PR_lrKey,
+            PR_udKey,
+            PR_keys,
             Float:PR_position[3],
             Float:PR_quaternion[4],
             PR_health,
@@ -141,9 +141,9 @@
         enum PR_InCarSync
         {
             PR_vehicleId,
-            PR_lrKeys,
-            PR_udKeys,
-            PR_sampKeys,
+            PR_lrKey,
+            PR_udKey,
+            PR_keys,
             Float:PR_quaternion[4],
             Float:PR_position[3],
             Float:PR_speed[3],
@@ -176,9 +176,9 @@
             PR_additionalKey,
             PR_playerHealth,
             PR_playerArmor,
-            PR_lrKeys,
-            PR_udKeys,
-            PR_sampKeys,
+            PR_lrKey,
+            PR_udKey,
+            PR_keys,
             Float:PR_position[3]
         };
 
@@ -287,9 +287,9 @@
         {
             BS_ReadValue(
                 bs,
-                PR_UINT16, data[PR_lrKeys],
-                PR_UINT16, data[PR_udKeys],
-                PR_UINT16, data[PR_sampKeys],
+                PR_UINT16, data[PR_lrKey],
+                PR_UINT16, data[PR_udKey],
+                PR_UINT16, data[PR_keys],
                 PR_FLOAT, data[PR_position][0],
                 PR_FLOAT, data[PR_position][1],
                 PR_FLOAT, data[PR_position][2],
@@ -319,9 +319,9 @@
             BS_ReadValue(
                 bs,
                 PR_UINT16, data[PR_vehicleId],
-                PR_UINT16, data[PR_lrKeys],
-                PR_UINT16, data[PR_udKeys],
-                PR_UINT16, data[PR_sampKeys],
+                PR_UINT16, data[PR_lrKey],
+                PR_UINT16, data[PR_udKey],
+                PR_UINT16, data[PR_keys],
                 PR_FLOAT, data[PR_quaternion][0],
                 PR_FLOAT, data[PR_quaternion][1],
                 PR_FLOAT, data[PR_quaternion][2],
@@ -376,9 +376,9 @@
                 PR_BITS, data[PR_weaponId], 6,
                 PR_UINT8, data[PR_playerHealth],
                 PR_UINT8, data[PR_playerArmor],
-                PR_UINT16, data[PR_lrKeys],
-                PR_UINT16, data[PR_udKeys],
-                PR_UINT16, data[PR_sampKeys],
+                PR_UINT16, data[PR_lrKey],
+                PR_UINT16, data[PR_udKey],
+                PR_UINT16, data[PR_keys],
                 PR_FLOAT, data[PR_position][0],
                 PR_FLOAT, data[PR_position][1],
                 PR_FLOAT, data[PR_position][2]
@@ -451,9 +451,9 @@
         {
             BS_WriteValue(
                 bs,
-                PR_UINT16, data[PR_lrKeys],
-                PR_UINT16, data[PR_udKeys],
-                PR_UINT16, data[PR_sampKeys],
+                PR_UINT16, data[PR_lrKey],
+                PR_UINT16, data[PR_udKey],
+                PR_UINT16, data[PR_keys],
                 PR_FLOAT, data[PR_position][0],
                 PR_FLOAT, data[PR_position][1],
                 PR_FLOAT, data[PR_position][2],
@@ -483,9 +483,9 @@
             BS_WriteValue(
                 bs,
                 PR_UINT16, data[PR_vehicleId],
-                PR_UINT16, data[PR_lrKeys],
-                PR_UINT16, data[PR_udKeys],
-                PR_UINT16, data[PR_sampKeys],
+                PR_UINT16, data[PR_lrKey],
+                PR_UINT16, data[PR_udKey],
+                PR_UINT16, data[PR_keys],
                 PR_FLOAT, data[PR_quaternion][0],
                 PR_FLOAT, data[PR_quaternion][1],
                 PR_FLOAT, data[PR_quaternion][2],
@@ -540,9 +540,9 @@
                 PR_BITS, data[PR_weaponId], 6,
                 PR_UINT8, data[PR_playerHealth],
                 PR_UINT8, data[PR_playerArmor],
-                PR_UINT16, data[PR_lrKeys],
-                PR_UINT16, data[PR_udKeys],
-                PR_UINT16, data[PR_sampKeys],
+                PR_UINT16, data[PR_lrKey],
+                PR_UINT16, data[PR_udKey],
+                PR_UINT16, data[PR_keys],
                 PR_FLOAT, data[PR_position][0],
                 PR_FLOAT, data[PR_position][1],
                 PR_FLOAT, data[PR_position][2]
