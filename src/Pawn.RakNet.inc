@@ -135,7 +135,7 @@
             Float:PR_surfingOffsets[3],
             PR_surfingVehicleId,
             PR_animationId,
-            PR_animFlags
+            PR_animationFlags
         };
 
         enum PR_InCarSync
@@ -310,7 +310,7 @@
                 PR_FLOAT, data[PR_surfingOffsets][2],
                 PR_UINT16, data[PR_surfingVehicleId],
                 PR_INT16, data[PR_animationId],
-                PR_INT16, data[PR_animFlags]
+                PR_INT16, data[PR_animationFlags]
             );
         }
 
@@ -474,7 +474,7 @@
                 PR_FLOAT, data[PR_surfingOffsets][2],
                 PR_UINT16, data[PR_surfingVehicleId],
                 PR_INT16, data[PR_animationId],
-                PR_INT16, data[PR_animFlags]
+                PR_INT16, data[PR_animationFlags]
             );
         }
 
