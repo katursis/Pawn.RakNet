@@ -152,7 +152,7 @@
             PR_armour,
             PR_weaponId,
             PR_additionalKey,
-            PR_siren,
+            PR_sirenState,
             PR_landingGearState,
             PR_trailerId,
             Float:PR_trainSpeed
@@ -337,7 +337,7 @@
                 PR_UINT8, data[PR_armour],
                 PR_BITS, data[PR_additionalKey], 2,
                 PR_BITS, data[PR_weaponId], 6,
-                PR_UINT8, data[PR_siren],
+                PR_UINT8, data[PR_sirenState],
                 PR_UINT8, data[PR_landingGearState],
                 PR_UINT16, data[PR_trailerId],
                 PR_FLOAT, data[PR_trainSpeed]
@@ -501,7 +501,7 @@
                 PR_UINT8, data[PR_armour],
                 PR_BITS, data[PR_additionalKey], 2,
                 PR_BITS, data[PR_weaponId], 6,
-                PR_UINT8, data[PR_siren],
+                PR_UINT8, data[PR_sirenState],
                 PR_UINT8, data[PR_landingGearState],
                 PR_UINT16, data[PR_trailerId],
                 PR_FLOAT, data[PR_trainSpeed]
