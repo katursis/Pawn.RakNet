@@ -197,12 +197,12 @@
         enum PR_AimSync
         {
             PR_camMode,
-            Float:PR_aimf1[3],
-            Float:PR_aimPos[3],
+            Float:PR_camFrontVec[3],
+            Float:PR_camPos[3],
             Float:PR_aimZ,
-            PR_camExtZoom,
+            PR_camZoom,
             PR_weaponState,
-            PR_unk
+            PR_aspectRatio
         };
 
         enum PR_BulletSync
@@ -415,19 +415,19 @@
             BS_ReadValue(
                 bs,
                 PR_UINT8, data[PR_camMode],
-                PR_FLOAT, data[PR_aimf1][0],
-                PR_FLOAT, data[PR_aimf1][1],
-                PR_FLOAT, data[PR_aimf1][2],
-                PR_FLOAT, data[PR_aimPos][0],
-                PR_FLOAT, data[PR_aimPos][1],
-                PR_FLOAT, data[PR_aimPos][2],
+                PR_FLOAT, data[PR_camFrontVec][0],
+                PR_FLOAT, data[PR_camFrontVec][1],
+                PR_FLOAT, data[PR_camFrontVec][2],
+                PR_FLOAT, data[PR_camPos][0],
+                PR_FLOAT, data[PR_camPos][1],
+                PR_FLOAT, data[PR_camPos][2],
                 PR_FLOAT, data[PR_aimZ],
 
                 // read bit fields in reverse order
                 PR_BITS, data[PR_weaponState], 2,
-                PR_BITS, data[PR_camExtZoom], 6,
+                PR_BITS, data[PR_camZoom], 6,
 
-                PR_UINT8, data[PR_unk]
+                PR_UINT8, data[PR_aspectRatio]
             );
         }
 
@@ -582,19 +582,19 @@
             BS_WriteValue(
                 bs,
                 PR_UINT8, data[PR_camMode],
-                PR_FLOAT, data[PR_aimf1][0],
-                PR_FLOAT, data[PR_aimf1][1],
-                PR_FLOAT, data[PR_aimf1][2],
-                PR_FLOAT, data[PR_aimPos][0],
-                PR_FLOAT, data[PR_aimPos][1],
-                PR_FLOAT, data[PR_aimPos][2],
+                PR_FLOAT, data[PR_camFrontVec][0],
+                PR_FLOAT, data[PR_camFrontVec][1],
+                PR_FLOAT, data[PR_camFrontVec][2],
+                PR_FLOAT, data[PR_camPos][0],
+                PR_FLOAT, data[PR_camPos][1],
+                PR_FLOAT, data[PR_camPos][2],
                 PR_FLOAT, data[PR_aimZ],
 
                 // write bit fields in reverse order
                 PR_BITS, data[PR_weaponState], 2,
-                PR_BITS, data[PR_camExtZoom], 6,
+                PR_BITS, data[PR_camZoom], 6,
 
-                PR_UINT8, data[PR_unk]
+                PR_UINT8, data[PR_aspectRatio]
             );
         }
 
