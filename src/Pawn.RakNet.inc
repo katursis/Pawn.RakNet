@@ -422,11 +422,8 @@
                 PR_FLOAT, data[PR_camPos][1],
                 PR_FLOAT, data[PR_camPos][2],
                 PR_FLOAT, data[PR_aimZ],
-
-                // read bit fields in reverse order
                 PR_BITS, data[PR_weaponState], 2,
                 PR_BITS, data[PR_camZoom], 6,
-
                 PR_UINT8, data[PR_aspectRatio]
             );
         }
@@ -589,11 +586,8 @@
                 PR_FLOAT, data[PR_camPos][1],
                 PR_FLOAT, data[PR_camPos][2],
                 PR_FLOAT, data[PR_aimZ],
-
-                // write bit fields in reverse order
                 PR_BITS, data[PR_weaponState], 2,
                 PR_BITS, data[PR_camZoom], 6,
-
                 PR_UINT8, data[PR_aspectRatio]
             );
         }
