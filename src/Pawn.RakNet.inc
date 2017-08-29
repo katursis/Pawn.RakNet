@@ -265,6 +265,8 @@
         #define BS_ReadCompressedBool(%0,%1) BS_ReadValue(%0, PR_CBOOL, %1)
         #define BS_ReadCompressedString(%0,%1,%2) BS_ReadValue(%0, PR_CSTRING, %1, %2)
 
+        #define BS_ReadBits(%0,%1,%2) BS_ReadValue(%0, PR_BITS, %1, %2)
+
         #define BS_WriteInt8(%0,%1) BS_WriteValue(%0, PR_INT8, %1)
         #define BS_WriteInt16(%0,%1) BS_WriteValue(%0, PR_INT16, %1)
         #define BS_WriteInt32(%0,%1) BS_WriteValue(%0, PR_INT32, %1)
@@ -284,6 +286,8 @@
         #define BS_WriteCompressedFloat(%0,%1) BS_WriteValue(%0, PR_CFLOAT, %1)
         #define BS_WriteCompressedBool(%0,%1) BS_WriteValue(%0, PR_CBOOL, %1)
         #define BS_WriteCompressedString(%0,%1) BS_WriteValue(%0, PR_CSTRING, %1)
+
+        #define BS_WriteBits(%0,%1,%2) BS_WriteValue(%0, PR_BITS, %1, %2)
 
         stock BS_ReadOnFootSync(BitStream:bs, data[PR_OnFootSync])
         {
