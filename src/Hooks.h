@@ -59,19 +59,27 @@ namespace Hooks {
             bool broadcast,
             bool shiftTimestamp
         ) {
-            if (uniqueID && bitStream && bitStream->GetNumberOfBytesUsed()) {
+            if (!uniqueID) {
+                return false;
+            }
+
+            const int rpc_id = static_cast<int>(*uniqueID);
+
+            if (bitStream) {
                 const int
                     read_offset = bitStream->GetReadOffset(),
-                    write_offset = bitStream->GetWriteOffset(),
-                    rpc_id = static_cast<int>(*uniqueID);
+                    write_offset = bitStream->GetWriteOffset();
 
                 if (!Scripts::OnOutcomingRPC(Functions::GetIndexFromPlayerID(playerId), rpc_id, bitStream)) {
                     return false;
                 }
 
                 bitStream->SetReadOffset(read_offset);
-
                 bitStream->SetWriteOffset(write_offset);
+            } else {
+                if (!Scripts::OnOutcomingRPC(Functions::GetIndexFromPlayerID(playerId), rpc_id, nullptr)) {
+                    return false;
+                }
             }
 
             return urmem::call_function<urmem::calling_convention::thiscall, bool>(
