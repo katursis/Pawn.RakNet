@@ -21,20 +21,25 @@ namespace Hooks {
             PlayerID playerId,
             bool broadcast
         ) {
-            if (bitStream && bitStream->GetNumberOfBytesUsed()) {
-                const int
-                    read_offset = bitStream->GetReadOffset(),
-                    write_offset = bitStream->GetWriteOffset(),
-                    packet_id = static_cast<int>(bitStream->GetData()[0]);
-
-                if (!Scripts::OnOutcomingPacket(Functions::GetIndexFromPlayerID(playerId), packet_id, bitStream)) {
-                    return false;
-                }
-
-                bitStream->SetReadOffset(read_offset);
-
-                bitStream->SetWriteOffset(write_offset);
+            if (!bitStream) {
+                return false;
             }
+
+            if (bitStream->GetNumberOfBytesUsed() <= 0) {
+                return false;
+            }
+
+            const int
+                read_offset = bitStream->GetReadOffset(),
+                write_offset = bitStream->GetWriteOffset(),
+                packet_id = static_cast<int>(bitStream->GetData()[0]);
+
+            if (!Scripts::OnOutcomingPacket(Functions::GetIndexFromPlayerID(playerId), packet_id, bitStream)) {
+                return false;
+            }
+
+            bitStream->SetReadOffset(read_offset);
+            bitStream->SetWriteOffset(write_offset);
 
             return urmem::call_function<urmem::calling_convention::thiscall, bool>(
                 Addresses::FUNC_RAKSERVER__SEND,
@@ -121,13 +126,19 @@ namespace Hooks {
             RPCIndex *uniqueID,
             RPCFunction functionPointer
         ) {
-            if (uniqueID && functionPointer) {
-                const int rpc_id = static_cast<int>(*uniqueID);
-
-                original_rpc[rpc_id] = functionPointer;
-
-                functionPointer = custom_rpc[rpc_id];
+            if (!uniqueID) {
+                return nullptr;
             }
+
+            if (!functionPointer) {
+                return nullptr;
+            }
+
+            const int rpc_id = static_cast<int>(*uniqueID);
+
+            original_rpc[rpc_id] = functionPointer;
+
+            functionPointer = custom_rpc[rpc_id];
 
             return urmem::call_function<urmem::calling_convention::thiscall, void *>(
                 Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
