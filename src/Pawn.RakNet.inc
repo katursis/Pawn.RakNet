@@ -25,7 +25,7 @@
 #if !defined PAWNRAKNET_INC_
     #define PAWNRAKNET_INC_
 
-    #define PAWNRAKNET_INCLUDE_VERSION 101
+    #define PAWNRAKNET_INCLUDE_VERSION 102
 
     enum PR_HandlerType
     {
