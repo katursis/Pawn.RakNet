@@ -237,7 +237,15 @@ namespace Scripts {
                 amx_GetPublic(_amx, i, public_name);
 
                 if (std::regex_match(public_name, r)) {
-                    amx_Exec(_amx, nullptr, i);
+                    if (_amx->flags & AMX_FLAG_NTVREG) { // all native functions are registered
+                        amx_Exec(_amx, nullptr, i);
+                    } else {
+                        _amx->flags |= AMX_FLAG_NTVREG;
+
+                        amx_Exec(_amx, nullptr, i);
+
+                        _amx->flags &= ~AMX_FLAG_NTVREG;
+                    }
                 }
             }
         }
