@@ -214,12 +214,12 @@
             Float:PR_offsets[3],
             PR_weaponId
         };
-		
-	    enum PR_SpectatingSync
+	
+        enum PR_SpectatingSync
         {
             PR_lrKey,
             PR_udKey,
-	        PR_keys,
+	    PR_keys,
             Float:PR_position[3]
         };
 
@@ -442,7 +442,7 @@
             );
         }
 		
-	    stock BS_ReadBulletSync(BitStream:bs, data[PR_BulletSync])
+        stock BS_ReadBulletSync(BitStream:bs, data[PR_BulletSync])
         {
             BS_ReadValue(
                 bs,
@@ -461,7 +461,7 @@
             );
         }
 		
-	    stock BS_ReadSpectatingSync(BitStream:bs, data[PR_SpectatingSync])
+        stock BS_ReadSpectatingSync(BitStream:bs, data[PR_SpectatingSync])
         {
             BS_ReadValue(
                 bs,
@@ -471,8 +471,8 @@
                 PR_FLOAT, data[PR_position][0],
                 PR_FLOAT, data[PR_position][1],
                 PR_FLOAT, data[PR_position][2]
-	        );
-	    }
+	    );
+	}
 
         stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync])
         {
@@ -638,7 +638,7 @@
             );
         }
 		
-	    stock BS_WriteSpectatingSync(BitStream:bs, data[PR_SpectatingSync])
+        stock BS_WriteSpectatingSync(BitStream:bs, data[PR_SpectatingSync])
         {
             BS_WriteValue(
                 bs,
