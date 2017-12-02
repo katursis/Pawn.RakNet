@@ -214,6 +214,14 @@
             Float:PR_offsets[3],
             PR_weaponId
         };
+		
+		enum PR_SpectatingSync
+        {
+            PR_lrKey,
+            PR_udKey,
+			PR_keys,
+            Float:PR_position[3]
+        };
 
         /*
          * RPC list: https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
@@ -433,8 +441,8 @@
                 PR_UINT8, data[PR_aspectRatio]
             );
         }
-
-        stock BS_ReadBulletSync(BitStream:bs, data[PR_BulletSync])
+		
+		stock BS_ReadBulletSync(BitStream:bs, data[PR_BulletSync])
         {
             BS_ReadValue(
                 bs,
@@ -452,6 +460,19 @@
                 PR_UINT8, data[PR_weaponId]
             );
         }
+		
+		stock BS_ReadSpectatingSync(BitStream:bs, data[PR_SpectatingSync])
+        {
+            BS_ReadValue(
+                bs,
+                PR_UINT16, data[PR_lrKey],
+                PR_UINT16, data[PR_udKey],
+                PR_UINT16, data[PR_keys],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2]
+			);
+		}
 
         stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync])
         {
@@ -614,6 +635,19 @@
                 PR_FLOAT, data[PR_offsets][1],
                 PR_FLOAT, data[PR_offsets][2],
                 PR_UINT8, data[PR_weaponId]
+            );
+        }
+		
+		stock BS_WriteSpectatingSync(BitStream:bs, data[PR_SpectatingSync])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT16, data[PR_lrKey],
+                PR_UINT16, data[PR_udKey],
+                PR_UINT16, data[PR_keys],
+                PR_FLOAT, data[PR_position][0],
+                PR_FLOAT, data[PR_position][1],
+                PR_FLOAT, data[PR_position][2]
             );
         }
 
