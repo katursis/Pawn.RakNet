@@ -15,7 +15,7 @@ namespace Settings {
         "\x68\x18\x0E\x00\x00\xE8\xFF\xFF\xFF\xFF\x83" \
         "\xC4\x04\x89\x04\x24\x85\xC0\xC7\x44\x24\xFF" \
         "\x00\x00\x00\x00\x74\x16",
-        *kMask = "xxx????xxxxxxxxxxxxxxxx????x????xxxxxxxxxxx?xxxxxx";
+        *kMask = "???????xxxxxxxxxxxxxxxx????x????xxxxxxxxxxx?xxxxxx";
 #else
         *kPattern =
         "\x55\x89\xE5\x83\xEC\x18\xC7\x04\x24\xFF\xFF" \
@@ -23,7 +23,7 @@ namespace Settings {
         "\xFF\xFF\x89\x04\x24\x89\xC6\xE8\xFF\xFF\xFF" \
         "\xFF\x89\xF0\x8B\x5D\xFF\x8B\x75\xFF\x89\xEC" \
         "\x5D\xC3",
-        *kMask = "xxxxxxxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
+        *kMask = "?????xxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
 #endif
     bool
         intercept_incoming_rpc{},
