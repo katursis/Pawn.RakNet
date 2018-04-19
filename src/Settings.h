@@ -35,6 +35,8 @@ namespace Settings {
 
     bool Read(const std::string &path) {
         try {
+            std::fstream(path, std::fstream::out | std::fstream::app); // create the config if it does not exist
+
             const auto config = cpptoml::parse_file(path);
 
             intercept_incoming_rpc = config->get_as<bool>("InterceptIncomingRPC").value_or(true);
