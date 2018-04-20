@@ -4,7 +4,7 @@
 namespace Settings {
     constexpr char
         *kPluginName = "Pawn.RakNet",
-        *kPluginVersion = "1.0.2",
+        *kPluginVersion = "1.1.0",
         *kConfigFile = "plugins/pawnraknet.cfg",
         *kPublicVarNameVersion = "_pawnraknet_version",
         *kPublicVarNameIsGamemode = "_pawnraknet_is_gamemode",
