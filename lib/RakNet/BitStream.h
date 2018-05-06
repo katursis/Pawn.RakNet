@@ -451,6 +451,12 @@ namespace RakNet
 		/// *makes sure it is set to on and the data pointed to is copied.
 		void AssertCopyData(void);
 
+		/// Returns true if the internal buffer is copy of the data passed to the constructor
+		inline bool isCopyData() const { return copyData; }
+
+		/// Returns the number of bits allocated
+		inline int GetNumberOfBitsAllocated() const { return numberOfBitsAllocated; };
+
 		/// Use this if you pass a pointer copy to the constructor
 		/// *(_copyData==false) and want to overallocate to prevent
 		/// *reallocation
