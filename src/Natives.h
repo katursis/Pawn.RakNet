@@ -338,6 +338,33 @@ namespace Natives {
         return 1;
     }
 
+    // native BS_GetNumberOfBitsAllocated(BitStream:bs, &number);
+    cell AMX_NATIVE_CALL n_BS_GetNumberOfBitsAllocated(AMX *amx, cell *params) {
+        if (!Utils::check_params(__FUNCTION__, 2, params)) {
+            return 0;
+        }
+
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+
+        if (!bs) {
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        cell *cptr{};
+
+        if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
+            Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        *cptr = static_cast<cell>(bs->GetNumberOfBitsAllocated());
+
+        return 1;
+    }
+
     // native BS_WriteValue(BitStream:bs, {Float,_}:...);
     cell AMX_NATIVE_CALL n_BS_WriteValue(AMX *amx, cell *params) {
         if (params[0] < (sizeof(cell) * 3)) {
@@ -697,6 +724,7 @@ namespace Natives {
             { "BS_GetNumberOfBitsUsed", n_BS_GetNumberOfBitsUsed },
             { "BS_GetNumberOfBytesUsed", n_BS_GetNumberOfBytesUsed },
             { "BS_GetNumberOfUnreadBits", n_BS_GetNumberOfUnreadBits },
+            { "BS_GetNumberOfBitsAllocated", n_BS_GetNumberOfBitsAllocated },
 
             { "BS_WriteValue", n_BS_WriteValue },
             { "BS_ReadValue", n_BS_ReadValue },

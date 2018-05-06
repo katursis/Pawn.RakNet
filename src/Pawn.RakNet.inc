@@ -249,6 +249,7 @@
         native BS_GetNumberOfBitsUsed(BitStream:bs, &number);
         native BS_GetNumberOfBytesUsed(BitStream:bs, &number);
         native BS_GetNumberOfUnreadBits(BitStream:bs, &number);
+        native BS_GetNumberOfBitsAllocated(BitStream:bs, &number);
 
         native BS_WriteValue(BitStream:bs, {PR_ValueType, Float, _}:...);
         native BS_ReadValue(BitStream:bs, {PR_ValueType, Float, _}:...);
