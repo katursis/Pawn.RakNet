@@ -25,6 +25,7 @@
 #include <string.h>
 #include <math.h>
 #include <float.h>
+#include <stdexcept>
 #ifdef _COMPATIBILITY_1
 #include "Compatibility1Includes.h"
 #elif defined(_WIN32)
@@ -601,6 +602,10 @@ void BitStream::AddBitsAndReallocate(const int numberOfBitsToWrite)
 		// It needs to reallocate to hold all the data and can't do it unless we allocated to begin with
 		assert(copyData == true);
 #endif
+		if (copyData == false)
+		{
+			throw std::runtime_error{ "copyData == false (AddBitsAndReallocate)" };
+		}
 
 		// Less memory efficient but saves on news and deletes
 		newNumberOfBitsAllocated = (numberOfBitsToWrite + numberOfBitsUsed) * 2;

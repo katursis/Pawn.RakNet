@@ -354,116 +354,122 @@ namespace Natives {
             return 0;
         }
 
-        cell *cptr_type{}, *cptr_value{};
+        try {
+            cell *cptr_type{}, *cptr_value{};
 
-        for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
-            if (amx_GetAddr(amx, params[i + 1], &cptr_type) != AMX_ERR_NONE ||
-                amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE
-            ) {
-                Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
-
-                return 0;
-            }
-
-            const auto type = static_cast<PR_ValueType>(*cptr_type);
-
-            switch (type) {
-                case PR_STRING: {
-                    int size{}; amx_StrLen(cptr_value, &size);
-
-                    char *str = new char[size + 1]{};
-
-                    amx_GetString(str, cptr_value, 0, size + 1);
-
-                    bs->Write(str, size);
-
-                    delete[] str;
-
-                    break;
-                }
-                case PR_CSTRING: {
-                    int size{}; amx_StrLen(cptr_value, &size);
-
-                    char *str = new char[size + 1]{};
-
-                    amx_GetString(str, cptr_value, 0, size + 1);
-
-                    stringCompressor->EncodeString(str, size + 1, bs);
-
-                    delete[] str;
-
-                    break;
-                }
-                case PR_INT8:
-                    bs->Write(static_cast<char>(*cptr_value));
-                    break;
-                case PR_INT16:
-                    bs->Write(static_cast<short>(*cptr_value));
-                    break;
-                case PR_INT32:
-                    bs->Write(static_cast<int>(*cptr_value));
-                    break;
-                case PR_UINT8:
-                    bs->Write(static_cast<unsigned char>(*cptr_value));
-                    break;
-                case PR_UINT16:
-                    bs->Write(static_cast<unsigned short>(*cptr_value));
-                    break;
-                case PR_UINT32:
-                    bs->Write(static_cast<unsigned int>(*cptr_value));
-                    break;
-                case PR_FLOAT:
-                    bs->Write(amx_ctof(*cptr_value));
-                    break;
-                case PR_BOOL:
-                    bs->Write(!!(*cptr_value));
-                    break;
-                case PR_CINT8:
-                    bs->WriteCompressed(static_cast<char>(*cptr_value));
-                    break;
-                case PR_CINT16:
-                    bs->WriteCompressed(static_cast<short>(*cptr_value));
-                    break;
-                case PR_CINT32:
-                    bs->WriteCompressed(static_cast<int>(*cptr_value));
-                    break;
-                case PR_CUINT8:
-                    bs->WriteCompressed(static_cast<unsigned char>(*cptr_value));
-                    break;
-                case PR_CUINT16:
-                    bs->WriteCompressed(static_cast<unsigned short>(*cptr_value));
-                    break;
-                case PR_CUINT32:
-                    bs->WriteCompressed(static_cast<unsigned int>(*cptr_value));
-                    break;
-                case PR_CFLOAT:
-                    bs->WriteCompressed(amx_ctof(*cptr_value));
-                    break;
-                case PR_CBOOL:
-                    bs->WriteCompressed(!!(*cptr_value));
-                    break;
-                case PR_BITS: {
-                    cell *cptr_number_of_bits{}; amx_GetAddr(amx, params[i + 3], &cptr_number_of_bits);
-
-                    int number_of_bits = static_cast<int>(*cptr_number_of_bits);
-
-                    if (number_of_bits <= 0 || number_of_bits > (sizeof(cell) * 8)) {
-                        Logger::instance()->Write("[%s] %s: invalid number of bits", Settings::kPluginName, __FUNCTION__);
-
-                        return 0;
-                    }
-
-                    bs->WriteBits(reinterpret_cast<unsigned char *>(cptr_value), number_of_bits, true);
-
-                    ++i;
-
-                    break;
-                }
-                default:
-                    Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
+            for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
+                if (amx_GetAddr(amx, params[i + 1], &cptr_type) != AMX_ERR_NONE ||
+                    amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE
+                ) {
+                    Logger::instance()->Write("[%s] %s: invalid param reference", Settings::kPluginName, __FUNCTION__);
 
                     return 0;
+                }
+
+                const auto type = static_cast<PR_ValueType>(*cptr_type);
+
+                switch (type) {
+                    case PR_STRING: {
+                        int size{}; amx_StrLen(cptr_value, &size);
+
+                        char *str = new char[size + 1]{};
+
+                        amx_GetString(str, cptr_value, 0, size + 1);
+
+                        bs->Write(str, size);
+
+                        delete[] str;
+
+                        break;
+                    }
+                    case PR_CSTRING: {
+                        int size{}; amx_StrLen(cptr_value, &size);
+
+                        char *str = new char[size + 1]{};
+
+                        amx_GetString(str, cptr_value, 0, size + 1);
+
+                        stringCompressor->EncodeString(str, size + 1, bs);
+
+                        delete[] str;
+
+                        break;
+                    }
+                    case PR_INT8:
+                        bs->Write(static_cast<char>(*cptr_value));
+                        break;
+                    case PR_INT16:
+                        bs->Write(static_cast<short>(*cptr_value));
+                        break;
+                    case PR_INT32:
+                        bs->Write(static_cast<int>(*cptr_value));
+                        break;
+                    case PR_UINT8:
+                        bs->Write(static_cast<unsigned char>(*cptr_value));
+                        break;
+                    case PR_UINT16:
+                        bs->Write(static_cast<unsigned short>(*cptr_value));
+                        break;
+                    case PR_UINT32:
+                        bs->Write(static_cast<unsigned int>(*cptr_value));
+                        break;
+                    case PR_FLOAT:
+                        bs->Write(amx_ctof(*cptr_value));
+                        break;
+                    case PR_BOOL:
+                        bs->Write(!!(*cptr_value));
+                        break;
+                    case PR_CINT8:
+                        bs->WriteCompressed(static_cast<char>(*cptr_value));
+                        break;
+                    case PR_CINT16:
+                        bs->WriteCompressed(static_cast<short>(*cptr_value));
+                        break;
+                    case PR_CINT32:
+                        bs->WriteCompressed(static_cast<int>(*cptr_value));
+                        break;
+                    case PR_CUINT8:
+                        bs->WriteCompressed(static_cast<unsigned char>(*cptr_value));
+                        break;
+                    case PR_CUINT16:
+                        bs->WriteCompressed(static_cast<unsigned short>(*cptr_value));
+                        break;
+                    case PR_CUINT32:
+                        bs->WriteCompressed(static_cast<unsigned int>(*cptr_value));
+                        break;
+                    case PR_CFLOAT:
+                        bs->WriteCompressed(amx_ctof(*cptr_value));
+                        break;
+                    case PR_CBOOL:
+                        bs->WriteCompressed(!!(*cptr_value));
+                        break;
+                    case PR_BITS: {
+                        cell *cptr_number_of_bits{}; amx_GetAddr(amx, params[i + 3], &cptr_number_of_bits);
+
+                        int number_of_bits = static_cast<int>(*cptr_number_of_bits);
+
+                        if (number_of_bits <= 0 || number_of_bits > (sizeof(cell) * 8)) {
+                            Logger::instance()->Write("[%s] %s: invalid number of bits", Settings::kPluginName, __FUNCTION__);
+
+                            return 0;
+                        }
+
+                        bs->WriteBits(reinterpret_cast<unsigned char *>(cptr_value), number_of_bits, true);
+
+                        ++i;
+
+                        break;
+                    }
+                    default:
+                        Logger::instance()->Write("[%s] %s: invalid type of value", Settings::kPluginName, __FUNCTION__);
+
+                        return 0;
+                }
             }
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+
+            return 0;
         }
 
         return 1;
