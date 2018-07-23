@@ -72,7 +72,7 @@ namespace Plugin {
         return true;
     }
 
-    void Unload(void) {
+    void Unload() {
         StringCompressor::RemoveReference();
 
         Logger::instance()->Write("%s plugin v%s by urShadow unloaded", Settings::kPluginName, Settings::kPluginVersion);
