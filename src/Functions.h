@@ -51,12 +51,10 @@ namespace Functions {
         int priority,
         int reliability
     ) {
-        const auto rpc_index = static_cast<RPCIndex>(rpc_id);
-
         return urmem::call_function<urmem::calling_convention::thiscall, bool>(
             Addresses::FUNC_RAKSERVER__RPC,
             Addresses::PTR_RAKSERVER,
-            &rpc_index,
+            &rpc_id,
             bs,
             priority,
             reliability,
