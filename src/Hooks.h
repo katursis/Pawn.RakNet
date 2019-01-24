@@ -166,7 +166,7 @@ namespace Hooks {
             return Scripts::OnIncomingRPC(player_id, rpc_id, bs.get());
         }
 
-        static void * GetRakServerInterface(void) {
+        static void * GetRakServerInterface() {
             const urmem::hook::raii scope(*hook_get_rak_server_interface);
 
             const auto rakserver = urmem::call_function<urmem::calling_convention::cdeclcall, void *>(
@@ -227,7 +227,7 @@ namespace Hooks {
         }
 
         struct RPCHandle {
-            static void Generate(void) {
+            static void Generate() {
                 Generator<0>::Run();
             }
 
@@ -239,7 +239,7 @@ namespace Hooks {
                     }
                 }
 
-                static void Run(void) {
+                static void Run() {
                     custom_rpc[ID] = reinterpret_cast<RPCFunction>(&Handle);
 
                     Generator<ID + 1>::Run();
@@ -250,7 +250,7 @@ namespace Hooks {
 
     template<>
     struct InternalHooks::RPCHandle::Generator<MAX_RPC_MAP_SIZE> {
-        static void Run(void) {}
+        static void Run() {}
     };
 
     bool Init(void *addr_in_server) {
