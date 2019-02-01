@@ -47,6 +47,45 @@ namespace Natives {
         return static_cast<cell>(Functions::SendPacket(player_id, bs, priority, reliability));
     }
 
+    // native BS_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
+    cell AMX_NATIVE_CALL n_BS_EmulateIncomingRPC(AMX *amx, cell *params) {
+        if (!Utils::check_params(__FUNCTION__, 3, params)) {
+            return 0;
+        }
+
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
+
+        if (!bs) {
+            Logger::instance()->Write("[%s] %s: invalid BitStream handle", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        const int
+            player_id = static_cast<int>(params[2]),
+            rpc_id = static_cast<RPCIndex>(params[3]);
+
+        const auto &handler = Hooks::original_rpc[rpc_id];
+
+        if (!handler) {
+            Logger::instance()->Write("[%s] %s: invalid rpcid", Settings::kPluginName, __FUNCTION__);
+
+            return 0;
+        }
+
+        RPCParameters RPCParams;
+        RPCParams.numberOfBitsOfData = bs->GetNumberOfBitsUsed();
+        RPCParams.sender = Functions::GetPlayerIDFromIndex(player_id);
+
+        if (RPCParams.numberOfBitsOfData) {
+            RPCParams.input = bs->GetData();
+        }
+
+        handler(&RPCParams);
+
+        return 1;
+    }
+
     // native BitStream:BS_New();
     cell AMX_NATIVE_CALL n_BS_New(AMX *amx, cell *params) {
         if (!Utils::check_params(__FUNCTION__, 0, params)) {
@@ -707,6 +746,8 @@ namespace Natives {
         const std::vector<AMX_NATIVE_INFO> natives{
             { "BS_RPC", n_BS_RPC },
             { "BS_Send", n_BS_Send },
+
+            { "BS_EmulateIncomingRPC", n_BS_EmulateIncomingRPC },
 
             { "BS_New", n_BS_New },
             { "BS_Delete", n_BS_Delete },

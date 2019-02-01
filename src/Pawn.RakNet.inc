@@ -233,6 +233,8 @@
         native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
         native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
+        native BS_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
+
         native BitStream:BS_New();
         native BS_Delete(&BitStream:bs);
 
