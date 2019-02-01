@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2018 urShadow
+ * Copyright (c) 2017-2019 urShadow
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,49 +42,52 @@ extern void *pAMXFunctions;
 
 #include "Logger.h"
 #include "Settings.h"
-#include "Utils.h"
-#include "Scripts.h"
 #include "Addresses.h"
 #include "Functions.h"
+#include "Scripts.h"
 #include "Hooks.h"
 #include "Natives.h"
 
 namespace Plugin {
     bool Load(void **ppData) {
-        pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
+        try {
+            pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
 
-        Logger::instance()->Init(ppData[PLUGIN_DATA_LOGPRINTF]);
+            Logger::instance()->Init(ppData[PLUGIN_DATA_LOGPRINTF]);
 
-        if (!Settings::Read()) {
-            return false;
+            Settings::Read();
+
+            Hooks::Init(*ppData);
+
+            StringCompressor::AddReference();
+
+            Logger::instance()->Write("%s plugin v%s by urShadow has been loaded", Settings::kPluginName, Settings::kPluginVersion);
+
+            return true;
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
         }
 
-        if (!Hooks::Init(ppData[PLUGIN_DATA_LOGPRINTF])) {
-            Logger::instance()->Write("[%s] %s: RakServer address not found", Settings::kPluginName, __FUNCTION__);
-
-            return false;
-        }
-
-        StringCompressor::AddReference();
-
-        Logger::instance()->Write("%s plugin v%s by urShadow loaded", Settings::kPluginName, Settings::kPluginVersion);
-
-        return true;
+        return false;
     }
 
     void Unload() {
-        StringCompressor::RemoveReference();
+        try {
+            StringCompressor::RemoveReference();
 
-        Settings::Save();
+            Settings::Save();
 
-        Logger::instance()->Write("%s plugin v%s by urShadow unloaded", Settings::kPluginName, Settings::kPluginVersion);
+            Logger::instance()->Write("%s plugin v%s by urShadow has been unloaded", Settings::kPluginName, Settings::kPluginVersion);
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+        }
     }
 
     void AmxLoad(AMX *amx) {
         cell include_version{}, is_gamemode{};
 
-        const bool exists = Utils::get_public_var(amx, Settings::kPublicVarNameVersion, include_version) &&
-            Utils::get_public_var(amx, Settings::kPublicVarNameIsGamemode, is_gamemode);
+        const bool exists = Functions::GetAmxPublicVar(amx, Settings::kPublicVarNameVersion, include_version) &&
+            Functions::GetAmxPublicVar(amx, Settings::kPublicVarNameIsGamemode, is_gamemode);
 
         if (exists) {
             if (include_version != PAWNRAKNET_INCLUDE_VERSION) {

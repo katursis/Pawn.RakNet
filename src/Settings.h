@@ -10,20 +10,20 @@ namespace Settings {
         *kPublicVarNameIsGamemode = "_pawnraknet_is_gamemode",
         *kRegHandlerPublicRegExp = R"(^pr_r(?:ir|ip|or|op)_\w+$)",
 #ifdef _WIN32
-        *kPattern = "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
+        *kGetRakServerInterfacePattern = "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
         "\x00\x00\x50\x64\x89\x25\x00\x00\x00\x00\x51" \
         "\x68\x18\x0E\x00\x00\xE8\xFF\xFF\xFF\xFF\x83" \
         "\xC4\x04\x89\x04\x24\x85\xC0\xC7\x44\x24\xFF" \
         "\x00\x00\x00\x00\x74\x16",
-        *kMask = "???????xxxxxxxxxxxxxxxx????x????xxxxxxxxxxx?xxxxxx";
+        *kGetRakServerInterfaceMask = "???????xxxxxxxxxxxxxxxx????x????xxxxxxxxxxx?xxxxxx";
 #else
-        *kPattern =
+        *kGetRakServerInterfacePattern =
         "\x55\x89\xE5\x83\xEC\x18\xC7\x04\x24\xFF\xFF" \
         "\xFF\xFF\x89\x75\xFF\x89\x5D\xFF\xE8\xFF\xFF" \
         "\xFF\xFF\x89\x04\x24\x89\xC6\xE8\xFF\xFF\xFF" \
         "\xFF\x89\xF0\x8B\x5D\xFF\x8B\x75\xFF\x89\xEC" \
         "\x5D\xC3",
-        *kMask = "?????xxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
+        *kGetRakServerInterfaceMask = "?????xxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
 #endif
     bool
         intercept_incoming_rpc{},
@@ -33,42 +33,30 @@ namespace Settings {
 
         use_caching{};
 
-    bool Read() {
-        try {
-            std::fstream{kConfigFile, std::fstream::out | std::fstream::app};
+    void Read() {
+        std::fstream{kConfigFile, std::fstream::out | std::fstream::app};
 
-            const auto config = cpptoml::parse_file(kConfigFile);
+        const auto config = cpptoml::parse_file(kConfigFile);
 
-            intercept_incoming_rpc = config->get_as<bool>("InterceptIncomingRPC").value_or(true);
-            intercept_incoming_packet = config->get_as<bool>("InterceptIncomingPacket").value_or(true);
-            intercept_outcoming_rpc = config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
-            intercept_outcoming_packet = config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
+        intercept_incoming_rpc = config->get_as<bool>("InterceptIncomingRPC").value_or(true);
+        intercept_incoming_packet = config->get_as<bool>("InterceptIncomingPacket").value_or(true);
+        intercept_outcoming_rpc = config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
+        intercept_outcoming_packet = config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
 
-            use_caching = config->get_as<bool>("UseCaching").value_or(false);
-        } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", kPluginName, __FUNCTION__, e.what());
-
-            return false;
-        }
-
-        return true;
+        use_caching = config->get_as<bool>("UseCaching").value_or(false);
     }
 
     void Save() {
-        try {
-            auto table = cpptoml::make_table();
+        auto config = cpptoml::make_table();
 
-            table->insert("InterceptIncomingRPC", intercept_incoming_rpc);
-            table->insert("InterceptIncomingPacket", intercept_incoming_packet);
-            table->insert("InterceptOutcomingRPC", intercept_outcoming_rpc);
-            table->insert("InterceptOutcomingPacket", intercept_outcoming_packet);
+        config->insert("InterceptIncomingRPC", intercept_incoming_rpc);
+        config->insert("InterceptIncomingPacket", intercept_incoming_packet);
+        config->insert("InterceptOutcomingRPC", intercept_outcoming_rpc);
+        config->insert("InterceptOutcomingPacket", intercept_outcoming_packet);
 
-            table->insert("UseCaching", use_caching);
+        config->insert("UseCaching", use_caching);
 
-            std::fstream{kConfigFile, std::fstream::out | std::fstream::trunc} << (*table);
-        } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", kPluginName, __FUNCTION__, e.what());
-        }
+        std::fstream{kConfigFile, std::fstream::out | std::fstream::trunc} << (*config);
     }
 }
 
