@@ -33,11 +33,11 @@ namespace Settings {
 
         use_caching{};
 
-    bool Read(const std::string &path) {
+    bool Read() {
         try {
-            std::fstream(path, std::fstream::out | std::fstream::app); // create the config if it does not exist
+            std::fstream{kConfigFile, std::fstream::out | std::fstream::app};
 
-            const auto config = cpptoml::parse_file(path);
+            const auto config = cpptoml::parse_file(kConfigFile);
 
             intercept_incoming_rpc = config->get_as<bool>("InterceptIncomingRPC").value_or(true);
             intercept_incoming_packet = config->get_as<bool>("InterceptIncomingPacket").value_or(true);
@@ -52,6 +52,23 @@ namespace Settings {
         }
 
         return true;
+    }
+
+    void Save() {
+        try {
+            auto table = cpptoml::make_table();
+
+            table->insert("InterceptIncomingRPC", intercept_incoming_rpc);
+            table->insert("InterceptIncomingPacket", intercept_incoming_packet);
+            table->insert("InterceptOutcomingRPC", intercept_outcoming_rpc);
+            table->insert("InterceptOutcomingPacket", intercept_outcoming_packet);
+
+            table->insert("UseCaching", use_caching);
+
+            std::fstream{kConfigFile, std::fstream::out | std::fstream::trunc} << (*table);
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", kPluginName, __FUNCTION__, e.what());
+        }
     }
 }
 

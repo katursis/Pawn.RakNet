@@ -55,7 +55,7 @@ namespace Plugin {
 
         Logger::instance()->Init(ppData[PLUGIN_DATA_LOGPRINTF]);
 
-        if (!Settings::Read(Settings::kConfigFile)) {
+        if (!Settings::Read()) {
             return false;
         }
 
@@ -74,6 +74,8 @@ namespace Plugin {
 
     void Unload() {
         StringCompressor::RemoveReference();
+
+        Settings::Save();
 
         Logger::instance()->Write("%s plugin v%s by urShadow unloaded", Settings::kPluginName, Settings::kPluginVersion);
     }
