@@ -122,6 +122,17 @@ namespace Functions {
         return {};
     }
 
+    RakNet::BitStream * GetAmxBitStream(cell amx_addr)
+    {
+        const auto bs = reinterpret_cast<RakNet::BitStream *>(amx_addr);
+
+        if (!bs) {
+            throw std::runtime_error{"invalid BitStream handle"};
+        }
+
+        return bs;
+    }
+
     template<typename T>
     struct Value {
         static inline void Push(AMX *amx, T value, cell &addr_release) {

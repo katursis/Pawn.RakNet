@@ -7,11 +7,7 @@ namespace Natives {
         try {
             Functions::AssertParams(5, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             const int
                 player_id = static_cast<int>(params[2]),
@@ -32,11 +28,7 @@ namespace Natives {
         try {
             Functions::AssertParams(4, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             const int
                 player_id = static_cast<int>(params[2]),
@@ -56,11 +48,7 @@ namespace Natives {
         try {
             Functions::AssertParams(3, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             const int
                 player_id = static_cast<int>(params[2]),
@@ -114,11 +102,9 @@ namespace Natives {
                 throw std::runtime_error{"invalid param"};
             }
 
-            if (!*cptr) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(*cptr);
 
-            delete reinterpret_cast<RakNet::BitStream *>(*cptr);
+            delete bs;
 
             *cptr = 0;
 
@@ -135,11 +121,7 @@ namespace Natives {
         try {
             Functions::AssertParams(1, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             bs->Reset();
 
@@ -156,11 +138,7 @@ namespace Natives {
         try {
             Functions::AssertParams(1, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             bs->ResetReadPointer();
 
@@ -177,11 +155,7 @@ namespace Natives {
         try {
             Functions::AssertParams(1, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             bs->ResetWritePointer();
 
@@ -198,11 +172,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             const int number_of_bits = static_cast<int>(params[2]);
 
@@ -221,11 +191,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             const int offset = static_cast<int>(params[2]);
 
@@ -244,11 +210,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             cell *cptr{};
 
@@ -271,11 +233,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             const int offset = static_cast<int>(params[2]);
 
@@ -294,11 +252,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             cell *cptr{};
 
@@ -321,11 +275,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             cell *cptr{};
 
@@ -348,11 +298,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             cell *cptr{};
 
@@ -375,11 +321,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             cell *cptr{};
 
@@ -402,11 +344,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             cell *cptr{};
 
@@ -431,11 +369,7 @@ namespace Natives {
                 throw std::runtime_error{"number of parameters must be >= 3"};
             }
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             cell *cptr_type{}, *cptr_value{};
 
@@ -586,11 +520,7 @@ namespace Natives {
                 throw std::runtime_error{"number of parameters must be >= 3"};
             }
 
-            const auto bs = reinterpret_cast<RakNet::BitStream *>(params[1]);
-
-            if (!bs) {
-                throw std::runtime_error{"invalid BitStream handle"};
-            }
+            const auto bs = Functions::GetAmxBitStream(params[1]);
 
             cell *cptr_type{}, *cptr_value{};
 
