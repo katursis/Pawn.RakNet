@@ -155,15 +155,15 @@ namespace Hooks {
 
             const int player_id = Functions::GetIndexFromPlayerID(p->sender);
 
-            std::unique_ptr<RakNet::BitStream> bs;
+            RakNet::BitStream bs;
 
             if (p->input) {
-                bs = std::unique_ptr<RakNet::BitStream>(
-                    new RakNet::BitStream{ p->input, BITS_TO_BYTES(p->numberOfBitsOfData), false }
-                );
+                bs.SetData(p->input);
+                bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
+                bs.SetWriteOffset(p->numberOfBitsOfData);
             }
 
-            return Scripts::OnIncomingRPC(player_id, rpc_id, bs.get());
+            return Scripts::OnIncomingRPC(player_id, rpc_id, &bs);
         }
 
         static void * GetRakServerInterface() {
