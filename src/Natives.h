@@ -96,17 +96,13 @@ namespace Natives {
         try {
             Functions::AssertParams(1, params);
 
-            cell *cptr{};
+            auto &ref = Functions::GetAmxParamRef(amx, params[1]);
 
-            if (amx_GetAddr(amx, params[1], &cptr) != AMX_ERR_NONE) {
-                throw std::runtime_error{"invalid param"};
-            }
-
-            const auto bs = Functions::GetAmxBitStream(*cptr);
+            const auto bs = Functions::GetAmxBitStream(ref);
 
             delete bs;
 
-            *cptr = 0;
+            ref = 0;
 
             return 1;
         } catch (const std::exception &e) {
@@ -212,13 +208,9 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            cell *cptr{};
+            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
-                throw std::runtime_error{"invalid param"};
-            }
-
-            *cptr = static_cast<cell>(bs->GetWriteOffset());
+            ref = static_cast<cell>(bs->GetWriteOffset());
 
             return 1;
         } catch (const std::exception &e) {
@@ -254,13 +246,9 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            cell *cptr{};
+            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
-                throw std::runtime_error{"invalid param"};
-            }
-
-            *cptr = static_cast<cell>(bs->GetReadOffset());
+            ref = static_cast<cell>(bs->GetReadOffset());
 
             return 1;
         } catch (const std::exception &e) {
@@ -277,13 +265,9 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            cell *cptr{};
+            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
-                throw std::runtime_error{"invalid param"};
-            }
-
-            *cptr = static_cast<cell>(bs->GetNumberOfBitsUsed());
+            ref = static_cast<cell>(bs->GetNumberOfBitsUsed());
 
             return 1;
         } catch (const std::exception &e) {
@@ -300,13 +284,9 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            cell *cptr{};
+            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
-                throw std::runtime_error{"invalid param"};
-            }
-
-            *cptr = static_cast<cell>(bs->GetNumberOfBytesUsed());
+            ref = static_cast<cell>(bs->GetNumberOfBytesUsed());
 
             return 1;
         } catch (const std::exception &e) {
@@ -323,13 +303,9 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            cell *cptr{};
+            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
-                throw std::runtime_error{"invalid param"};
-            }
-
-            *cptr = static_cast<cell>(bs->GetNumberOfUnreadBits());
+            ref = static_cast<cell>(bs->GetNumberOfUnreadBits());
 
             return 1;
         } catch (const std::exception &e) {
@@ -346,13 +322,9 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            cell *cptr{};
+            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            if (amx_GetAddr(amx, params[2], &cptr) != AMX_ERR_NONE) {
-                throw std::runtime_error{"invalid param"};
-            }
-
-            *cptr = static_cast<cell>(bs->GetNumberOfBitsAllocated());
+            ref = static_cast<cell>(bs->GetNumberOfBitsAllocated());
 
             return 1;
         } catch (const std::exception &e) {
@@ -371,17 +343,9 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            cell *cptr_type{}, *cptr_value{};
-
             for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
-                if (
-                    amx_GetAddr(amx, params[i + 1], &cptr_type) != AMX_ERR_NONE ||
-                    amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE
-                ) {
-                    throw std::runtime_error{"invalid param"};
-                }
-
-                const auto type = static_cast<PR_ValueType>(*cptr_type);
+                const auto type = Functions::GetAmxParamRef(amx, params[i + 1]);
+                const auto value = Functions::GetAmxParamRef(amx, params[i + 2]);
 
                 switch (type) {
                     case PR_STRING: {
@@ -399,63 +363,61 @@ namespace Natives {
                         break;
                     }
                     case PR_INT8:
-                        bs->Write(static_cast<char>(*cptr_value));
+                        bs->Write(static_cast<char>(value));
                         break;
                     case PR_INT16:
-                        bs->Write(static_cast<short>(*cptr_value));
+                        bs->Write(static_cast<short>(value));
                         break;
                     case PR_INT32:
-                        bs->Write(static_cast<int>(*cptr_value));
+                        bs->Write(static_cast<int>(value));
                         break;
                     case PR_UINT8:
-                        bs->Write(static_cast<unsigned char>(*cptr_value));
+                        bs->Write(static_cast<unsigned char>(value));
                         break;
                     case PR_UINT16:
-                        bs->Write(static_cast<unsigned short>(*cptr_value));
+                        bs->Write(static_cast<unsigned short>(value));
                         break;
                     case PR_UINT32:
-                        bs->Write(static_cast<unsigned int>(*cptr_value));
+                        bs->Write(static_cast<unsigned int>(value));
                         break;
                     case PR_FLOAT:
-                        bs->Write(amx_ctof(*cptr_value));
+                        bs->Write(amx_ctof(value));
                         break;
                     case PR_BOOL:
-                        bs->Write(!!(*cptr_value));
+                        bs->Write(!!value);
                         break;
                     case PR_CINT8:
-                        bs->WriteCompressed(static_cast<char>(*cptr_value));
+                        bs->WriteCompressed(static_cast<char>(value));
                         break;
                     case PR_CINT16:
-                        bs->WriteCompressed(static_cast<short>(*cptr_value));
+                        bs->WriteCompressed(static_cast<short>(value));
                         break;
                     case PR_CINT32:
-                        bs->WriteCompressed(static_cast<int>(*cptr_value));
+                        bs->WriteCompressed(static_cast<int>(value));
                         break;
                     case PR_CUINT8:
-                        bs->WriteCompressed(static_cast<unsigned char>(*cptr_value));
+                        bs->WriteCompressed(static_cast<unsigned char>(value));
                         break;
                     case PR_CUINT16:
-                        bs->WriteCompressed(static_cast<unsigned short>(*cptr_value));
+                        bs->WriteCompressed(static_cast<unsigned short>(value));
                         break;
                     case PR_CUINT32:
-                        bs->WriteCompressed(static_cast<unsigned int>(*cptr_value));
+                        bs->WriteCompressed(static_cast<unsigned int>(value));
                         break;
                     case PR_CFLOAT:
-                        bs->WriteCompressed(amx_ctof(*cptr_value));
+                        bs->WriteCompressed(amx_ctof(value));
                         break;
                     case PR_CBOOL:
-                        bs->WriteCompressed(!!(*cptr_value));
+                        bs->WriteCompressed(!!value);
                         break;
                     case PR_BITS: {
-                        cell *cptr_number_of_bits{}; amx_GetAddr(amx, params[i + 3], &cptr_number_of_bits);
-
-                        int number_of_bits = static_cast<int>(*cptr_number_of_bits);
+                        const auto number_of_bits = Functions::GetAmxParamRef(amx, params[i + 3]);
 
                         if (number_of_bits <= 0 || number_of_bits > (sizeof(cell) * 8)) {
                             throw std::runtime_error{"invalid number of bits"};
                         }
 
-                        bs->WriteBits(reinterpret_cast<unsigned char *>(cptr_value), number_of_bits, true);
+                        bs->WriteBits(reinterpret_cast<const unsigned char *>(&value), number_of_bits, true);
 
                         ++i;
 
@@ -522,23 +484,13 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            cell *cptr_type{}, *cptr_value{};
-
             for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
-                if (
-                    amx_GetAddr(amx, params[i + 1], &cptr_type) != AMX_ERR_NONE ||
-                    amx_GetAddr(amx, params[i + 2], &cptr_value) != AMX_ERR_NONE
-                ) {
-                    throw std::runtime_error{"invalid param"};
-                }
-
-                const auto type = static_cast<PR_ValueType>(*cptr_type);
+                const auto type = Functions::GetAmxParamRef(amx, params[i + 1]);
+                auto &value = Functions::GetAmxParamRef(amx, params[i + 2]);
 
                 switch (type) {
                     case PR_STRING: {
-                        cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
-
-                        std::size_t size = *cptr_size;
+                        const auto size = Functions::GetAmxParamRef(amx, params[i + 3]);
 
                         std::unique_ptr<char[]> str{new char[size + 1]{}};
 
@@ -551,9 +503,7 @@ namespace Natives {
                         break;
                     }
                     case PR_CSTRING: {
-                        cell *cptr_size{}; amx_GetAddr(amx, params[i + 3], &cptr_size);
-
-                        std::size_t size = *cptr_size;
+                        const auto size = Functions::GetAmxParamRef(amx, params[i + 3]);
 
                         std::unique_ptr<char[]> str{new char[size + 1]{}};
 
@@ -566,63 +516,61 @@ namespace Natives {
                         break;
                     }
                     case PR_INT8:
-                        *cptr_value = Value<char>::Read(bs);
+                        value = Value<char>::Read(bs);
                         break;
                     case PR_INT16:
-                        *cptr_value = Value<short>::Read(bs);
+                        value = Value<short>::Read(bs);
                         break;
                     case PR_INT32:
-                        *cptr_value = Value<int>::Read(bs);
+                        value = Value<int>::Read(bs);
                         break;
                     case PR_UINT8:
-                        *cptr_value = Value<unsigned char>::Read(bs);
+                        value = Value<unsigned char>::Read(bs);
                         break;
                     case PR_UINT16:
-                        *cptr_value = Value<unsigned short>::Read(bs);
+                        value = Value<unsigned short>::Read(bs);
                         break;
                     case PR_UINT32:
-                        *cptr_value = Value<unsigned int>::Read(bs);
+                        value = Value<unsigned int>::Read(bs);
                         break;
                     case PR_FLOAT:
-                        *cptr_value = Value<float>::Read(bs);
+                        value = Value<float>::Read(bs);
                         break;
                     case PR_BOOL:
-                        *cptr_value = Value<bool>::Read(bs);
+                        value = Value<bool>::Read(bs);
                         break;
                     case PR_CINT8:
-                        *cptr_value = Value<char>::ReadCompressed(bs);
+                        value = Value<char>::ReadCompressed(bs);
                         break;
                     case PR_CINT16:
-                        *cptr_value = Value<short>::ReadCompressed(bs);
+                        value = Value<short>::ReadCompressed(bs);
                         break;
                     case PR_CINT32:
-                        *cptr_value = Value<int>::ReadCompressed(bs);
+                        value = Value<int>::ReadCompressed(bs);
                         break;
                     case PR_CUINT8:
-                        *cptr_value = Value<unsigned char>::ReadCompressed(bs);
+                        value = Value<unsigned char>::ReadCompressed(bs);
                         break;
                     case PR_CUINT16:
-                        *cptr_value = Value<unsigned short>::ReadCompressed(bs);
+                        value = Value<unsigned short>::ReadCompressed(bs);
                         break;
                     case PR_CUINT32:
-                        *cptr_value = Value<unsigned int>::ReadCompressed(bs);
+                        value = Value<unsigned int>::ReadCompressed(bs);
                         break;
                     case PR_CFLOAT:
-                        *cptr_value = Value<float>::ReadCompressed(bs);
+                        value = Value<float>::ReadCompressed(bs);
                         break;
                     case PR_CBOOL:
-                        *cptr_value = Value<bool>::ReadCompressed(bs);
+                        value = Value<bool>::ReadCompressed(bs);
                         break;
                     case PR_BITS: {
-                        cell *cptr_number_of_bits{}; amx_GetAddr(amx, params[i + 3], &cptr_number_of_bits);
-
-                        int number_of_bits = static_cast<int>(*cptr_number_of_bits);
+                        const auto number_of_bits = Functions::GetAmxParamRef(amx, params[i + 3]);
 
                         if (number_of_bits <= 0 || number_of_bits > (sizeof(cell) * 8)) {
                             throw std::runtime_error{"invalid number of bits"};
                         }
 
-                        bs->ReadBits(reinterpret_cast<unsigned char *>(cptr_value), number_of_bits, true);
+                        bs->ReadBits(reinterpret_cast<unsigned char *>(&value), number_of_bits, true);
 
                         ++i;
 

@@ -122,8 +122,7 @@ namespace Functions {
         return {};
     }
 
-    RakNet::BitStream * GetAmxBitStream(cell amx_addr)
-    {
+    RakNet::BitStream * GetAmxBitStream(cell amx_addr) {
         const auto bs = reinterpret_cast<RakNet::BitStream *>(amx_addr);
 
         if (!bs) {
@@ -131,6 +130,16 @@ namespace Functions {
         }
 
         return bs;
+    }
+
+    cell & GetAmxParamRef(AMX *amx, cell amx_addr) {
+        cell *phys_addr{};
+
+        if (amx_GetAddr(amx, amx_addr, &phys_addr) != AMX_ERR_NONE) {
+            throw std::runtime_error{"invalid param"};
+        }
+
+        return *phys_addr;
     }
 
     template<typename T>
