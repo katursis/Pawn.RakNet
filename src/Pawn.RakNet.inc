@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2017-2018 urShadow
+ * Copyright (c) 2017-2019 urShadow
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -256,49 +256,49 @@
         native BS_WriteValue(BitStream:bs, {PR_ValueType, Float, _}:...);
         native BS_ReadValue(BitStream:bs, {PR_ValueType, Float, _}:...);
 
-        #define BS_ReadInt8(%0,%1) BS_ReadValue(%0, PR_INT8, %1)
-        #define BS_ReadInt16(%0,%1) BS_ReadValue(%0, PR_INT16, %1)
-        #define BS_ReadInt32(%0,%1) BS_ReadValue(%0, PR_INT32, %1)
-        #define BS_ReadUint8(%0,%1) BS_ReadValue(%0, PR_UINT8, %1)
-        #define BS_ReadUint16(%0,%1) BS_ReadValue(%0, PR_UINT16, %1)
-        #define BS_ReadUint32(%0,%1) BS_ReadValue(%0, PR_UINT32, %1)
-        #define BS_ReadFloat(%0,%1) BS_ReadValue(%0, PR_FLOAT, %1)
-        #define BS_ReadBool(%0,%1) BS_ReadValue(%0, PR_BOOL, %1)
-        #define BS_ReadString(%0,%1,%2) BS_ReadValue(%0, PR_STRING, %1, %2)
+        #define BS_ReadInt8(%0,%1) BS_ReadValue(%0,PR_INT8,%1)
+        #define BS_ReadInt16(%0,%1) BS_ReadValue(%0,PR_INT16,%1)
+        #define BS_ReadInt32(%0,%1) BS_ReadValue(%0,PR_INT32,%1)
+        #define BS_ReadUint8(%0,%1) BS_ReadValue(%0,PR_UINT8,%1)
+        #define BS_ReadUint16(%0,%1) BS_ReadValue(%0,PR_UINT16,%1)
+        #define BS_ReadUint32(%0,%1) BS_ReadValue(%0,PR_UINT32,%1)
+        #define BS_ReadFloat(%0,%1) BS_ReadValue(%0,PR_FLOAT,%1)
+        #define BS_ReadBool(%0,%1) BS_ReadValue(%0,PR_BOOL,%1)
+        #define BS_ReadString(%0,%1,%2) BS_ReadValue(%0,PR_STRING,%1,%2)
 
-        #define BS_ReadCompressedInt8(%0,%1) BS_ReadValue(%0, PR_CINT8, %1)
-        #define BS_ReadCompressedInt16(%0,%1) BS_ReadValue(%0, PR_CINT16, %1)
-        #define BS_ReadCompressedInt32(%0,%1) BS_ReadValue(%0, PR_CINT32, %1)
-        #define BS_ReadCompressedUint8(%0,%1) BS_ReadValue(%0, PR_CUINT8, %1)
-        #define BS_ReadCompressedUint16(%0,%1) BS_ReadValue(%0, PR_CUINT16, %1)
-        #define BS_ReadCompressedUint32(%0,%1) BS_ReadValue(%0, PR_CUINT32, %1)
-        #define BS_ReadCompressedFloat(%0,%1) BS_ReadValue(%0, PR_CFLOAT, %1)
-        #define BS_ReadCompressedBool(%0,%1) BS_ReadValue(%0, PR_CBOOL, %1)
-        #define BS_ReadCompressedString(%0,%1,%2) BS_ReadValue(%0, PR_CSTRING, %1, %2)
+        #define BS_ReadCompressedInt8(%0,%1) BS_ReadValue(%0,PR_CINT8,%1)
+        #define BS_ReadCompressedInt16(%0,%1) BS_ReadValue(%0,PR_CINT16,%1)
+        #define BS_ReadCompressedInt32(%0,%1) BS_ReadValue(%0,PR_CINT32,%1)
+        #define BS_ReadCompressedUint8(%0,%1) BS_ReadValue(%0,PR_CUINT8,%1)
+        #define BS_ReadCompressedUint16(%0,%1) BS_ReadValue(%0,PR_CUINT16,%1)
+        #define BS_ReadCompressedUint32(%0,%1) BS_ReadValue(%0,PR_CUINT32,%1)
+        #define BS_ReadCompressedFloat(%0,%1) BS_ReadValue(%0,PR_CFLOAT,%1)
+        #define BS_ReadCompressedBool(%0,%1) BS_ReadValue(%0,PR_CBOOL,%1)
+        #define BS_ReadCompressedString(%0,%1,%2) BS_ReadValue(%0,PR_CSTRING,%1,%2)
 
-        #define BS_ReadBits(%0,%1,%2) BS_ReadValue(%0, PR_BITS, %1, %2)
+        #define BS_ReadBits(%0,%1,%2) BS_ReadValue(%0,PR_BITS,%1,%2)
 
-        #define BS_WriteInt8(%0,%1) BS_WriteValue(%0, PR_INT8, %1)
-        #define BS_WriteInt16(%0,%1) BS_WriteValue(%0, PR_INT16, %1)
-        #define BS_WriteInt32(%0,%1) BS_WriteValue(%0, PR_INT32, %1)
-        #define BS_WriteUint8(%0,%1) BS_WriteValue(%0, PR_UINT8, %1)
-        #define BS_WriteUint16(%0,%1) BS_WriteValue(%0, PR_UINT16, %1)
-        #define BS_WriteUint32(%0,%1) BS_WriteValue(%0, PR_UINT32, %1)
-        #define BS_WriteFloat(%0,%1) BS_WriteValue(%0, PR_FLOAT, %1)
-        #define BS_WriteBool(%0,%1) BS_WriteValue(%0, PR_BOOL, %1)
-        #define BS_WriteString(%0,%1) BS_WriteValue(%0, PR_STRING, %1)
+        #define BS_WriteInt8(%0,%1) BS_WriteValue(%0,PR_INT8,%1)
+        #define BS_WriteInt16(%0,%1) BS_WriteValue(%0,PR_INT16,%1)
+        #define BS_WriteInt32(%0,%1) BS_WriteValue(%0,PR_INT32,%1)
+        #define BS_WriteUint8(%0,%1) BS_WriteValue(%0,PR_UINT8,%1)
+        #define BS_WriteUint16(%0,%1) BS_WriteValue(%0,PR_UINT16,%1)
+        #define BS_WriteUint32(%0,%1) BS_WriteValue(%0,PR_UINT32,%1)
+        #define BS_WriteFloat(%0,%1) BS_WriteValue(%0,PR_FLOAT,%1)
+        #define BS_WriteBool(%0,%1) BS_WriteValue(%0,PR_BOOL,%1)
+        #define BS_WriteString(%0,%1) BS_WriteValue(%0,PR_STRING,%1)
 
-        #define BS_WriteCompressedInt8(%0,%1) BS_WriteValue(%0, PR_CINT8, %1)
-        #define BS_WriteCompressedInt16(%0,%1) BS_WriteValue(%0, PR_CINT16, %1)
-        #define BS_WriteCompressedInt32(%0,%1) BS_WriteValue(%0, PR_CINT32, %1)
-        #define BS_WriteCompressedUint8(%0,%1) BS_WriteValue(%0, PR_CUINT8, %1)
-        #define BS_WriteCompressedUint16(%0,%1) BS_WriteValue(%0, PR_CUINT16, %1)
-        #define BS_WriteCompressedUint32(%0,%1) BS_WriteValue(%0, PR_CUINT32, %1)
-        #define BS_WriteCompressedFloat(%0,%1) BS_WriteValue(%0, PR_CFLOAT, %1)
-        #define BS_WriteCompressedBool(%0,%1) BS_WriteValue(%0, PR_CBOOL, %1)
-        #define BS_WriteCompressedString(%0,%1) BS_WriteValue(%0, PR_CSTRING, %1)
+        #define BS_WriteCompressedInt8(%0,%1) BS_WriteValue(%0,PR_CINT8,%1)
+        #define BS_WriteCompressedInt16(%0,%1) BS_WriteValue(%0,PR_CINT16,%1)
+        #define BS_WriteCompressedInt32(%0,%1) BS_WriteValue(%0,PR_CINT32,%1)
+        #define BS_WriteCompressedUint8(%0,%1) BS_WriteValue(%0,PR_CUINT8,%1)
+        #define BS_WriteCompressedUint16(%0,%1) BS_WriteValue(%0,PR_CUINT16,%1)
+        #define BS_WriteCompressedUint32(%0,%1) BS_WriteValue(%0,PR_CUINT32,%1)
+        #define BS_WriteCompressedFloat(%0,%1) BS_WriteValue(%0,PR_CFLOAT,%1)
+        #define BS_WriteCompressedBool(%0,%1) BS_WriteValue(%0,PR_CBOOL,%1)
+        #define BS_WriteCompressedString(%0,%1) BS_WriteValue(%0,PR_CSTRING,%1)
 
-        #define BS_WriteBits(%0,%1,%2) BS_WriteValue(%0, PR_BITS, %1, %2)
+        #define BS_WriteBits(%0,%1,%2) BS_WriteValue(%0,PR_BITS,%1,%2)
 
         stock BS_ReadOnFootSync(BitStream:bs, data[PR_OnFootSync])
         {
