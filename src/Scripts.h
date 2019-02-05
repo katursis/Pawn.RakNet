@@ -8,6 +8,21 @@ namespace Scripts {
             _exists = (amx_FindPublic(_amx, _name.c_str(), &_index) == AMX_ERR_NONE && _index >= 0);
         }
 
+        explicit Public(int index, AMX *amx) : _index{index}, _amx{amx} {
+            char pname[sNAMEMAX + 1]{};
+
+            _exists = (amx_GetPublic(_amx, _index, pname) == AMX_ERR_NONE);
+
+            if (_exists) {
+                _name = pname;
+            }
+        }
+
+        template<typename... ARGS>
+        inline cell call(ARGS ... args) {
+            return Functions::AmxCallPublic(_amx, this->get_index(), args...);
+        }
+
         inline bool exists() const {
             return _exists;
         }
@@ -22,7 +37,7 @@ namespace Scripts {
 
     private:
         AMX *_amx;
-        const std::string _name;
+        std::string _name;
         int _index;
         bool _exists;
     };
@@ -50,8 +65,6 @@ namespace Scripts {
 
         // forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
         inline bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-            cell retval{};
-
             const auto &pub = _publics[ON_INCOMING_RPC];
 
             if (pub->exists()) {
@@ -59,13 +72,7 @@ namespace Scripts {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(_amx, reinterpret_cast<cell>(bs));
-                amx_Push(_amx, static_cast<cell>(rpc_id));
-                amx_Push(_amx, static_cast<cell>(player_id));
-
-                amx_Exec(_amx, &retval, pub->get_index());
-
-                if (retval == 0) {
+                if (!pub->call(player_id, rpc_id, bs)) {
                     return false;
                 }
             }
@@ -78,12 +85,7 @@ namespace Scripts {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(_amx, reinterpret_cast<cell>(bs));
-                amx_Push(_amx, static_cast<cell>(player_id));
-
-                amx_Exec(_amx, &retval, handler->get_index());
-
-                if (retval == 0) {
+                if (!handler->call(player_id, bs)) {
                     return false;
                 }
             }
@@ -93,8 +95,6 @@ namespace Scripts {
 
         // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
         inline bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-            cell retval{};
-
             const auto &pub = _publics[ON_INCOMING_PACKET];
 
             if (pub->exists()) {
@@ -102,13 +102,7 @@ namespace Scripts {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(_amx, reinterpret_cast<cell>(bs));
-                amx_Push(_amx, static_cast<cell>(packet_id));
-                amx_Push(_amx, static_cast<cell>(player_id));
-
-                amx_Exec(_amx, &retval, pub->get_index());
-
-                if (retval == 0) {
+                if (!pub->call(player_id, packet_id, bs)) {
                     return false;
                 }
             }
@@ -121,12 +115,7 @@ namespace Scripts {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(_amx, reinterpret_cast<cell>(bs));
-                amx_Push(_amx, static_cast<cell>(player_id));
-
-                amx_Exec(_amx, &retval, handler->get_index());
-
-                if (retval == 0) {
+                if (!handler->call(player_id, bs)) {
                     return false;
                 }
             }
@@ -136,8 +125,6 @@ namespace Scripts {
 
         // forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
         inline bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-            cell retval{};
-
             const auto &pub = _publics[ON_OUTCOMIMG_RPC];
 
             if (pub->exists()) {
@@ -145,13 +132,7 @@ namespace Scripts {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(_amx, reinterpret_cast<cell>(bs));
-                amx_Push(_amx, static_cast<cell>(rpc_id));
-                amx_Push(_amx, static_cast<cell>(player_id));
-
-                amx_Exec(_amx, &retval, pub->get_index());
-
-                if (retval == 0) {
+                if (!pub->call(player_id, rpc_id, bs)) {
                     return false;
                 }
             }
@@ -164,12 +145,7 @@ namespace Scripts {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(_amx, reinterpret_cast<cell>(bs));
-                amx_Push(_amx, static_cast<cell>(player_id));
-
-                amx_Exec(_amx, &retval, handler->get_index());
-
-                if (retval == 0) {
+                if (!handler->call(player_id, bs)) {
                     return false;
                 }
             }
@@ -179,8 +155,6 @@ namespace Scripts {
 
         // forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
         inline bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-            cell retval{};
-
             const auto &pub = _publics[ON_OUTCOMING_PACKET];
 
             if (pub->exists()) {
@@ -188,13 +162,7 @@ namespace Scripts {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(_amx, reinterpret_cast<cell>(bs));
-                amx_Push(_amx, static_cast<cell>(packet_id));
-                amx_Push(_amx, static_cast<cell>(player_id));
-
-                amx_Exec(_amx, &retval, pub->get_index());
-
-                if (retval == 0) {
+                if (!pub->call(player_id, packet_id, bs)) {
                     return false;
                 }
             }
@@ -207,12 +175,7 @@ namespace Scripts {
                     bs->ResetReadPointer();
                 }
 
-                amx_Push(_amx, reinterpret_cast<cell>(bs));
-                amx_Push(_amx, static_cast<cell>(player_id));
-
-                amx_Exec(_amx, &retval, handler->get_index());
-
-                if (retval == 0) {
+                if (!handler->call(player_id, bs)) {
                     return false;
                 }
             }

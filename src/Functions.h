@@ -129,6 +129,13 @@ namespace Functions {
         }
     };
 
+    template<typename T>
+    struct Value<T *> {
+        static inline void Push(AMX *amx, T *value, cell &addr_release) {
+            amx_Push(amx, reinterpret_cast<cell>(value));
+        }
+    };
+
     template<>
     struct Value<float> {
         static inline void Push(AMX *amx, float value, cell &addr_release) {
@@ -148,23 +155,26 @@ namespace Functions {
         }
     };
 
+    inline void AmxPushInternal(AMX *amx, cell &addr_release) {
+    }
+
     template<typename T>
-    void AmxPushInternal(AMX *amx, cell &addr_release, T arg1) {
+    inline void AmxPushInternal(AMX *amx, cell &addr_release, T arg1) {
         Value<T>::Push(amx, arg1, addr_release);
     }
 
     template<typename T, typename... ARGS>
-    void AmxPushInternal(AMX *amx, cell &addr_release, T arg1, ARGS ... args) {
+    inline void AmxPushInternal(AMX *amx, cell &addr_release, T arg1, ARGS ... args) {
         AmxPushInternal(amx, addr_release, args...);
 
         Value<T>::Push(amx, arg1, addr_release);
     }
 
-    template<typename T, typename... ARGS>
-    cell AmxCallPublic(AMX *amx, int index, T arg1, ARGS ... args) {
+    template<typename... ARGS>
+    inline cell AmxCallPublic(AMX *amx, int index, ARGS ... args) {
         cell addr_release{}, retval{};
 
-        AmxPushInternal(amx, addr_release, arg1, args...);
+        AmxPushInternal(amx, addr_release, args...);
 
         amx_Exec(amx, &retval, index);
 
