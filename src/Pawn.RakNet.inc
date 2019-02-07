@@ -323,7 +323,7 @@
             armourTemp = (healthArmour & 0x0F);
             healthTemp = (healthArmour >> 4);
 
-            if (armourTemp == 0xF) { 
+            if (armourTemp == 0xF) {
                 armour = 100;
             } else if (armourTemp == 0) {
                 armour = 0;
@@ -393,7 +393,7 @@
 
                 if (hasAnimation) {
                     BS_ReadValue(
-                        bs, 
+                        bs,
                         PR_INT16, data[PR_animationId],
                         PR_INT16, data[PR_animationFlags]
                     );

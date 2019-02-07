@@ -32,25 +32,16 @@ namespace Hooks {
             const int
                 read_offset = bitStream->GetReadOffset(),
                 write_offset = bitStream->GetWriteOffset(),
-                packet_id = static_cast<int>(bitStream->GetData()[0]);
+                packet_id = bitStream->GetData()[0];
 
-            if (!Scripts::OnOutcomingPacket(Functions::GetIndexFromPlayerID(playerId), packet_id, bitStream)) {
+            if (!Scripts::OnOutcomingPacket(Functions::RakServer::GetIndexFromPlayerID(playerId), packet_id, bitStream)) {
                 return false;
             }
 
             bitStream->SetReadOffset(read_offset);
             bitStream->SetWriteOffset(write_offset);
 
-            return urmem::call_function<urmem::calling_convention::thiscall, bool>(
-                Addresses::FUNC_RAKSERVER__SEND,
-                _this,
-                bitStream,
-                priority,
-                reliability,
-                orderingChannel,
-                playerId,
-                broadcast
-            );
+            return Functions::RakServer::Send(bitStream, priority, reliability, orderingChannel, playerId, broadcast);
         }
 
         static bool THISCALL RakServer__RPC(
@@ -68,54 +59,41 @@ namespace Hooks {
                 return false;
             }
 
-            const int rpc_id = static_cast<int>(*uniqueID);
+            const int rpc_id = *uniqueID;
 
             if (bitStream) {
                 const int
                     read_offset = bitStream->GetReadOffset(),
                     write_offset = bitStream->GetWriteOffset();
 
-                if (!Scripts::OnOutcomingRPC(Functions::GetIndexFromPlayerID(playerId), rpc_id, bitStream)) {
+                if (!Scripts::OnOutcomingRPC(Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, bitStream)) {
                     return false;
                 }
 
                 bitStream->SetReadOffset(read_offset);
                 bitStream->SetWriteOffset(write_offset);
             } else {
-                if (!Scripts::OnOutcomingRPC(Functions::GetIndexFromPlayerID(playerId), rpc_id, nullptr)) {
+                if (!Scripts::OnOutcomingRPC(Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, nullptr)) {
                     return false;
                 }
             }
 
-            return urmem::call_function<urmem::calling_convention::thiscall, bool>(
-                Addresses::FUNC_RAKSERVER__RPC,
-                _this,
-                uniqueID,
-                bitStream,
-                priority,
-                reliability,
-                orderingChannel,
-                playerId,
-                broadcast,
-                shiftTimestamp
-            );
+            return Functions::RakServer::RPC(uniqueID, bitStream, priority, reliability, orderingChannel, playerId, broadcast, shiftTimestamp);
         }
 
         static  Packet * THISCALL RakServer__Receive(void *_this) {
             Packet *packet{};
 
-            while (packet = urmem::call_function<urmem::calling_convention::thiscall, Packet *>(Addresses::FUNC_RAKSERVER__RECEIVE, _this)) {
+            while (packet = Functions::RakServer::Receive()) {
                 RakNet::BitStream bitstream(packet->data, packet->length, false);
 
-                const int
-                    player_id = static_cast<int>(packet->playerIndex),
-                    packet_id = static_cast<int>(packet->data[0]);
+                const int packet_id = packet->data[0];
 
-                if (Scripts::OnIncomingPacket(player_id, packet_id, &bitstream)) {
+                if (Scripts::OnIncomingPacket(packet->playerIndex, packet_id, &bitstream)) {
                     break;
                 }
 
-                Functions::DeallocatePacket(packet);
+                Functions::RakServer::DeallocatePacket(packet);
             }
 
             return packet;
@@ -134,18 +112,13 @@ namespace Hooks {
                 return nullptr;
             }
 
-            const int rpc_id = static_cast<int>(*uniqueID);
+            const int rpc_id = *uniqueID;
 
             original_rpc[rpc_id] = functionPointer;
 
             functionPointer = custom_rpc[rpc_id];
 
-            return urmem::call_function<urmem::calling_convention::thiscall, void *>(
-                Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
-                _this,
-                uniqueID,
-                functionPointer
-            );
+            return Functions::RakServer::RegisterAsRemoteProcedureCall(uniqueID, functionPointer);
         }
 
         static bool ReceiveRPC(int rpc_id, RPCParameters *p) {
@@ -153,7 +126,7 @@ namespace Hooks {
                 return false;
             }
 
-            const int player_id = Functions::GetIndexFromPlayerID(p->sender);
+            const int player_id = Functions::RakServer::GetIndexFromPlayerID(p->sender);
 
             RakNet::BitStream bs;
 

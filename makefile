@@ -1,5 +1,5 @@
 OUTFILE = "pawnraknet.so"
- 
+
 COMPILE_FLAGS=-m32 -c -O3 -w -idirafter "lib"
 LINK_FLAGS=-m32 -shared -O3 -static-libstdc++
 
@@ -10,4 +10,4 @@ all:
 	g++ $(COMPILE_FLAGS) -std=c++11 src/*.cpp
 	g++ $(LINK_FLAGS) -o $(OUTFILE) *.o
 	rm *.o
-	strip -s $(OUTFILE) 
+	strip -s $(OUTFILE)

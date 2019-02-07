@@ -9,13 +9,18 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            const int
-                player_id = static_cast<int>(params[2]),
-                rpc_id = static_cast<int>(params[3]),
-                priority = static_cast<int>(params[4]),
-                reliability = static_cast<int>(params[5]);
+            RPCIndex rpc_id = params[3];
 
-            return static_cast<cell>(Functions::SendRPC(player_id, rpc_id, bs, priority, reliability));
+            return Functions::RakServer::RPC(
+                &rpc_id,
+                bs,
+                params[4],
+                params[5],
+                '\0',
+                Functions::RakServer::GetPlayerIDFromIndex(params[2]),
+                params[2] == -1,
+                false
+            );
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
         }
@@ -30,12 +35,14 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            const int
-                player_id = static_cast<int>(params[2]),
-                priority = static_cast<int>(params[3]),
-                reliability = static_cast<int>(params[4]);
-
-            return static_cast<cell>(Functions::SendPacket(player_id, bs, priority, reliability));
+            return Functions::RakServer::Send(
+                bs,
+                params[3],
+                params[4],
+                '\0',
+                Functions::RakServer::GetPlayerIDFromIndex(params[2]),
+                params[2] == -1
+            );
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
         }
@@ -50,11 +57,7 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            const int
-                player_id = static_cast<int>(params[2]),
-                rpc_id = static_cast<int>(params[3]);
-
-            const auto &handler = Hooks::original_rpc.at(rpc_id);
+            const auto &handler = Hooks::original_rpc.at(params[3]);
 
             if (!handler) {
                 throw std::runtime_error{"invalid rpcid"};
@@ -62,7 +65,7 @@ namespace Natives {
 
             RPCParameters RPCParams;
             RPCParams.numberOfBitsOfData = bs->GetNumberOfBitsUsed();
-            RPCParams.sender = Functions::GetPlayerIDFromIndex(player_id);
+            RPCParams.sender = Functions::RakServer::GetPlayerIDFromIndex(params[2]);
 
             if (RPCParams.numberOfBitsOfData) {
                 RPCParams.input = bs->GetData();
@@ -170,9 +173,7 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            const int number_of_bits = static_cast<int>(params[2]);
-
-            bs->IgnoreBits(number_of_bits);
+            bs->IgnoreBits(params[2]);
 
             return 1;
         } catch (const std::exception &e) {
@@ -189,9 +190,7 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            const int offset = static_cast<int>(params[2]);
-
-            bs->SetWriteOffset(offset);
+            bs->SetWriteOffset(params[2]);
 
             return 1;
         } catch (const std::exception &e) {
@@ -210,7 +209,7 @@ namespace Natives {
 
             auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            ref = static_cast<cell>(bs->GetWriteOffset());
+            ref = bs->GetWriteOffset();
 
             return 1;
         } catch (const std::exception &e) {
@@ -227,9 +226,7 @@ namespace Natives {
 
             const auto bs = Functions::GetAmxBitStream(params[1]);
 
-            const int offset = static_cast<int>(params[2]);
-
-            bs->SetReadOffset(offset);
+            bs->SetReadOffset(params[2]);
 
             return 1;
         } catch (const std::exception &e) {
@@ -248,7 +245,7 @@ namespace Natives {
 
             auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            ref = static_cast<cell>(bs->GetReadOffset());
+            ref = bs->GetReadOffset();
 
             return 1;
         } catch (const std::exception &e) {
@@ -267,7 +264,7 @@ namespace Natives {
 
             auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            ref = static_cast<cell>(bs->GetNumberOfBitsUsed());
+            ref = bs->GetNumberOfBitsUsed();
 
             return 1;
         } catch (const std::exception &e) {
@@ -286,7 +283,7 @@ namespace Natives {
 
             auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            ref = static_cast<cell>(bs->GetNumberOfBytesUsed());
+            ref = bs->GetNumberOfBytesUsed();
 
             return 1;
         } catch (const std::exception &e) {
@@ -305,7 +302,7 @@ namespace Natives {
 
             auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            ref = static_cast<cell>(bs->GetNumberOfUnreadBits());
+            ref = bs->GetNumberOfUnreadBits();
 
             return 1;
         } catch (const std::exception &e) {
@@ -324,7 +321,7 @@ namespace Natives {
 
             auto &ref = Functions::GetAmxParamRef(amx, params[2]);
 
-            ref = static_cast<cell>(bs->GetNumberOfBitsAllocated());
+            ref = bs->GetNumberOfBitsAllocated();
 
             return 1;
         } catch (const std::exception &e) {
@@ -649,7 +646,7 @@ namespace Natives {
 
             Scripts::RegisterHandler(
                 amx,
-                static_cast<int>(params[1]),
+                params[1],
                 Functions::GetAmxString(amx, params[2]),
                 static_cast<PR_HandlerType>(params[3])
             );

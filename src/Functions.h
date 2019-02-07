@@ -2,67 +2,74 @@
 #define FUNCTIONS_H_
 
 namespace Functions {
-    int GetIndexFromPlayerID(const PlayerID &id) {
-        return urmem::call_function<urmem::calling_convention::thiscall, int>(
-            Addresses::FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID,
-            Addresses::PTR_RAKSERVER,
-            id
-        );
-    }
+    namespace RakServer {
+        bool Send(RakNet::BitStream *bitStream, int priority, int reliability, char orderingChannel, PlayerID playerId, bool broadcast) {
+            return urmem::call_function<urmem::calling_convention::thiscall, bool>(
+                Addresses::FUNC_RAKSERVER__SEND,
+                Addresses::PTR_RAKSERVER,
+                bitStream,
+                priority,
+                reliability,
+                orderingChannel,
+                playerId,
+                broadcast
+            );
+        }
 
-    PlayerID GetPlayerIDFromIndex(int index) {
-        return urmem::call_function<urmem::calling_convention::thiscall, PlayerID>(
-            Addresses::FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX,
-            Addresses::PTR_RAKSERVER,
-            index
-        );
-    }
+        bool RPC(RPCIndex *uniqueID, RakNet::BitStream *bitStream, int priority, int reliability, char orderingChannel, PlayerID playerId, bool broadcast, bool shiftTimestamp) {
+            return urmem::call_function<urmem::calling_convention::thiscall, bool>(
+                Addresses::FUNC_RAKSERVER__RPC,
+                Addresses::PTR_RAKSERVER,
+                uniqueID,
+                bitStream,
+                priority,
+                reliability,
+                orderingChannel,
+                playerId,
+                broadcast,
+                shiftTimestamp
+            );
+        }
 
-    void DeallocatePacket(Packet *p) {
-        urmem::call_function<urmem::calling_convention::thiscall>(
-            Addresses::FUNC_RAKSERVER__DEALLOCATE_PACKET,
-            Addresses::PTR_RAKSERVER,
-            p
-        );
-    }
+        Packet * Receive() {
+            return urmem::call_function<urmem::calling_convention::thiscall, Packet *>(
+                Addresses::FUNC_RAKSERVER__RECEIVE,
+                Addresses::PTR_RAKSERVER
+            );
+        }
 
-    bool SendPacket(
-        int player_id,
-        RakNet::BitStream *bs,
-        int priority,
-        int reliability
-    ) {
-        return urmem::call_function<urmem::calling_convention::thiscall, bool>(
-            Addresses::FUNC_RAKSERVER__SEND,
-            Addresses::PTR_RAKSERVER,
-            bs,
-            priority,
-            reliability,
-            '\0',
-            GetPlayerIDFromIndex(player_id),
-            player_id == -1
-        );
-    }
+        void DeallocatePacket(Packet *packet) {
+            urmem::call_function<urmem::calling_convention::thiscall>(
+                Addresses::FUNC_RAKSERVER__DEALLOCATE_PACKET,
+                Addresses::PTR_RAKSERVER,
+                packet
+            );
+        }
 
-    bool SendRPC(
-        int player_id,
-        int rpc_id,
-        RakNet::BitStream *bs,
-        int priority,
-        int reliability
-    ) {
-        return urmem::call_function<urmem::calling_convention::thiscall, bool>(
-            Addresses::FUNC_RAKSERVER__RPC,
-            Addresses::PTR_RAKSERVER,
-            &rpc_id,
-            bs,
-            priority,
-            reliability,
-            '\0',
-            GetPlayerIDFromIndex(player_id),
-            player_id == -1,
-            false
-        );
+        void * RegisterAsRemoteProcedureCall(RPCIndex *uniqueID, RPCFunction functionPointer) {
+            return urmem::call_function<urmem::calling_convention::thiscall, void *>(
+                Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,
+                Addresses::PTR_RAKSERVER,
+                uniqueID,
+                functionPointer
+            );
+        }
+
+        int GetIndexFromPlayerID(const PlayerID &playerId) {
+            return urmem::call_function<urmem::calling_convention::thiscall, int>(
+                Addresses::FUNC_RAKSERVER__GET_INDEX_FROM_PLAYER_ID,
+                Addresses::PTR_RAKSERVER,
+                playerId
+            );
+        }
+
+        const PlayerID &GetPlayerIDFromIndex(int index) {
+            return urmem::call_function<urmem::calling_convention::thiscall, PlayerID>(
+                Addresses::FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX,
+                Addresses::PTR_RAKSERVER,
+                index
+            );
+        }
     }
 
     void AssertParams(int count, cell *params) {
