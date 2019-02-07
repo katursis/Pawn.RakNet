@@ -31,6 +31,7 @@
 #include "crtp_singleton/crtp_singleton.hpp"
 #include "cpptoml/include/cpptoml.h"
 
+#include <unordered_set>
 #include <list>
 #include <array>
 #include <string>

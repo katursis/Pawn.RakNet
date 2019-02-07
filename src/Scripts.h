@@ -217,8 +217,28 @@ namespace Scripts {
             _handlers.at(type).at(id) = std::unique_ptr<Public>(new Public{ public_name, _amx });
 
             if (!_handlers[type][id]->exists()) {
-                throw std::runtime_error{ "Public " + public_name + " not exists" };
+                throw std::runtime_error{ "public " + public_name + " not exists" };
             }
+        }
+
+        cell NewBitStream() {
+            auto bs = std::make_shared<RakNet::BitStream>();
+
+            _bitstreams.insert(bs);
+
+            return reinterpret_cast<cell>(bs.get());
+        }
+
+        void DeleteBitStream(cell handle) {
+            const auto bs = std::find_if(_bitstreams.begin(), _bitstreams.end(), [handle](const std::shared_ptr<RakNet::BitStream> &bs) {
+                return reinterpret_cast<cell>(bs.get()) == handle;
+            });
+
+            if (bs == _bitstreams.end()) {
+                throw std::runtime_error{"invalid BitStream handle"};
+            }
+
+            _bitstreams.erase(bs);
         }
 
         inline AMX *get_amx() const {
@@ -229,27 +249,36 @@ namespace Scripts {
         AMX *_amx;
         std::array<std::unique_ptr<Public>, NUMBER_OF_PUBLICS> _publics;
         std::array<std::array<std::unique_ptr<Public>, MAX_RPC_MAP_SIZE>, PR_NUMBER_OF_HANDLER_TYPES> _handlers;
+        std::unordered_set<std::shared_ptr<RakNet::BitStream>> _bitstreams;
     };
 
-    std::list<std::unique_ptr<Script>> scripts;
+    std::list<Script> scripts;
+
+    Script & GetScript(AMX *amx) {
+        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const Script &script) {
+            return script.get_amx() == amx;
+        });
+
+        if (script == scripts.end()) {
+            throw std::runtime_error{"amx not found"};
+        }
+
+        return *script;
+    }
 
     void Load(AMX *amx, bool is_gamemode) {
-        auto script = std::unique_ptr<Script>(new Script{ amx });
-
         if (is_gamemode) {
-            scripts.push_back(std::move(script));
-
-            scripts.back()->InitHandlersRegistration();
+            scripts.emplace_back(amx);
         } else {
-            scripts.push_front(std::move(script));
-
-            scripts.front()->InitHandlersRegistration();
+            scripts.emplace_front(amx);
         }
+
+        GetScript(amx).InitHandlersRegistration();
     }
 
     void Unload(AMX *amx) {
-        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const std::unique_ptr<Script> &script) {
-            return script->get_amx() == amx;
+        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const Script &script) {
+            return script.get_amx() == amx;
         });
 
         if (script != scripts.end()) {
@@ -258,36 +287,36 @@ namespace Scripts {
     }
 
     void RegisterHandler(AMX *amx, int id, const std::string &public_name, PR_HandlerType type) {
-        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const std::unique_ptr<Script> &script) {
-            return script->get_amx() == amx;
+        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const Script &script) {
+            return script.get_amx() == amx;
         });
 
         if (script != scripts.end()) {
-            (*script)->RegisterHandler(id, public_name, type);
+            (*script).RegisterHandler(id, public_name, type);
         }
     }
 
     bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-        return std::all_of(scripts.begin(), scripts.end(), [=](const std::unique_ptr<Script> &script) {
-            return script->OnIncomingPacket(player_id, packet_id, bs);
+        return std::all_of(scripts.begin(), scripts.end(), [=](Script &script) {
+            return script.OnIncomingPacket(player_id, packet_id, bs);
         });
     }
 
     bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-        return std::all_of(scripts.begin(), scripts.end(), [=](const std::unique_ptr<Script> &script) {
-            return script->OnIncomingRPC(player_id, rpc_id, bs);
+        return std::all_of(scripts.begin(), scripts.end(), [=](Script &script) {
+            return script.OnIncomingRPC(player_id, rpc_id, bs);
         });
     }
 
     bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-        return std::all_of(scripts.begin(), scripts.end(), [=](const std::unique_ptr<Script> &script) {
-            return script->OnOutcomingPacket(player_id, packet_id, bs);
+        return std::all_of(scripts.begin(), scripts.end(), [=](Script &script) {
+            return script.OnOutcomingPacket(player_id, packet_id, bs);
         });
     }
 
     bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-        return std::all_of(scripts.begin(), scripts.end(), [=](const std::unique_ptr<Script> &script) {
-            return script->OnOutcomingRPC(player_id, rpc_id, bs);
+        return std::all_of(scripts.begin(), scripts.end(), [=](Script &script) {
+            return script.OnOutcomingRPC(player_id, rpc_id, bs);
         });
     }
 }

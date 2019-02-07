@@ -86,7 +86,7 @@ namespace Natives {
         try {
             Functions::AssertParams(0, params);
 
-            return reinterpret_cast<cell>(new RakNet::BitStream{});
+            return Scripts::GetScript(amx).NewBitStream();
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
         }
@@ -101,9 +101,7 @@ namespace Natives {
 
             auto &ref = Functions::GetAmxParamRef(amx, params[1]);
 
-            const auto bs = Functions::GetAmxBitStream(ref);
-
-            delete bs;
+            Scripts::GetScript(amx).DeleteBitStream(ref);
 
             ref = 0;
 
