@@ -59,7 +59,10 @@
         PR_CBOOL,
         PR_CSTRING,
 
-        PR_BITS
+        PR_BITS,
+
+        PR_NORM_QUAT,
+        PR_VECTOR
     };
 
     enum PR_PacketPriority
@@ -300,65 +303,207 @@
 
         #define BS_WriteBits(%0,%1,%2) BS_WriteValue(%0,PR_BITS,%1,%2)
 
-        stock BS_ReadOnFootSync(BitStream:bs, data[PR_OnFootSync])
-        {
-            BS_ReadValue(
-                bs,
-                PR_UINT16, data[PR_lrKey],
-                PR_UINT16, data[PR_udKey],
-                PR_UINT16, data[PR_keys],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2],
-                PR_FLOAT, data[PR_quaternion][0],
-                PR_FLOAT, data[PR_quaternion][1],
-                PR_FLOAT, data[PR_quaternion][2],
-                PR_FLOAT, data[PR_quaternion][3],
-                PR_UINT8, data[PR_health],
-                PR_UINT8, data[PR_armour],
-                PR_BITS, data[PR_additionalKey], 2,
-                PR_BITS, data[PR_weaponId], 6,
-                PR_UINT8, data[PR_specialAction],
-                PR_FLOAT, data[PR_velocity][0],
-                PR_FLOAT, data[PR_velocity][1],
-                PR_FLOAT, data[PR_velocity][2],
-                PR_FLOAT, data[PR_surfingOffsets][0],
-                PR_FLOAT, data[PR_surfingOffsets][1],
-                PR_FLOAT, data[PR_surfingOffsets][2],
-                PR_UINT16, data[PR_surfingVehicleId],
-                PR_INT16, data[PR_animationId],
-                PR_INT16, data[PR_animationFlags]
-            );
+        stock BS_PackHealthArmour(health, armour, &healthArmour) {
+            if (health > 0 && health < 100) {
+                healthArmour = (health / 7) << 4;
+            } else if (health >= 100) {
+                healthArmour = 0xF << 4;
+            }
+
+            if (armour > 0 && armour < 100) {
+                healthArmour |= (armour / 7);
+            } else if (armour >= 100) {
+                healthArmour |= 0xF;
+            }
         }
 
-        stock BS_ReadInCarSync(BitStream:bs, data[PR_InCarSync])
+        stock BS_UnpackHealthArmour(healthArmour, &health, &armour) {
+            new armourTemp, healthTemp;
+
+            armourTemp = (healthArmour & 0x0F);
+            healthTemp = (healthArmour >> 4);
+
+            if (armourTemp == 0xF) { 
+                armour = 100;
+            } else if (armourTemp == 0) {
+                armour = 0;
+            } else {
+                armour = armourTemp * 7;
+            }
+
+            if (healthTemp == 0xF) {
+                health = 100;
+            } else if (healthTemp == 0) {
+                health = 0;
+            } else {
+                health = healthTemp * 7;
+            }
+        }
+
+        stock BS_ReadOnFootSync(BitStream:bs, data[PR_OnFootSync], outcoming = false)
         {
-            BS_ReadValue(
-                bs,
-                PR_UINT16, data[PR_vehicleId],
-                PR_UINT16, data[PR_lrKey],
-                PR_UINT16, data[PR_udKey],
-                PR_UINT16, data[PR_keys],
-                PR_FLOAT, data[PR_quaternion][0],
-                PR_FLOAT, data[PR_quaternion][1],
-                PR_FLOAT, data[PR_quaternion][2],
-                PR_FLOAT, data[PR_quaternion][3],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2],
-                PR_FLOAT, data[PR_velocity][0],
-                PR_FLOAT, data[PR_velocity][1],
-                PR_FLOAT, data[PR_velocity][2],
-                PR_FLOAT, data[PR_vehicleHealth],
-                PR_UINT8, data[PR_playerHealth],
-                PR_UINT8, data[PR_armour],
-                PR_BITS, data[PR_additionalKey], 2,
-                PR_BITS, data[PR_weaponId], 6,
-                PR_UINT8, data[PR_sirenState],
-                PR_UINT8, data[PR_landingGearState],
-                PR_UINT16, data[PR_trailerId],
-                PR_FLOAT, data[PR_trainSpeed]
-            );
+            if (outcoming) {
+                new hasLeftRight, hasUpDown, hasSurfInfo, hasAnimation, healthArmour;
+
+                BS_ReadValue(bs, PR_BOOL, hasLeftRight);
+
+                if (hasLeftRight) {
+                    BS_ReadValue(bs, PR_UINT16, data[PR_lrKey]);
+                } else {
+                    data[PR_lrKey] = 0;
+                }
+
+                BS_ReadValue(bs, PR_BOOL, hasUpDown);
+
+                if (hasUpDown) {
+                    BS_ReadValue(bs, PR_UINT16, data[PR_udKey]);
+                } else {
+                    data[PR_udKey] = 0;
+                }
+
+                BS_ReadValue(
+                    bs,
+                    PR_UINT16, data[PR_keys],
+                    PR_FLOAT, data[PR_position][0],
+                    PR_FLOAT, data[PR_position][1],
+                    PR_FLOAT, data[PR_position][2],
+                    PR_NORM_QUAT, data[PR_quaternion][0], data[PR_quaternion][1], data[PR_quaternion][2], data[PR_quaternion][3],
+                    PR_UINT8, healthArmour,
+                    PR_UINT8, data[PR_weaponId],
+                    PR_UINT8, data[PR_specialAction],
+                    PR_VECTOR, data[PR_velocity][0], data[PR_velocity][1], data[PR_velocity][2],
+                    PR_BOOL, hasSurfInfo
+                );
+
+                BS_UnpackHealthArmour(healthArmour, data[PR_health], data[PR_armour]);
+
+                if (hasSurfInfo) {
+                    BS_ReadValue(
+                        bs,
+                        PR_UINT16, data[PR_surfingVehicleId],
+                        PR_FLOAT, data[PR_surfingOffsets][0],
+                        PR_FLOAT, data[PR_surfingOffsets][1],
+                        PR_FLOAT, data[PR_surfingOffsets][2]
+                    );
+                } else {
+                    data[PR_surfingVehicleId] = 0;
+                }
+
+                BS_ReadValue(bs, PR_BOOL, hasAnimation);
+
+                if (hasAnimation) {
+                    BS_ReadValue(
+                        bs, 
+                        PR_INT16, data[PR_animationId],
+                        PR_INT16, data[PR_animationFlags]
+                    );
+                } else {
+                    data[PR_animationId] = 0;
+                    data[PR_animationFlags] = 0;
+                }
+            } else {
+                BS_ReadValue(
+                    bs,
+                    PR_UINT16, data[PR_lrKey],
+                    PR_UINT16, data[PR_udKey],
+                    PR_UINT16, data[PR_keys],
+                    PR_FLOAT, data[PR_position][0],
+                    PR_FLOAT, data[PR_position][1],
+                    PR_FLOAT, data[PR_position][2],
+                    PR_FLOAT, data[PR_quaternion][0],
+                    PR_FLOAT, data[PR_quaternion][1],
+                    PR_FLOAT, data[PR_quaternion][2],
+                    PR_FLOAT, data[PR_quaternion][3],
+                    PR_UINT8, data[PR_health],
+                    PR_UINT8, data[PR_armour],
+                    PR_BITS, data[PR_additionalKey], 2,
+                    PR_BITS, data[PR_weaponId], 6,
+                    PR_UINT8, data[PR_specialAction],
+                    PR_FLOAT, data[PR_velocity][0],
+                    PR_FLOAT, data[PR_velocity][1],
+                    PR_FLOAT, data[PR_velocity][2],
+                    PR_FLOAT, data[PR_surfingOffsets][0],
+                    PR_FLOAT, data[PR_surfingOffsets][1],
+                    PR_FLOAT, data[PR_surfingOffsets][2],
+                    PR_UINT16, data[PR_surfingVehicleId],
+                    PR_INT16, data[PR_animationId],
+                    PR_INT16, data[PR_animationFlags]
+                );
+            }
+        }
+
+        stock BS_ReadInCarSync(BitStream:bs, data[PR_InCarSync], outcoming = false)
+        {
+            if (outcoming) {
+                new vehicleHealth, healthArmour;
+
+                BS_ReadValue(
+                    bs,
+                    PR_UINT16, data[PR_vehicleId],
+                    PR_UINT16, data[PR_lrKey],
+                    PR_UINT16, data[PR_udKey],
+                    PR_UINT16, data[PR_keys],
+                    PR_NORM_QUAT, data[PR_quaternion][0], data[PR_quaternion][1], data[PR_quaternion][2], data[PR_quaternion][3],
+                    PR_FLOAT, data[PR_position][0],
+                    PR_FLOAT, data[PR_position][1],
+                    PR_FLOAT, data[PR_position][2],
+                    PR_VECTOR, data[PR_velocity][0], data[PR_velocity][1], data[PR_velocity][2],
+                    PR_UINT16, vehicleHealth,
+                    PR_UINT8, healthArmour,
+                    PR_UINT8, data[PR_weaponId],
+                    PR_BOOL, data[PR_sirenState],
+                    PR_BOOL, data[PR_landingGearState]
+                );
+
+                data[PR_vehicleHealth] = float(vehicleHealth);
+
+                BS_UnpackHealthArmour(healthArmour, data[PR_playerHealth], data[PR_armour]);
+
+                new hasTrainSpeed, hasTrailer;
+
+                BS_ReadValue(bs, PR_BOOL, hasTrainSpeed);
+
+                if (hasTrainSpeed) {
+                    BS_ReadValue(bs, PR_FLOAT, data[PR_trainSpeed]);
+                } else {
+                    data[PR_trainSpeed] = 0.0;
+                }
+
+                BS_ReadValue(bs, PR_BOOL, hasTrailer);
+
+                if (hasTrailer) {
+                    BS_ReadValue(bs, PR_UINT16, data[PR_trailerId]);
+                } else {
+                    data[PR_trailerId] = 0;
+                }
+            } else {
+                BS_ReadValue(
+                    bs,
+                    PR_UINT16, data[PR_vehicleId],
+                    PR_UINT16, data[PR_lrKey],
+                    PR_UINT16, data[PR_udKey],
+                    PR_UINT16, data[PR_keys],
+                    PR_FLOAT, data[PR_quaternion][0],
+                    PR_FLOAT, data[PR_quaternion][1],
+                    PR_FLOAT, data[PR_quaternion][2],
+                    PR_FLOAT, data[PR_quaternion][3],
+                    PR_FLOAT, data[PR_position][0],
+                    PR_FLOAT, data[PR_position][1],
+                    PR_FLOAT, data[PR_position][2],
+                    PR_FLOAT, data[PR_velocity][0],
+                    PR_FLOAT, data[PR_velocity][1],
+                    PR_FLOAT, data[PR_velocity][2],
+                    PR_FLOAT, data[PR_vehicleHealth],
+                    PR_UINT8, data[PR_playerHealth],
+                    PR_UINT8, data[PR_armour],
+                    PR_BITS, data[PR_additionalKey], 2,
+                    PR_BITS, data[PR_weaponId], 6,
+                    PR_UINT8, data[PR_sirenState],
+                    PR_UINT8, data[PR_landingGearState],
+                    PR_UINT16, data[PR_trailerId],
+                    PR_FLOAT, data[PR_trainSpeed]
+                );
+            }
         }
 
         stock BS_ReadTrailerSync(BitStream:bs, data[PR_TrailerSync])
@@ -477,65 +622,170 @@
             );
         }
 
-        stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync])
+        stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync], outcoming = false)
         {
-            BS_WriteValue(
-                bs,
-                PR_UINT16, data[PR_lrKey],
-                PR_UINT16, data[PR_udKey],
-                PR_UINT16, data[PR_keys],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2],
-                PR_FLOAT, data[PR_quaternion][0],
-                PR_FLOAT, data[PR_quaternion][1],
-                PR_FLOAT, data[PR_quaternion][2],
-                PR_FLOAT, data[PR_quaternion][3],
-                PR_UINT8, data[PR_health],
-                PR_UINT8, data[PR_armour],
-                PR_BITS, data[PR_additionalKey], 2,
-                PR_BITS, data[PR_weaponId], 6,
-                PR_UINT8, data[PR_specialAction],
-                PR_FLOAT, data[PR_velocity][0],
-                PR_FLOAT, data[PR_velocity][1],
-                PR_FLOAT, data[PR_velocity][2],
-                PR_FLOAT, data[PR_surfingOffsets][0],
-                PR_FLOAT, data[PR_surfingOffsets][1],
-                PR_FLOAT, data[PR_surfingOffsets][2],
-                PR_UINT16, data[PR_surfingVehicleId],
-                PR_INT16, data[PR_animationId],
-                PR_INT16, data[PR_animationFlags]
-            );
+            if (outcoming) {
+                new healthArmour;
+
+                if (data[PR_lrKey]) {
+                    BS_WriteValue(
+                        bs,
+                        PR_BOOL, true,
+                        PR_UINT16, data[PR_lrKey]
+                    );
+                } else {
+                    BS_WriteValue(bs, PR_BOOL, false);
+                }
+
+                if (data[PR_udKey]) {
+                    BS_WriteValue(
+                        bs,
+                        PR_BOOL, true,
+                        PR_UINT16, data[PR_udKey]
+                    );
+                } else {
+                    BS_WriteValue(bs, PR_BOOL, false);
+                }
+
+                BS_PackHealthArmour(data[PR_health], data[PR_armour], healthArmour);
+
+                BS_WriteValue(
+                    bs,
+                    PR_UINT16, data[PR_keys],
+                    PR_FLOAT, data[PR_position][0],
+                    PR_FLOAT, data[PR_position][1],
+                    PR_FLOAT, data[PR_position][2],
+                    PR_NORM_QUAT, data[PR_quaternion][0], data[PR_quaternion][1], data[PR_quaternion][2], data[PR_quaternion][3],
+                    PR_UINT8, healthArmour,
+                    PR_UINT8, data[PR_weaponId],
+                    PR_UINT8, data[PR_specialAction],
+                    PR_VECTOR, data[PR_velocity][0], data[PR_velocity][1], data[PR_velocity][2]
+                );
+
+                if (data[PR_surfingVehicleId]) {
+                    BS_WriteValue(
+                        bs,
+                        PR_BOOL, true,
+                        PR_UINT16, data[PR_surfingVehicleId],
+                        PR_FLOAT, data[PR_surfingOffsets][0],
+                        PR_FLOAT, data[PR_surfingOffsets][1],
+                        PR_FLOAT, data[PR_surfingOffsets][2]
+                    );
+                } else {
+                    BS_WriteValue(bs, PR_BOOL, false);
+                }
+
+                if (data[PR_animationId] || data[PR_animationFlags]) {
+                    BS_WriteValue(
+                        bs,
+                        PR_BOOL, true,
+                        PR_INT16, data[PR_animationId],
+                        PR_INT16, data[PR_animationFlags]
+                    );
+                } else {
+                    BS_WriteValue(bs, PR_BOOL, false);
+                }
+            } else {
+                BS_WriteValue(
+                    bs,
+                    PR_UINT16, data[PR_lrKey],
+                    PR_UINT16, data[PR_udKey],
+                    PR_UINT16, data[PR_keys],
+                    PR_FLOAT, data[PR_position][0],
+                    PR_FLOAT, data[PR_position][1],
+                    PR_FLOAT, data[PR_position][2],
+                    PR_FLOAT, data[PR_quaternion][0],
+                    PR_FLOAT, data[PR_quaternion][1],
+                    PR_FLOAT, data[PR_quaternion][2],
+                    PR_FLOAT, data[PR_quaternion][3],
+                    PR_UINT8, data[PR_health],
+                    PR_UINT8, data[PR_armour],
+                    PR_BITS, data[PR_additionalKey], 2,
+                    PR_BITS, data[PR_weaponId], 6,
+                    PR_UINT8, data[PR_specialAction],
+                    PR_FLOAT, data[PR_velocity][0],
+                    PR_FLOAT, data[PR_velocity][1],
+                    PR_FLOAT, data[PR_velocity][2],
+                    PR_FLOAT, data[PR_surfingOffsets][0],
+                    PR_FLOAT, data[PR_surfingOffsets][1],
+                    PR_FLOAT, data[PR_surfingOffsets][2],
+                    PR_UINT16, data[PR_surfingVehicleId],
+                    PR_INT16, data[PR_animationId],
+                    PR_INT16, data[PR_animationFlags]
+                );
+            }
         }
 
-        stock BS_WriteInCarSync(BitStream:bs, data[PR_InCarSync])
+        stock BS_WriteInCarSync(BitStream:bs, data[PR_InCarSync], outcoming = false)
         {
-            BS_WriteValue(
-                bs,
-                PR_UINT16, data[PR_vehicleId],
-                PR_UINT16, data[PR_lrKey],
-                PR_UINT16, data[PR_udKey],
-                PR_UINT16, data[PR_keys],
-                PR_FLOAT, data[PR_quaternion][0],
-                PR_FLOAT, data[PR_quaternion][1],
-                PR_FLOAT, data[PR_quaternion][2],
-                PR_FLOAT, data[PR_quaternion][3],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2],
-                PR_FLOAT, data[PR_velocity][0],
-                PR_FLOAT, data[PR_velocity][1],
-                PR_FLOAT, data[PR_velocity][2],
-                PR_FLOAT, data[PR_vehicleHealth],
-                PR_UINT8, data[PR_playerHealth],
-                PR_UINT8, data[PR_armour],
-                PR_BITS, data[PR_additionalKey], 2,
-                PR_BITS, data[PR_weaponId], 6,
-                PR_UINT8, data[PR_sirenState],
-                PR_UINT8, data[PR_landingGearState],
-                PR_UINT16, data[PR_trailerId],
-                PR_FLOAT, data[PR_trainSpeed]
-            );
+            if (outcoming) {
+                new healthArmour;
+
+                BS_PackHealthArmour(data[PR_playerHealth], data[PR_armour], healthArmour);
+
+                BS_WriteValue(
+                    bs,
+                    PR_UINT16, data[PR_vehicleId],
+                    PR_UINT16, data[PR_lrKey],
+                    PR_UINT16, data[PR_udKey],
+                    PR_UINT16, data[PR_keys],
+                    PR_NORM_QUAT, data[PR_quaternion][0], data[PR_quaternion][1], data[PR_quaternion][2], data[PR_quaternion][3],
+                    PR_FLOAT, data[PR_position][0],
+                    PR_FLOAT, data[PR_position][1],
+                    PR_FLOAT, data[PR_position][2],
+                    PR_VECTOR, data[PR_velocity][0], data[PR_velocity][1], data[PR_velocity][2],
+                    PR_UINT16, floatround(data[PR_vehicleHealth]),
+                    PR_UINT8, healthArmour,
+                    PR_UINT8, data[PR_weaponId],
+                    PR_BOOL, data[PR_sirenState],
+                    PR_BOOL, data[PR_landingGearState]
+                );
+
+                if (data[PR_trainSpeed]) {
+                    BS_WriteValue(bs,
+                        PR_BOOL, true,
+                        PR_FLOAT, data[PR_trainSpeed]
+                    );
+                } else {
+                    BS_WriteValue(bs, PR_BOOL, false);
+                }
+
+                if (data[PR_trailerId]) {
+                    BS_WriteValue(bs,
+                        PR_BOOL, true,
+                        PR_UINT16, data[PR_trailerId]
+                    );
+                } else {
+                    BS_WriteValue(bs, PR_BOOL, false);
+                }
+            } else {
+                BS_WriteValue(
+                    bs,
+                    PR_UINT16, data[PR_vehicleId],
+                    PR_UINT16, data[PR_lrKey],
+                    PR_UINT16, data[PR_udKey],
+                    PR_UINT16, data[PR_keys],
+                    PR_FLOAT, data[PR_quaternion][0],
+                    PR_FLOAT, data[PR_quaternion][1],
+                    PR_FLOAT, data[PR_quaternion][2],
+                    PR_FLOAT, data[PR_quaternion][3],
+                    PR_FLOAT, data[PR_position][0],
+                    PR_FLOAT, data[PR_position][1],
+                    PR_FLOAT, data[PR_position][2],
+                    PR_FLOAT, data[PR_velocity][0],
+                    PR_FLOAT, data[PR_velocity][1],
+                    PR_FLOAT, data[PR_velocity][2],
+                    PR_FLOAT, data[PR_vehicleHealth],
+                    PR_UINT8, data[PR_playerHealth],
+                    PR_UINT8, data[PR_armour],
+                    PR_BITS, data[PR_additionalKey], 2,
+                    PR_BITS, data[PR_weaponId], 6,
+                    PR_UINT8, data[PR_sirenState],
+                    PR_UINT8, data[PR_landingGearState],
+                    PR_UINT16, data[PR_trailerId],
+                    PR_FLOAT, data[PR_trainSpeed]
+                );
+            }
         }
 
         stock BS_WriteTrailerSync(BitStream:bs, data[PR_TrailerSync])

@@ -423,6 +423,32 @@ namespace Natives {
 
                         break;
                     }
+                    case PR_NORM_QUAT: {
+                        std::array<float, 4> quat;
+
+                        for (int index{}; index < quat.size(); ++index) {
+                            quat[index] = amx_ctof(Functions::GetAmxParamRef(amx, params[i + 2 + index]));
+                        }
+
+                        bs->WriteNormQuat(quat[0], quat[1], quat[2], quat[3]);
+
+                        i += (quat.size() - 1);
+
+                        break;
+                    }
+                    case PR_VECTOR: {
+                        std::array<float, 3> vec;
+
+                        for (int index{}; index < vec.size(); ++index) {
+                            vec[index] = amx_ctof(Functions::GetAmxParamRef(amx, params[i + 2 + index]));
+                        }
+
+                        bs->WriteVector(vec[0], vec[1], vec[2]);
+
+                        i += (vec.size() - 1);
+
+                        break;
+                    }
                     default: {
                         throw std::runtime_error{"invalid type of value"};
                     }
@@ -573,6 +599,32 @@ namespace Natives {
                         bs->ReadBits(reinterpret_cast<unsigned char *>(&value), number_of_bits, true);
 
                         ++i;
+
+                        break;
+                    }
+                    case PR_NORM_QUAT: {
+                        std::array<float, 4> quat;
+
+                        bs->ReadNormQuat(quat[0], quat[1], quat[2], quat[3]);
+
+                        for (int index{}; index < quat.size(); ++index) {
+                            Functions::GetAmxParamRef(amx, params[i + 2 + index]) = amx_ftoc(quat[index]);
+                        }
+
+                        i += (quat.size() - 1);
+
+                        break;
+                    }
+                    case PR_VECTOR: {
+                        std::array<float, 3> vec;
+
+                        bs->ReadVector(vec[0], vec[1], vec[2]);
+
+                        for (int index{}; index < vec.size(); ++index) {
+                            Functions::GetAmxParamRef(amx, params[i + 2 + index]) = amx_ftoc(vec[index]);
+                        }
+
+                        i += (vec.size() - 1);
 
                         break;
                     }
