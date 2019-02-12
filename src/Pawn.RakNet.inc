@@ -27,13 +27,15 @@
 
     #define PAWNRAKNET_INCLUDE_VERSION 120
 
-    enum PR_HandlerType
+    #define PR_MAX_HANDLERS 255
+
+    enum PR_EventType
     {
         PR_INCOMING_RPC,
         PR_INCOMING_PACKET,
         PR_OUTCOMING_RPC,
         PR_OUTCOMING_PACKET,
-        PR_NUMBER_OF_HANDLER_TYPES
+        PR_NUMBER_OF_EVENT_TYPES
     };
 
     enum PR_ValueType
@@ -226,13 +228,6 @@
             Float:PR_position[3]
         };
 
-        /*
-         * RPC list: https://github.com/P3ti/RakSAMP/blob/master/raknet/SAMP/SAMPRPC.cpp
-         * Packet list: https://github.com/P3ti/RakSAMP/blob/master/raknet/PacketEnumerations.h
-         *
-         * playerid == -1 => send to all players (broadcast)
-         */
-
         native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
         native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
@@ -258,6 +253,8 @@
 
         native BS_WriteValue(BitStream:bs, {PR_ValueType, Float, _}:...);
         native BS_ReadValue(BitStream:bs, {PR_ValueType, Float, _}:...);
+
+        native PR_RegHandler(id, const publicname[], PR_EventType:type);
 
         #define BS_ReadInt8(%0,%1) BS_ReadValue(%0,PR_INT8,%1)
         #define BS_ReadInt16(%0,%1) BS_ReadValue(%0,PR_INT16,%1)
@@ -903,12 +900,6 @@
                 PR_FLOAT, data[PR_position][2]
             );
         }
-
-        native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
-
-        /*
-         * playerid == -1 => send to all players (broadcast)
-         */
 
         forward OnIncomingPacket(playerid, packetid, BitStream:bs);
         forward OnIncomingRPC(playerid, rpcid, BitStream:bs);

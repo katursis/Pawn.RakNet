@@ -6,7 +6,7 @@ namespace Hooks {
         hook_get_rakserver_interface,
         hook_amx_cleanup;
 
-    std::array<RPCFunction, MAX_RPC_MAP_SIZE>
+    std::array<RPCFunction, PR_MAX_HANDLERS>
         original_rpc,
         custom_rpc;
 
@@ -222,7 +222,7 @@ namespace Hooks {
     };
 
     template<>
-    struct InternalHooks::RPCHandle::Generator<MAX_RPC_MAP_SIZE> {
+    struct InternalHooks::RPCHandle::Generator<PR_MAX_HANDLERS> {
         static void Run() {}
     };
 

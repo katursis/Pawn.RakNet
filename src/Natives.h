@@ -637,16 +637,15 @@ namespace Natives {
         return 0;
     }
 
-    // native PR_RegHandler(id, const publicname[], PR_HandlerType:type);
+    // native PR_RegHandler(id, const publicname[], PR_EventType:type);
     cell AMX_NATIVE_CALL n_PR_RegHandler(AMX *amx, cell *params) {
         try {
             Functions::AssertParams(3, params);
 
-            Scripts::RegisterHandler(
-                amx,
+            Scripts::GetScript(amx).RegisterHandler(
                 params[1],
                 Functions::GetAmxString(amx, params[2]),
-                static_cast<PR_HandlerType>(params[3])
+                static_cast<PR_EventType>(params[3])
             );
 
             return 1;

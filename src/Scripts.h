@@ -4,7 +4,7 @@
 namespace Scripts {
     class Public {
     public:
-        explicit Public(const std::string &name, AMX *amx) : _name{ name }, _amx{ amx } {
+        explicit Public(const std::string &name, AMX *amx) : _name{name}, _amx{amx} {
             _exists = (amx_FindPublic(_amx, _name.c_str(), &_index) == AMX_ERR_NONE && _index >= 0);
         }
 
@@ -20,7 +20,7 @@ namespace Scripts {
 
         template<typename... ARGS>
         inline cell call(ARGS ... args) {
-            return Functions::AmxCallPublic(_amx, this->get_index(), args...);
+            return Functions::AmxCallPublic(_amx, get_index(), args...);
         }
 
         inline bool exists() const {
@@ -44,28 +44,16 @@ namespace Scripts {
 
     class Script {
     public:
-        enum Publics {
-            ON_INCOMING_RPC,
-            ON_INCOMING_PACKET,
-            ON_OUTCOMIMG_RPC,
-            ON_OUTCOMING_PACKET,
-            NUMBER_OF_PUBLICS
-        };
-
-        explicit Script(AMX *amx) : _amx(amx) {
-            const auto make_public = [amx](const std::string &name) {
-                return std::unique_ptr<Public>(new Public{ name, amx });
-            };
-
-            _publics[ON_INCOMING_RPC] = make_public("OnIncomingRPC");
-            _publics[ON_INCOMING_PACKET] = make_public("OnIncomingPacket");
-            _publics[ON_OUTCOMIMG_RPC] = make_public("OnOutcomingRPC");
-            _publics[ON_OUTCOMING_PACKET] = make_public("OnOutcomingPacket");
+        explicit Script(AMX *amx) : _amx{amx} {
+            InitPublic(PR_INCOMING_RPC, "OnIncomingRPC");
+            InitPublic(PR_INCOMING_PACKET, "OnIncomingPacket");
+            InitPublic(PR_OUTCOMING_RPC, "OnOutcomingRPC");
+            InitPublic(PR_OUTCOMING_PACKET, "OnOutcomingPacket");
         }
 
         // forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
         inline bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[ON_INCOMING_RPC];
+            const auto &pub = _publics[PR_INCOMING_RPC];
 
             if (pub->exists()) {
                 if (bs) {
@@ -95,7 +83,7 @@ namespace Scripts {
 
         // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
         inline bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[ON_INCOMING_PACKET];
+            const auto &pub = _publics[PR_INCOMING_PACKET];
 
             if (pub->exists()) {
                 if (bs) {
@@ -125,7 +113,7 @@ namespace Scripts {
 
         // forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
         inline bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[ON_OUTCOMIMG_RPC];
+            const auto &pub = _publics[PR_OUTCOMING_RPC];
 
             if (pub->exists()) {
                 if (bs) {
@@ -155,7 +143,7 @@ namespace Scripts {
 
         // forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
         inline bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[ON_OUTCOMING_PACKET];
+            const auto &pub = _publics[PR_OUTCOMING_PACKET];
 
             if (pub->exists()) {
                 if (bs) {
@@ -183,6 +171,10 @@ namespace Scripts {
             return true;
         }
 
+        void InitPublic(PR_EventType type, const std::string &name) {
+            _publics.at(type) = std::unique_ptr<Public>{new Public{name, _amx}};
+        }
+
         void InitHandlersRegistration() {
             int num_publics{};
 
@@ -192,7 +184,7 @@ namespace Scripts {
                 return;
             }
 
-            std::regex r{ Settings::kRegHandlerPublicRegExp };
+            std::regex r{Settings::kRegHandlerPublicRegExp};
 
             for (int i{}; i < num_publics; i++) {
                 char public_name[32]{};
@@ -213,16 +205,16 @@ namespace Scripts {
             }
         }
 
-        void RegisterHandler(int id, const std::string &public_name, PR_HandlerType type) {
-            _handlers.at(type).at(id) = std::unique_ptr<Public>(new Public{ public_name, _amx });
+        void RegisterHandler(int id, const std::string &public_name, PR_EventType type) {
+            _handlers.at(type).at(id) = std::unique_ptr<Public>{new Public{public_name, _amx}};
 
             if (!_handlers[type][id]->exists()) {
-                throw std::runtime_error{ "public " + public_name + " not exists" };
+                throw std::runtime_error{"public " + public_name + " not exists"};
             }
         }
 
         cell NewBitStream() {
-            auto bs = std::make_shared<RakNet::BitStream>();
+            const auto bs = std::make_shared<RakNet::BitStream>();
 
             _bitstreams.insert(bs);
 
@@ -241,23 +233,21 @@ namespace Scripts {
             _bitstreams.erase(bs);
         }
 
-        inline AMX *get_amx() const {
-            return _amx;
+        inline bool operator==(AMX *amx) {
+            return _amx == amx;
         }
-
+ 
     private:
         AMX *_amx;
-        std::array<std::unique_ptr<Public>, NUMBER_OF_PUBLICS> _publics;
-        std::array<std::array<std::unique_ptr<Public>, MAX_RPC_MAP_SIZE>, PR_NUMBER_OF_HANDLER_TYPES> _handlers;
+        std::array<std::unique_ptr<Public>, PR_NUMBER_OF_EVENT_TYPES> _publics;
+        std::array<std::array<std::unique_ptr<Public>, PR_MAX_HANDLERS>, PR_NUMBER_OF_EVENT_TYPES> _handlers;
         std::unordered_set<std::shared_ptr<RakNet::BitStream>> _bitstreams;
     };
 
     std::list<Script> scripts;
 
     Script & GetScript(AMX *amx) {
-        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const Script &script) {
-            return script.get_amx() == amx;
-        });
+        const auto script = std::find(scripts.begin(), scripts.end(), amx);
 
         if (script == scripts.end()) {
             throw std::runtime_error{"amx not found"};
@@ -277,22 +267,10 @@ namespace Scripts {
     }
 
     void Unload(AMX *amx) {
-        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const Script &script) {
-            return script.get_amx() == amx;
-        });
+        const auto script = std::find(scripts.begin(), scripts.end(), amx);
 
         if (script != scripts.end()) {
             scripts.erase(script);
-        }
-    }
-
-    void RegisterHandler(AMX *amx, int id, const std::string &public_name, PR_HandlerType type) {
-        const auto script = std::find_if(scripts.begin(), scripts.end(), [amx](const Script &script) {
-            return script.get_amx() == amx;
-        });
-
-        if (script != scripts.end()) {
-            (*script).RegisterHandler(id, public_name, type);
         }
     }
 

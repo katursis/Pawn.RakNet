@@ -604,7 +604,7 @@ void BitStream::AddBitsAndReallocate(const int numberOfBitsToWrite)
 #endif
 		if (copyData == false)
 		{
-			throw std::runtime_error{ "copyData == false (AddBitsAndReallocate)" };
+			throw std::runtime_error{"copyData == false (AddBitsAndReallocate)"};
 		}
 
 		// Less memory efficient but saves on news and deletes
