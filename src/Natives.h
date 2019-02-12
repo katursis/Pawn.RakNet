@@ -418,10 +418,22 @@ namespace Natives {
 
                         break;
                     }
+                    case PR_FLOAT3:
+                    case PR_FLOAT4: {
+                        const std::size_t arr_size = (type == PR_FLOAT3 ? 3 : 4);
+
+                        for (std::size_t index{}; index < arr_size; ++index) {
+                            bs->Write(amx_ctof(Functions::GetAmxParamRef(amx, params[i + 2 + index])));
+                        }
+
+                        i += (arr_size - 1);
+
+                        break;
+                    }
                     case PR_NORM_QUAT: {
                         std::array<float, 4> quat;
 
-                        for (int index{}; index < quat.size(); ++index) {
+                        for (std::size_t index{}; index < quat.size(); ++index) {
                             quat[index] = amx_ctof(Functions::GetAmxParamRef(amx, params[i + 2 + index]));
                         }
 
@@ -434,7 +446,7 @@ namespace Natives {
                     case PR_VECTOR: {
                         std::array<float, 3> vec;
 
-                        for (int index{}; index < vec.size(); ++index) {
+                        for (std::size_t index{}; index < vec.size(); ++index) {
                             vec[index] = amx_ctof(Functions::GetAmxParamRef(amx, params[i + 2 + index]));
                         }
 
@@ -597,12 +609,24 @@ namespace Natives {
 
                         break;
                     }
+                    case PR_FLOAT3:
+                    case PR_FLOAT4: {
+                        const std::size_t arr_size = (type == PR_FLOAT3 ? 3 : 4);
+
+                        for (std::size_t index{}; index < arr_size; ++index) {
+                            Functions::GetAmxParamRef(amx, params[i + 2 + index]) = Value<float>::Read(bs);
+                        }
+
+                        i += (arr_size - 1);
+
+                        break;
+                    }
                     case PR_NORM_QUAT: {
                         std::array<float, 4> quat;
 
                         bs->ReadNormQuat(quat[0], quat[1], quat[2], quat[3]);
 
-                        for (int index{}; index < quat.size(); ++index) {
+                        for (std::size_t index{}; index < quat.size(); ++index) {
                             Functions::GetAmxParamRef(amx, params[i + 2 + index]) = amx_ftoc(quat[index]);
                         }
 
@@ -615,7 +639,7 @@ namespace Natives {
 
                         bs->ReadVector(vec[0], vec[1], vec[2]);
 
-                        for (int index{}; index < vec.size(); ++index) {
+                        for (std::size_t index{}; index < vec.size(); ++index) {
                             Functions::GetAmxParamRef(amx, params[i + 2 + index]) = amx_ftoc(vec[index]);
                         }
 

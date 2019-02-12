@@ -63,6 +63,9 @@
 
         PR_BITS,
 
+        PR_FLOAT3,
+        PR_FLOAT4,
+
         PR_NORM_QUAT,
         PR_VECTOR
     };
@@ -300,6 +303,9 @@
 
         #define BS_WriteBits(%0,%1,%2) BS_WriteValue(%0,PR_BITS,%1,%2)
 
+        #define PR_EXPAND_ARR3(%0) %0[0],%0[1],%0[2]
+        #define PR_EXPAND_ARR4(%0) %0[0],%0[1],%0[2],%0[3]
+
         stock BS_PackHealthArmour(health, armour, &healthArmour) {
             if (health > 0 && health < 100) {
                 healthArmour = (health / 7) << 4;
@@ -361,14 +367,12 @@
                 BS_ReadValue(
                     bs,
                     PR_UINT16, data[PR_keys],
-                    PR_FLOAT, data[PR_position][0],
-                    PR_FLOAT, data[PR_position][1],
-                    PR_FLOAT, data[PR_position][2],
-                    PR_NORM_QUAT, data[PR_quaternion][0], data[PR_quaternion][1], data[PR_quaternion][2], data[PR_quaternion][3],
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                    PR_NORM_QUAT, PR_EXPAND_ARR4(data[PR_quaternion]),
                     PR_UINT8, healthArmour,
                     PR_UINT8, data[PR_weaponId],
                     PR_UINT8, data[PR_specialAction],
-                    PR_VECTOR, data[PR_velocity][0], data[PR_velocity][1], data[PR_velocity][2],
+                    PR_VECTOR, PR_EXPAND_ARR3(data[PR_velocity]),
                     PR_BOOL, hasSurfInfo
                 );
 
@@ -378,9 +382,7 @@
                     BS_ReadValue(
                         bs,
                         PR_UINT16, data[PR_surfingVehicleId],
-                        PR_FLOAT, data[PR_surfingOffsets][0],
-                        PR_FLOAT, data[PR_surfingOffsets][1],
-                        PR_FLOAT, data[PR_surfingOffsets][2]
+                        PR_FLOAT3, PR_EXPAND_ARR3(data[PR_surfingOffsets])
                     );
                 } else {
                     data[PR_surfingVehicleId] = 0;
@@ -404,24 +406,15 @@
                     PR_UINT16, data[PR_lrKey],
                     PR_UINT16, data[PR_udKey],
                     PR_UINT16, data[PR_keys],
-                    PR_FLOAT, data[PR_position][0],
-                    PR_FLOAT, data[PR_position][1],
-                    PR_FLOAT, data[PR_position][2],
-                    PR_FLOAT, data[PR_quaternion][0],
-                    PR_FLOAT, data[PR_quaternion][1],
-                    PR_FLOAT, data[PR_quaternion][2],
-                    PR_FLOAT, data[PR_quaternion][3],
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                    PR_FLOAT4, PR_EXPAND_ARR4(data[PR_quaternion]),
                     PR_UINT8, data[PR_health],
                     PR_UINT8, data[PR_armour],
                     PR_BITS, data[PR_additionalKey], 2,
                     PR_BITS, data[PR_weaponId], 6,
                     PR_UINT8, data[PR_specialAction],
-                    PR_FLOAT, data[PR_velocity][0],
-                    PR_FLOAT, data[PR_velocity][1],
-                    PR_FLOAT, data[PR_velocity][2],
-                    PR_FLOAT, data[PR_surfingOffsets][0],
-                    PR_FLOAT, data[PR_surfingOffsets][1],
-                    PR_FLOAT, data[PR_surfingOffsets][2],
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_velocity]),
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_surfingOffsets]),
                     PR_UINT16, data[PR_surfingVehicleId],
                     PR_INT16, data[PR_animationId],
                     PR_INT16, data[PR_animationFlags]
@@ -440,11 +433,9 @@
                     PR_UINT16, data[PR_lrKey],
                     PR_UINT16, data[PR_udKey],
                     PR_UINT16, data[PR_keys],
-                    PR_NORM_QUAT, data[PR_quaternion][0], data[PR_quaternion][1], data[PR_quaternion][2], data[PR_quaternion][3],
-                    PR_FLOAT, data[PR_position][0],
-                    PR_FLOAT, data[PR_position][1],
-                    PR_FLOAT, data[PR_position][2],
-                    PR_VECTOR, data[PR_velocity][0], data[PR_velocity][1], data[PR_velocity][2],
+                    PR_NORM_QUAT, PR_EXPAND_ARR4(data[PR_quaternion]),
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                    PR_VECTOR, PR_EXPAND_ARR3(data[PR_velocity]),
                     PR_UINT16, vehicleHealth,
                     PR_UINT8, healthArmour,
                     PR_UINT8, data[PR_weaponId],
@@ -480,16 +471,9 @@
                     PR_UINT16, data[PR_lrKey],
                     PR_UINT16, data[PR_udKey],
                     PR_UINT16, data[PR_keys],
-                    PR_FLOAT, data[PR_quaternion][0],
-                    PR_FLOAT, data[PR_quaternion][1],
-                    PR_FLOAT, data[PR_quaternion][2],
-                    PR_FLOAT, data[PR_quaternion][3],
-                    PR_FLOAT, data[PR_position][0],
-                    PR_FLOAT, data[PR_position][1],
-                    PR_FLOAT, data[PR_position][2],
-                    PR_FLOAT, data[PR_velocity][0],
-                    PR_FLOAT, data[PR_velocity][1],
-                    PR_FLOAT, data[PR_velocity][2],
+                    PR_FLOAT4, PR_EXPAND_ARR4(data[PR_quaternion]),
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_velocity]),
                     PR_FLOAT, data[PR_vehicleHealth],
                     PR_UINT8, data[PR_playerHealth],
                     PR_UINT8, data[PR_armour],
@@ -508,19 +492,10 @@
             BS_ReadValue(
                 bs,
                 PR_UINT16, data[PR_trailerId],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2],
-                PR_FLOAT, data[PR_quaternion][0],
-                PR_FLOAT, data[PR_quaternion][1],
-                PR_FLOAT, data[PR_quaternion][2],
-                PR_FLOAT, data[PR_quaternion][3],
-                PR_FLOAT, data[PR_velocity][0],
-                PR_FLOAT, data[PR_velocity][1],
-                PR_FLOAT, data[PR_velocity][2],
-                PR_FLOAT, data[PR_angularVelocity][0],
-                PR_FLOAT, data[PR_angularVelocity][1],
-                PR_FLOAT, data[PR_angularVelocity][2]
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                PR_FLOAT4, PR_EXPAND_ARR4(data[PR_quaternion]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_velocity]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_angularVelocity])
             );
         }
 
@@ -538,9 +513,7 @@
                 PR_UINT16, data[PR_lrKey],
                 PR_UINT16, data[PR_udKey],
                 PR_UINT16, data[PR_keys],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2]
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position])
             );
         }
 
@@ -550,21 +523,11 @@
                 bs,
                 PR_UINT16, data[PR_vehicleId],
                 PR_UINT8, data[PR_seatId],
-                PR_FLOAT, data[PR_roll][0],
-                PR_FLOAT, data[PR_roll][1],
-                PR_FLOAT, data[PR_roll][2],
-                PR_FLOAT, data[PR_direction][0],
-                PR_FLOAT, data[PR_direction][1],
-                PR_FLOAT, data[PR_direction][2],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2],
-                PR_FLOAT, data[PR_velocity][0],
-                PR_FLOAT, data[PR_velocity][1],
-                PR_FLOAT, data[PR_velocity][2],
-                PR_FLOAT, data[PR_angularVelocity][0],
-                PR_FLOAT, data[PR_angularVelocity][1],
-                PR_FLOAT, data[PR_angularVelocity][2],
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_roll]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_direction]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_velocity]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_angularVelocity]),
                 PR_FLOAT, data[PR_vehicleHealth]
             );
         }
@@ -574,12 +537,8 @@
             BS_ReadValue(
                 bs,
                 PR_UINT8, data[PR_camMode],
-                PR_FLOAT, data[PR_camFrontVec][0],
-                PR_FLOAT, data[PR_camFrontVec][1],
-                PR_FLOAT, data[PR_camFrontVec][2],
-                PR_FLOAT, data[PR_camPos][0],
-                PR_FLOAT, data[PR_camPos][1],
-                PR_FLOAT, data[PR_camPos][2],
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_camFrontVec]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_camPos]),
                 PR_FLOAT, data[PR_aimZ],
                 PR_BITS, data[PR_weaponState], 2,
                 PR_BITS, data[PR_camZoom], 6,
@@ -593,15 +552,9 @@
                 bs,
                 PR_UINT8, data[PR_hitType],
                 PR_UINT16, data[PR_hitId],
-                PR_FLOAT, data[PR_origin][0],
-                PR_FLOAT, data[PR_origin][1],
-                PR_FLOAT, data[PR_origin][2],
-                PR_FLOAT, data[PR_hitPos][0],
-                PR_FLOAT, data[PR_hitPos][1],
-                PR_FLOAT, data[PR_hitPos][2],
-                PR_FLOAT, data[PR_offsets][0],
-                PR_FLOAT, data[PR_offsets][1],
-                PR_FLOAT, data[PR_offsets][2],
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_origin]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_hitPos]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_offsets]),
                 PR_UINT8, data[PR_weaponId]
             );
         }
@@ -613,9 +566,7 @@
                 PR_UINT16, data[PR_lrKey],
                 PR_UINT16, data[PR_udKey],
                 PR_UINT16, data[PR_keys],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2]
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position])
             );
         }
 
@@ -649,14 +600,12 @@
                 BS_WriteValue(
                     bs,
                     PR_UINT16, data[PR_keys],
-                    PR_FLOAT, data[PR_position][0],
-                    PR_FLOAT, data[PR_position][1],
-                    PR_FLOAT, data[PR_position][2],
-                    PR_NORM_QUAT, data[PR_quaternion][0], data[PR_quaternion][1], data[PR_quaternion][2], data[PR_quaternion][3],
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                    PR_NORM_QUAT, PR_EXPAND_ARR4(data[PR_quaternion]),
                     PR_UINT8, healthArmour,
                     PR_UINT8, data[PR_weaponId],
                     PR_UINT8, data[PR_specialAction],
-                    PR_VECTOR, data[PR_velocity][0], data[PR_velocity][1], data[PR_velocity][2]
+                    PR_VECTOR, PR_EXPAND_ARR3(data[PR_velocity])
                 );
 
                 if (data[PR_surfingVehicleId]) {
@@ -664,9 +613,7 @@
                         bs,
                         PR_BOOL, true,
                         PR_UINT16, data[PR_surfingVehicleId],
-                        PR_FLOAT, data[PR_surfingOffsets][0],
-                        PR_FLOAT, data[PR_surfingOffsets][1],
-                        PR_FLOAT, data[PR_surfingOffsets][2]
+                        PR_FLOAT3, PR_EXPAND_ARR3(data[PR_surfingOffsets])
                     );
                 } else {
                     BS_WriteValue(bs, PR_BOOL, false);
@@ -688,24 +635,15 @@
                     PR_UINT16, data[PR_lrKey],
                     PR_UINT16, data[PR_udKey],
                     PR_UINT16, data[PR_keys],
-                    PR_FLOAT, data[PR_position][0],
-                    PR_FLOAT, data[PR_position][1],
-                    PR_FLOAT, data[PR_position][2],
-                    PR_FLOAT, data[PR_quaternion][0],
-                    PR_FLOAT, data[PR_quaternion][1],
-                    PR_FLOAT, data[PR_quaternion][2],
-                    PR_FLOAT, data[PR_quaternion][3],
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                    PR_FLOAT4, PR_EXPAND_ARR4(data[PR_quaternion]),
                     PR_UINT8, data[PR_health],
                     PR_UINT8, data[PR_armour],
                     PR_BITS, data[PR_additionalKey], 2,
                     PR_BITS, data[PR_weaponId], 6,
                     PR_UINT8, data[PR_specialAction],
-                    PR_FLOAT, data[PR_velocity][0],
-                    PR_FLOAT, data[PR_velocity][1],
-                    PR_FLOAT, data[PR_velocity][2],
-                    PR_FLOAT, data[PR_surfingOffsets][0],
-                    PR_FLOAT, data[PR_surfingOffsets][1],
-                    PR_FLOAT, data[PR_surfingOffsets][2],
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_velocity]),
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_surfingOffsets]),
                     PR_UINT16, data[PR_surfingVehicleId],
                     PR_INT16, data[PR_animationId],
                     PR_INT16, data[PR_animationFlags]
@@ -726,11 +664,9 @@
                     PR_UINT16, data[PR_lrKey],
                     PR_UINT16, data[PR_udKey],
                     PR_UINT16, data[PR_keys],
-                    PR_NORM_QUAT, data[PR_quaternion][0], data[PR_quaternion][1], data[PR_quaternion][2], data[PR_quaternion][3],
-                    PR_FLOAT, data[PR_position][0],
-                    PR_FLOAT, data[PR_position][1],
-                    PR_FLOAT, data[PR_position][2],
-                    PR_VECTOR, data[PR_velocity][0], data[PR_velocity][1], data[PR_velocity][2],
+                    PR_NORM_QUAT, PR_EXPAND_ARR4(data[PR_quaternion]),
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                    PR_VECTOR, PR_EXPAND_ARR3(data[PR_velocity]),
                     PR_UINT16, floatround(data[PR_vehicleHealth]),
                     PR_UINT8, healthArmour,
                     PR_UINT8, data[PR_weaponId],
@@ -762,16 +698,9 @@
                     PR_UINT16, data[PR_lrKey],
                     PR_UINT16, data[PR_udKey],
                     PR_UINT16, data[PR_keys],
-                    PR_FLOAT, data[PR_quaternion][0],
-                    PR_FLOAT, data[PR_quaternion][1],
-                    PR_FLOAT, data[PR_quaternion][2],
-                    PR_FLOAT, data[PR_quaternion][3],
-                    PR_FLOAT, data[PR_position][0],
-                    PR_FLOAT, data[PR_position][1],
-                    PR_FLOAT, data[PR_position][2],
-                    PR_FLOAT, data[PR_velocity][0],
-                    PR_FLOAT, data[PR_velocity][1],
-                    PR_FLOAT, data[PR_velocity][2],
+                    PR_FLOAT4, PR_EXPAND_ARR4(data[PR_quaternion]),
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                    PR_FLOAT3, PR_EXPAND_ARR3(data[PR_velocity]),
                     PR_FLOAT, data[PR_vehicleHealth],
                     PR_UINT8, data[PR_playerHealth],
                     PR_UINT8, data[PR_armour],
@@ -790,19 +719,10 @@
             BS_WriteValue(
                 bs,
                 PR_UINT16, data[PR_trailerId],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2],
-                PR_FLOAT, data[PR_quaternion][0],
-                PR_FLOAT, data[PR_quaternion][1],
-                PR_FLOAT, data[PR_quaternion][2],
-                PR_FLOAT, data[PR_quaternion][3],
-                PR_FLOAT, data[PR_velocity][0],
-                PR_FLOAT, data[PR_velocity][1],
-                PR_FLOAT, data[PR_velocity][2],
-                PR_FLOAT, data[PR_angularVelocity][0],
-                PR_FLOAT, data[PR_angularVelocity][1],
-                PR_FLOAT, data[PR_angularVelocity][2]
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                PR_FLOAT4, PR_EXPAND_ARR4(data[PR_quaternion]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_velocity]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_angularVelocity])
             );
         }
 
@@ -820,9 +740,7 @@
                 PR_UINT16, data[PR_lrKey],
                 PR_UINT16, data[PR_udKey],
                 PR_UINT16, data[PR_keys],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2]
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position])
             );
         }
 
@@ -832,21 +750,11 @@
                 bs,
                 PR_UINT16, data[PR_vehicleId],
                 PR_UINT8, data[PR_seatId],
-                PR_FLOAT, data[PR_roll][0],
-                PR_FLOAT, data[PR_roll][1],
-                PR_FLOAT, data[PR_roll][2],
-                PR_FLOAT, data[PR_direction][0],
-                PR_FLOAT, data[PR_direction][1],
-                PR_FLOAT, data[PR_direction][2],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2],
-                PR_FLOAT, data[PR_velocity][0],
-                PR_FLOAT, data[PR_velocity][1],
-                PR_FLOAT, data[PR_velocity][2],
-                PR_FLOAT, data[PR_angularVelocity][0],
-                PR_FLOAT, data[PR_angularVelocity][1],
-                PR_FLOAT, data[PR_angularVelocity][2],
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_roll]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_direction]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_velocity]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_angularVelocity]),
                 PR_FLOAT, data[PR_vehicleHealth]
             );
         }
@@ -856,12 +764,8 @@
             BS_WriteValue(
                 bs,
                 PR_UINT8, data[PR_camMode],
-                PR_FLOAT, data[PR_camFrontVec][0],
-                PR_FLOAT, data[PR_camFrontVec][1],
-                PR_FLOAT, data[PR_camFrontVec][2],
-                PR_FLOAT, data[PR_camPos][0],
-                PR_FLOAT, data[PR_camPos][1],
-                PR_FLOAT, data[PR_camPos][2],
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_camFrontVec]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_camPos]),
                 PR_FLOAT, data[PR_aimZ],
                 PR_BITS, data[PR_weaponState], 2,
                 PR_BITS, data[PR_camZoom], 6,
@@ -875,15 +779,9 @@
                 bs,
                 PR_UINT8, data[PR_hitType],
                 PR_UINT16, data[PR_hitId],
-                PR_FLOAT, data[PR_origin][0],
-                PR_FLOAT, data[PR_origin][1],
-                PR_FLOAT, data[PR_origin][2],
-                PR_FLOAT, data[PR_hitPos][0],
-                PR_FLOAT, data[PR_hitPos][1],
-                PR_FLOAT, data[PR_hitPos][2],
-                PR_FLOAT, data[PR_offsets][0],
-                PR_FLOAT, data[PR_offsets][1],
-                PR_FLOAT, data[PR_offsets][2],
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_origin]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_hitPos]),
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_offsets]),
                 PR_UINT8, data[PR_weaponId]
             );
         }
@@ -895,9 +793,7 @@
                 PR_UINT16, data[PR_lrKey],
                 PR_UINT16, data[PR_udKey],
                 PR_UINT16, data[PR_keys],
-                PR_FLOAT, data[PR_position][0],
-                PR_FLOAT, data[PR_position][1],
-                PR_FLOAT, data[PR_position][2]
+                PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position])
             );
         }
 
