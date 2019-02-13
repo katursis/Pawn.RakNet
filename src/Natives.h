@@ -343,17 +343,15 @@ namespace Natives {
                 const auto value = Functions::GetAmxParamRef(amx, params[i + 2]);
 
                 switch (type) {
-                    case PR_STRING: {
-                        auto str = Functions::GetAmxString(amx, params[i + 2]);
-
-                        bs->Write(str.c_str(), str.size());
-
-                        break;
-                    }
+                    case PR_STRING:
                     case PR_CSTRING: {
                         auto str = Functions::GetAmxString(amx, params[i + 2]);
 
-                        stringCompressor->EncodeString(str.c_str(), str.size() + 1, bs);
+                        if (type == PR_STRING) {
+                            bs->Write(str.c_str(), str.size());
+                        } else {
+                            stringCompressor->EncodeString(str.c_str(), str.size() + 1, bs);
+                        }
 
                         break;
                     }
@@ -522,25 +520,17 @@ namespace Natives {
                 auto &value = Functions::GetAmxParamRef(amx, params[i + 2]);
 
                 switch (type) {
-                    case PR_STRING: {
-                        const auto size = Functions::GetAmxParamRef(amx, params[i + 3]);
-
-                        std::unique_ptr<char[]> str{new char[size + 1]{}};
-
-                        bs->Read(str.get(), size);
-
-                        Functions::SetAmxString(amx, params[i + 2], str.get(), size);
-
-                        ++i;
-
-                        break;
-                    }
+                    case PR_STRING:
                     case PR_CSTRING: {
                         const auto size = Functions::GetAmxParamRef(amx, params[i + 3]);
 
                         std::unique_ptr<char[]> str{new char[size + 1]{}};
 
-                        stringCompressor->DecodeString(str.get(), size, bs);
+                        if (type == PR_STRING) {
+                            bs->Read(str.get(), size);
+                        } else {
+                            stringCompressor->DecodeString(str.get(), size, bs);
+                        }
 
                         Functions::SetAmxString(amx, params[i + 2], str.get(), size);
 
