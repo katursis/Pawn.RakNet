@@ -10,7 +10,8 @@ namespace Settings {
         *kPublicVarNameIsGamemode = "_pawnraknet_is_gamemode",
         *kRegHandlerPublicRegExp = R"(^pr_r(?:ir|ip|or|op)_\w+$)",
 #ifdef _WIN32
-        *kGetRakServerInterfacePattern = "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
+        *kGetRakServerInterfacePattern =
+        "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
         "\x00\x00\x50\x64\x89\x25\x00\x00\x00\x00\x51" \
         "\x68\x18\x0E\x00\x00\xE8\xFF\xFF\xFF\xFF\x83" \
         "\xC4\x04\x89\x04\x24\x85\xC0\xC7\x44\x24\xFF" \
@@ -23,7 +24,13 @@ namespace Settings {
         "\xFF\xFF\x89\x04\x24\x89\xC6\xE8\xFF\xFF\xFF" \
         "\xFF\x89\xF0\x8B\x5D\xFF\x8B\x75\xFF\x89\xEC" \
         "\x5D\xC3",
-        *kGetRakServerInterfaceMask = "?????xxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
+        *kGetRakServerInterfaceMask = "?????xxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx",
+
+        *kGetPacketIdPattern =
+        "\x55\xB8\xFF\x00\x00\x00\x89\xE5\x8B\x55\x08\x85\xD2\x74\x0D\x8B" \
+        "\x52\x10\x0F\xB6\x02\x3C\xFF\x74\x07\x0F\xB6\xC0\x5D\xC3\x66\x90" \
+        "\x0F\xB6\x42\x05\x5D\xC3",
+        *kGetPacketIdMask = "xxxxxxxxxxxxxxxxxxxxxx?xxxxxxxxxxxxxxx";
 #endif
     bool
         intercept_incoming_rpc{},

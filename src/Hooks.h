@@ -87,7 +87,7 @@ namespace Hooks {
             while (packet = Functions::RakServer::Receive()) {
                 RakNet::BitStream bitstream(packet->data, packet->length, false);
 
-                const int packet_id = packet->data[0];
+                const int packet_id = Functions::RakServer::GetPacketId(packet);
 
                 if (Scripts::OnIncomingPacket(packet->playerIndex, packet_id, &bitstream)) {
                     break;
@@ -230,12 +230,22 @@ namespace Hooks {
         urmem::sig_scanner scanner;
         urmem::address_t get_rakserver_interface_addr{};
 
+        if (!scanner.init(addr_in_server)) {
+            throw std::runtime_error{"signature scanner init error"};
+        }
+
         if (
-            !scanner.init(addr_in_server)
-            || !scanner.find(Settings::kGetRakServerInterfacePattern, Settings::kGetRakServerInterfaceMask, get_rakserver_interface_addr)
-            || !get_rakserver_interface_addr
+            !scanner.find(Settings::kGetRakServerInterfacePattern, Settings::kGetRakServerInterfaceMask, get_rakserver_interface_addr) ||
+            !get_rakserver_interface_addr
         ) {
             throw std::runtime_error{"GetRakServerInterface not found"};
+        }
+
+        if (
+            !scanner.find(Settings::kGetPacketIdPattern, Settings::kGetPacketIdMask, Addresses::FUNC_GET_PACKET_ID) ||
+            !Addresses::FUNC_GET_PACKET_ID
+        ) {
+            throw std::runtime_error{"GetPacketId not found"};
         }
 
         hook_get_rakserver_interface = std::make_shared<urmem::hook>(

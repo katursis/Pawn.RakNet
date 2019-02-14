@@ -70,6 +70,10 @@ namespace Functions {
                 index
             );
         }
+
+        int GetPacketId(Packet *packet) {
+            return urmem::call_function<urmem::calling_convention::cdeclcall, unsigned char>(Addresses::FUNC_GET_PACKET_ID, packet);
+        }
     }
 
     void AssertParams(int count, cell *params) {
