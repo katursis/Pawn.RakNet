@@ -56,9 +56,7 @@ namespace Scripts {
             const auto &pub = _publics[PR_INCOMING_RPC];
 
             if (pub->exists()) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
+                bs->ResetReadPointer();
 
                 if (!pub->call(player_id, rpc_id, bs)) {
                     return false;
@@ -69,9 +67,7 @@ namespace Scripts {
             const auto &handler = _handlers[PR_INCOMING_RPC][rpc_id];
 
             if (handler && handler->exists()) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
+                bs->ResetReadPointer();
 
                 if (!handler->call(player_id, bs)) {
                     return false;
@@ -86,9 +82,7 @@ namespace Scripts {
             const auto &pub = _publics[PR_INCOMING_PACKET];
 
             if (pub->exists()) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
+                bs->ResetReadPointer();
 
                 if (!pub->call(player_id, packet_id, bs)) {
                     return false;
@@ -99,9 +93,7 @@ namespace Scripts {
             const auto &handler = _handlers[PR_INCOMING_PACKET][packet_id];
 
             if (handler && handler->exists()) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
+                bs->ResetReadPointer();
 
                 if (!handler->call(player_id, bs)) {
                     return false;
@@ -116,9 +108,7 @@ namespace Scripts {
             const auto &pub = _publics[PR_OUTCOMING_RPC];
 
             if (pub->exists()) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
+                bs->ResetReadPointer();
 
                 if (!pub->call(player_id, rpc_id, bs)) {
                     return false;
@@ -129,9 +119,7 @@ namespace Scripts {
             const auto &handler = _handlers[PR_OUTCOMING_RPC][rpc_id];
 
             if (handler && handler->exists()) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
+                bs->ResetReadPointer();
 
                 if (!handler->call(player_id, bs)) {
                     return false;
@@ -146,9 +134,7 @@ namespace Scripts {
             const auto &pub = _publics[PR_OUTCOMING_PACKET];
 
             if (pub->exists()) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
+                bs->ResetReadPointer();
 
                 if (!pub->call(player_id, packet_id, bs)) {
                     return false;
@@ -159,9 +145,7 @@ namespace Scripts {
             const auto &handler = _handlers[PR_OUTCOMING_PACKET][packet_id];
 
             if (handler && handler->exists()) {
-                if (bs) {
-                    bs->ResetReadPointer();
-                }
+                bs->ResetReadPointer();
 
                 if (!handler->call(player_id, bs)) {
                     return false;

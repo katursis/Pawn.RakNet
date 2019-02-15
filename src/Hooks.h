@@ -29,17 +29,15 @@ namespace Hooks {
                 return false;
             }
 
-            const int
-                read_offset = bitStream->GetReadOffset(),
-                write_offset = bitStream->GetWriteOffset(),
-                packet_id = bitStream->GetData()[0];
-
-            if (!Scripts::OnOutcomingPacket(Functions::RakServer::GetIndexFromPlayerID(playerId), packet_id, bitStream)) {
+            if (!bitStream->GetData()) {
                 return false;
             }
 
-            bitStream->SetReadOffset(read_offset);
-            bitStream->SetWriteOffset(write_offset);
+            RakNet::BitStream bs{bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), false};
+
+            if (!Scripts::OnOutcomingPacket(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), *bs.GetData(), &bs)) {
+                return false;
+            }
 
             return Functions::RakServer::Send(bitStream, priority, reliability, orderingChannel, playerId, broadcast);
         }
@@ -61,21 +59,16 @@ namespace Hooks {
 
             const int rpc_id = *uniqueID;
 
+            RakNet::BitStream bs;
+
             if (bitStream) {
-                const int
-                    read_offset = bitStream->GetReadOffset(),
-                    write_offset = bitStream->GetWriteOffset();
+                bs.SetData(bitStream->GetData());
+                bs.SetNumberOfBitsAllocated(bitStream->GetNumberOfBitsAllocated());
+                bs.SetWriteOffset(bitStream->GetWriteOffset());
+            }
 
-                if (!Scripts::OnOutcomingRPC(Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, bitStream)) {
-                    return false;
-                }
-
-                bitStream->SetReadOffset(read_offset);
-                bitStream->SetWriteOffset(write_offset);
-            } else {
-                if (!Scripts::OnOutcomingRPC(Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, nullptr)) {
-                    return false;
-                }
+            if (!Scripts::OnOutcomingRPC(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, &bs)) {
+                return false;
             }
 
             return Functions::RakServer::RPC(uniqueID, bitStream, priority, reliability, orderingChannel, playerId, broadcast, shiftTimestamp);
@@ -85,11 +78,9 @@ namespace Hooks {
             Packet *packet{};
 
             while (packet = Functions::RakServer::Receive()) {
-                RakNet::BitStream bitstream(packet->data, packet->length, false);
+                RakNet::BitStream bs{packet->data, packet->length, false};
 
-                const int packet_id = Functions::RakServer::GetPacketId(packet);
-
-                if (Scripts::OnIncomingPacket(packet->playerIndex, packet_id, &bitstream)) {
+                if (Scripts::OnIncomingPacket(packet->playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
                     break;
                 }
 
@@ -116,9 +107,7 @@ namespace Hooks {
 
             original_rpc[rpc_id] = functionPointer;
 
-            functionPointer = custom_rpc[rpc_id];
-
-            return Functions::RakServer::RegisterAsRemoteProcedureCall(uniqueID, functionPointer);
+            return Functions::RakServer::RegisterAsRemoteProcedureCall(uniqueID, custom_rpc[rpc_id]);
         }
 
         static bool ReceiveRPC(int rpc_id, RPCParameters *p) {
@@ -186,17 +175,12 @@ namespace Hooks {
             return rakserver;
         }
 
-        static int AMXAPI amx_Cleanup(AMX *amx) {
+        static int AMXAPI _amx_Cleanup(AMX *amx) {
             const urmem::hook::raii scope(*hook_amx_cleanup);
 
             Scripts::Unload(amx);
 
-            const auto amx_err_code = urmem::call_function<urmem::calling_convention::cdeclcall, int>(
-                hook_amx_cleanup->get_original_addr(),
-                amx
-            );
-
-            return amx_err_code;
+            return amx_Cleanup(amx);
         }
 
         struct RPCHandle {
@@ -204,7 +188,7 @@ namespace Hooks {
                 Generator<0>::Run();
             }
 
-            template<size_t ID>
+            template<std::size_t ID>
             struct Generator {
                 static void Handle(RPCParameters *p) {
                     if (ReceiveRPC(ID, p)) {
@@ -255,7 +239,7 @@ namespace Hooks {
 
         hook_amx_cleanup = std::make_shared<urmem::hook>(
             reinterpret_cast<urmem::address_t *>(pAMXFunctions)[PLUGIN_AMX_EXPORT_Cleanup],
-            urmem::get_func_addr(&InternalHooks::amx_Cleanup)
+            urmem::get_func_addr(&InternalHooks::_amx_Cleanup)
         );
     }
 };
