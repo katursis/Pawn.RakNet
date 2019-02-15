@@ -7,13 +7,11 @@ namespace Natives {
         try {
             Functions::AssertParams(5, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
             RPCIndex rpc_id = params[3];
 
             return Functions::RakServer::RPC(
                 &rpc_id,
-                bs,
+                Functions::GetAmxBitStream(params[1]),
                 params[4],
                 params[5],
                 '\0',
@@ -33,10 +31,8 @@ namespace Natives {
         try {
             Functions::AssertParams(4, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
             return Functions::RakServer::Send(
-                bs,
+                Functions::GetAmxBitStream(params[1]),
                 params[3],
                 params[4],
                 '\0',
@@ -118,9 +114,7 @@ namespace Natives {
         try {
             Functions::AssertParams(1, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            bs->Reset();
+            Functions::GetAmxBitStream(params[1])->Reset();
 
             return 1;
         } catch (const std::exception &e) {
@@ -135,9 +129,7 @@ namespace Natives {
         try {
             Functions::AssertParams(1, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            bs->ResetReadPointer();
+            Functions::GetAmxBitStream(params[1])->ResetReadPointer();
 
             return 1;
         } catch (const std::exception &e) {
@@ -152,9 +144,7 @@ namespace Natives {
         try {
             Functions::AssertParams(1, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            bs->ResetWritePointer();
+            Functions::GetAmxBitStream(params[1])->ResetWritePointer();
 
             return 1;
         } catch (const std::exception &e) {
@@ -169,9 +159,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            bs->IgnoreBits(params[2]);
+            Functions::GetAmxBitStream(params[1])->IgnoreBits(params[2]);
 
             return 1;
         } catch (const std::exception &e) {
@@ -186,9 +174,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            bs->SetWriteOffset(params[2]);
+            Functions::GetAmxBitStream(params[1])->SetWriteOffset(params[2]);
 
             return 1;
         } catch (const std::exception &e) {
@@ -203,11 +189,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
-
-            ref = bs->GetWriteOffset();
+            Functions::GetAmxParamRef(amx, params[2]) = Functions::GetAmxBitStream(params[1])->GetWriteOffset();
 
             return 1;
         } catch (const std::exception &e) {
@@ -222,9 +204,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            bs->SetReadOffset(params[2]);
+            Functions::GetAmxBitStream(params[1])->SetReadOffset(params[2]);
 
             return 1;
         } catch (const std::exception &e) {
@@ -239,11 +219,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
-
-            ref = bs->GetReadOffset();
+            Functions::GetAmxParamRef(amx, params[2]) = Functions::GetAmxBitStream(params[1])->GetReadOffset();
 
             return 1;
         } catch (const std::exception &e) {
@@ -258,11 +234,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
-
-            ref = bs->GetNumberOfBitsUsed();
+            Functions::GetAmxParamRef(amx, params[2]) = Functions::GetAmxBitStream(params[1])->GetNumberOfBitsUsed();
 
             return 1;
         } catch (const std::exception &e) {
@@ -277,11 +249,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
-
-            ref = bs->GetNumberOfBytesUsed();
+            Functions::GetAmxParamRef(amx, params[2]) = Functions::GetAmxBitStream(params[1])->GetNumberOfBytesUsed();
 
             return 1;
         } catch (const std::exception &e) {
@@ -296,11 +264,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
-
-            ref = bs->GetNumberOfUnreadBits();
+            Functions::GetAmxParamRef(amx, params[2]) = Functions::GetAmxBitStream(params[1])->GetNumberOfUnreadBits();
 
             return 1;
         } catch (const std::exception &e) {
@@ -315,11 +279,7 @@ namespace Natives {
         try {
             Functions::AssertParams(2, params);
 
-            const auto bs = Functions::GetAmxBitStream(params[1]);
-
-            auto &ref = Functions::GetAmxParamRef(amx, params[2]);
-
-            ref = bs->GetNumberOfBitsAllocated();
+            Functions::GetAmxParamRef(amx, params[2]) = Functions::GetAmxBitStream(params[1])->GetNumberOfBitsAllocated();
 
             return 1;
         } catch (const std::exception &e) {
