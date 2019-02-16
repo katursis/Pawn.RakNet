@@ -127,6 +127,8 @@
         #define IncomingPacket IPacket
         #define OutcomingPacket OPacket
 
+        #define PR_MAX_WEAPON_SLOTS 13
+
         enum PR_OnFootSync
         {
             PR_lrKey,
@@ -229,6 +231,16 @@
             PR_udKey,
             PR_keys,
             Float:PR_position[3]
+        };
+
+        enum PR_WeaponsUpdate
+        {
+            PR_targetId,
+            PR_targetActorId,
+            PR_slotWeaponId[PR_MAX_WEAPON_SLOTS],
+            PR_slotWeaponAmmo[PR_MAX_WEAPON_SLOTS],
+
+            PR_slotUpdated[PR_MAX_WEAPON_SLOTS] // helping field
         };
 
         native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
@@ -570,6 +582,40 @@
             );
         }
 
+        stock BS_ReadWeaponsUpdate(BitStream:bs, data[PR_WeaponsUpdate])
+        {
+            new numberOfBytes, numberOfSlots;
+
+            BS_GetNumberOfBytesUsed(bs, numberOfBytes);
+
+            if (numberOfBytes > 5) {
+                numberOfSlots = (numberOfBytes - 5) / 4;
+            }
+
+            BS_ReadValue(
+                bs,
+                PR_UINT16, data[PR_targetId],
+                PR_UINT16, data[PR_targetActorId]
+            );
+
+            while (numberOfSlots--) {
+                new slotId, weaponId, ammo;
+
+                BS_ReadValue(
+                    bs,
+                    PR_UINT8, slotId,
+                    PR_UINT8, weaponId,
+                    PR_UINT16, ammo
+                );
+
+                if (slotId < PR_MAX_WEAPON_SLOTS) {
+                    data[PR_slotWeaponId][slotId] = weaponId;
+                    data[PR_slotWeaponAmmo][slotId] = ammo;
+                    data[PR_slotUpdated][slotId] = true;
+                }
+            }
+        }
+
         stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync], outcoming = false)
         {
             if (outcoming) {
@@ -795,6 +841,28 @@
                 PR_UINT16, data[PR_keys],
                 PR_FLOAT3, PR_EXPAND_ARR3(data[PR_position])
             );
+        }
+
+        stock BS_WriteWeaponsUpdate(BitStream:bs, data[PR_WeaponsUpdate])
+        {
+            BS_WriteValue(
+                bs,
+                PR_UINT16, data[PR_targetId],
+                PR_UINT16, data[PR_targetActorId]
+            );
+
+            for (new slotId; slotId < PR_MAX_WEAPON_SLOTS; ++slotId) {
+                if (!data[PR_slotUpdated][slotId]) {
+                    continue;
+                }
+
+                BS_WriteValue(
+                    bs,
+                    PR_UINT8, slotId,
+                    PR_UINT8, data[PR_slotWeaponId][slotId],
+                    PR_UINT16, data[PR_slotWeaponAmmo][slotId]
+                );
+            }
         }
 
         forward OnIncomingPacket(playerid, packetid, BitStream:bs);
