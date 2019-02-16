@@ -51,98 +51,19 @@ namespace Scripts {
             InitPublic(PR_OUTCOMING_PACKET, "OnOutcomingPacket");
         }
 
-        // forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
-        inline bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[PR_INCOMING_RPC];
+        template<PR_EventType eventType>
+        inline bool OnEvent(int player_id, int id, RakNet::BitStream *bs) {
+            const auto &pub = _publics[eventType];
 
             if (pub->exists()) {
                 bs->ResetReadPointer();
 
-                if (!pub->call(player_id, rpc_id, bs)) {
+                if (!pub->call(player_id, id, bs)) {
                     return false;
                 }
             }
 
-            // IRPC:<ID>(playerid, BitStream:bs)
-            const auto &handler = _handlers[PR_INCOMING_RPC][rpc_id];
-
-            if (handler && handler->exists()) {
-                bs->ResetReadPointer();
-
-                if (!handler->call(player_id, bs)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
-        inline bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[PR_INCOMING_PACKET];
-
-            if (pub->exists()) {
-                bs->ResetReadPointer();
-
-                if (!pub->call(player_id, packet_id, bs)) {
-                    return false;
-                }
-            }
-
-            // IPacket:<ID>(playerid, BitStream:bs)
-            const auto &handler = _handlers[PR_INCOMING_PACKET][packet_id];
-
-            if (handler && handler->exists()) {
-                bs->ResetReadPointer();
-
-                if (!handler->call(player_id, bs)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        // forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
-        inline bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[PR_OUTCOMING_RPC];
-
-            if (pub->exists()) {
-                bs->ResetReadPointer();
-
-                if (!pub->call(player_id, rpc_id, bs)) {
-                    return false;
-                }
-            }
-
-            // ORPC:<ID>(playerid, BitStream:bs)
-            const auto &handler = _handlers[PR_OUTCOMING_RPC][rpc_id];
-
-            if (handler && handler->exists()) {
-                bs->ResetReadPointer();
-
-                if (!handler->call(player_id, bs)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        // forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
-        inline bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
-            const auto &pub = _publics[PR_OUTCOMING_PACKET];
-
-            if (pub->exists()) {
-                bs->ResetReadPointer();
-
-                if (!pub->call(player_id, packet_id, bs)) {
-                    return false;
-                }
-            }
-
-            // OPacket:<ID>(playerid, BitStream:bs)
-            const auto &handler = _handlers[PR_OUTCOMING_PACKET][packet_id];
+            const auto &handler = _handlers[eventType][id];
 
             if (handler && handler->exists()) {
                 bs->ResetReadPointer();
@@ -258,27 +179,31 @@ namespace Scripts {
         }
     }
 
+    // forward OnIncomingPacket(playerid, packetid, BitStream:bs);
     bool OnIncomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
         return std::all_of(scripts.begin(), scripts.end(), [=](Script &script) {
-            return script.OnIncomingPacket(player_id, packet_id, bs);
+            return script.OnEvent<PR_INCOMING_PACKET>(player_id, packet_id, bs);
         });
     }
 
+    // forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
     bool OnIncomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
         return std::all_of(scripts.begin(), scripts.end(), [=](Script &script) {
-            return script.OnIncomingRPC(player_id, rpc_id, bs);
+            return script.OnEvent<PR_INCOMING_RPC>(player_id, rpc_id, bs);
         });
     }
 
+    // forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
     bool OnOutcomingPacket(int player_id, int packet_id, RakNet::BitStream *bs) {
         return std::all_of(scripts.begin(), scripts.end(), [=](Script &script) {
-            return script.OnOutcomingPacket(player_id, packet_id, bs);
+            return script.OnEvent<PR_OUTCOMING_PACKET>(player_id, packet_id, bs);
         });
     }
 
+    // forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
     bool OnOutcomingRPC(int player_id, int rpc_id, RakNet::BitStream *bs) {
         return std::all_of(scripts.begin(), scripts.end(), [=](Script &script) {
-            return script.OnOutcomingRPC(player_id, rpc_id, bs);
+            return script.OnEvent<PR_OUTCOMING_RPC>(player_id, rpc_id, bs);
         });
     }
 }
