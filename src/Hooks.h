@@ -80,6 +80,10 @@ namespace Hooks {
             Packet *packet{};
 
             while (packet = Functions::RakServer::Receive()) {
+                if (packet->playerIndex == static_cast<PlayerIndex>(-1)) {
+                    break;
+                }
+
                 RakNet::BitStream bs{packet->data, packet->length, false};
 
                 if (Scripts::OnIncomingPacket(packet->playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
