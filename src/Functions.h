@@ -63,7 +63,7 @@ namespace Functions {
             );
         }
 
-        const PlayerID &GetPlayerIDFromIndex(int index) {
+        const PlayerID GetPlayerIDFromIndex(int index) {
             return urmem::call_function<urmem::calling_convention::thiscall, PlayerID>(
                 Addresses::FUNC_RAKSERVER__GET_PLAYER_ID_FROM_INDEX,
                 Addresses::PTR_RAKSERVER,

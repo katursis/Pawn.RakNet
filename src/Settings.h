@@ -16,7 +16,12 @@ namespace Settings {
         "\x68\x18\x0E\x00\x00\xE8\xFF\xFF\xFF\xFF\x83" \
         "\xC4\x04\x89\x04\x24\x85\xC0\xC7\x44\x24\xFF" \
         "\x00\x00\x00\x00\x74\x16",
-        *kGetRakServerInterfaceMask = "???????xxxxxxxxxxxxxxxx????x????xxxxxxxxxxx?xxxxxx";
+        *kGetRakServerInterfaceMask = "???????xxxxxxxxxxxxxxxx????x????xxxxxxxxxxx?xxxxxx",
+
+        *kGetPacketIdPattern =
+        "\x8B\x44\x24\x04\x85\xC0\x75\x03\x0C\xFF\xC3\x8B\x48\x10\x8A\x01" \
+        "\x3C\xFF\x75\x03\x8A\x41\x05\xC3",
+        *kGetPacketIdMask = "xxxxxxxxxxxxxxxxx?xxxxxx";
 #else
         *kGetRakServerInterfacePattern =
         "\x55\x89\xE5\x83\xEC\x18\xC7\x04\x24\xFF\xFF" \

@@ -25,7 +25,9 @@ namespace Hooks {
                 return false;
             }
 
-            if (bitStream->GetNumberOfBytesUsed() == 0) {
+            const size_t length = bitStream->GetNumberOfBytesUsed();
+
+            if (!length) {
                 return false;
             }
 
@@ -33,7 +35,7 @@ namespace Hooks {
                 return false;
             }
 
-            RakNet::BitStream bs{bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), false};
+            RakNet::BitStream bs{bitStream->GetData(), length, false};
 
             if (!Scripts::OnOutcomingPacket(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), *bs.GetData(), &bs)) {
                 return false;
