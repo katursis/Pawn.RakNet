@@ -110,23 +110,39 @@ namespace Hooks {
             return Functions::RakServer::RegisterAsRemoteProcedureCall(uniqueID, custom_rpc[rpc_id]);
         }
 
-        static bool ReceiveRPC(int rpc_id, RPCParameters *p) {
-            if (!p) {
-                return false;
+        struct ReceiveRPC {
+            static void Init() {
+                Handler<0>::Init();
             }
 
-            const int player_id = Functions::RakServer::GetIndexFromPlayerID(p->sender);
+            template<std::size_t ID>
+            struct Handler {
+                static void Interlayer(RPCParameters *p) {
+                    const int player_id = Functions::RakServer::GetIndexFromPlayerID(p->sender);
 
-            RakNet::BitStream bs;
+                    RakNet::BitStream bs;
 
-            if (p->input) {
-                bs.SetData(p->input);
-                bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
-                bs.SetWriteOffset(p->numberOfBitsOfData);
-            }
+                    if (p->input) {
+                        bs.SetData(p->input);
+                        bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
+                        bs.SetWriteOffset(p->numberOfBitsOfData);
+                    }
 
-            return Scripts::OnIncomingRPC(player_id, rpc_id, &bs);
-        }
+                    if (!Scripts::OnIncomingRPC(player_id, ID, &bs)) {
+                        return;
+                    }
+
+                    original_rpc[ID](p);
+                }
+
+                static void Init() {
+                    original_rpc[ID] = nullptr;
+                    custom_rpc[ID] = reinterpret_cast<RPCFunction>(&Interlayer);
+
+                    Handler<ID + 1>::Init();
+                }
+            };
+        };
 
         static void * GetRakServerInterface() {
             const urmem::hook::raii scope(*hook_get_rakserver_interface);
@@ -163,10 +179,7 @@ namespace Hooks {
                         urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall)
                     );
 
-                    original_rpc.fill(nullptr);
-                    custom_rpc.fill(nullptr);
-
-                    RPCHandle::Generate();
+                    ReceiveRPC::Init();
                 }
             } else {
                 Logger::instance()->Write("[%s] Invalid RakServer VMT", Settings::kPluginName);
@@ -182,32 +195,11 @@ namespace Hooks {
 
             return amx_Cleanup(amx);
         }
-
-        struct RPCHandle {
-            static void Generate() {
-                Generator<0>::Run();
-            }
-
-            template<std::size_t ID>
-            struct Generator {
-                static void Handle(RPCParameters *p) {
-                    if (ReceiveRPC(ID, p)) {
-                        original_rpc[ID](p);
-                    }
-                }
-
-                static void Run() {
-                    custom_rpc[ID] = reinterpret_cast<RPCFunction>(&Handle);
-
-                    Generator<ID + 1>::Run();
-                }
-            };
-        };
     };
 
     template<>
-    struct InternalHooks::RPCHandle::Generator<PR_MAX_HANDLERS> {
-        static void Run() {}
+    struct InternalHooks::ReceiveRPC::Handler<PR_MAX_HANDLERS> {
+        static void Init() {}
     };
 
     void Init(void *addr_in_server) {
