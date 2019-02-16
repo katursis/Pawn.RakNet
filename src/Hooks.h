@@ -25,7 +25,7 @@ namespace Hooks {
                 return false;
             }
 
-            if (bitStream->GetNumberOfBytesUsed() <= 0) {
+            if (bitStream->GetNumberOfBytesUsed() == 0) {
                 return false;
             }
 
