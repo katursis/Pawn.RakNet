@@ -122,16 +122,18 @@ namespace Hooks {
                 static void Interlayer(RPCParameters *p) {
                     const int player_id = Functions::RakServer::GetIndexFromPlayerID(p->sender);
 
-                    RakNet::BitStream bs;
+                    if (player_id != -1) {
+                        RakNet::BitStream bs;
 
-                    if (p->input) {
-                        bs.SetData(p->input);
-                        bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
-                        bs.SetWriteOffset(p->numberOfBitsOfData);
-                    }
+                        if (p->input) {
+                            bs.SetData(p->input);
+                            bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
+                            bs.SetWriteOffset(p->numberOfBitsOfData);
+                        }
 
-                    if (!Scripts::OnIncomingRPC(player_id, ID, &bs)) {
-                        return;
+                        if (!Scripts::OnIncomingRPC(player_id, ID, &bs)) {
+                            return;
+                        }
                     }
 
                     original_rpc[ID](p);
