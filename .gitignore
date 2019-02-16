@@ -6,5 +6,4 @@ Debug/
 *.o
 *.gch
 *.so
-.user
-
+*.user
