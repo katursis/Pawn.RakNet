@@ -25,7 +25,7 @@ namespace Hooks {
                 return false;
             }
 
-            const size_t length = bitStream->GetNumberOfBytesUsed();
+            const std::size_t length = bitStream->GetNumberOfBytesUsed();
 
             if (!length) {
                 return false;
