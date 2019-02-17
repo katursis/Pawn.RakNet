@@ -144,7 +144,6 @@ namespace Hooks {
                 }
 
                 static void Init() {
-                    original_rpc[ID] = nullptr;
                     custom_rpc[ID] = reinterpret_cast<RPCFunction>(&Interlayer);
 
                     Handler<ID + 1>::Init();
