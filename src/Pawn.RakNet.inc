@@ -91,9 +91,6 @@
         public _pawnraknet_version = PAWNRAKNET_INCLUDE_VERSION;
         #pragma unused _pawnraknet_version
 
-        public bool:_pawnraknet_is_gamemode = !defined FILTERSCRIPT;
-        #pragma unused _pawnraknet_is_gamemode
-
         #define IRPC:%0(%1) \
         forward pr_rir_%0(); \
         public pr_rir_%0() \
@@ -270,6 +267,7 @@
         native BS_ReadValue(BitStream:bs, {PR_ValueType, Float, _}:...);
 
         native PR_RegHandler(id, const publicname[], PR_EventType:type);
+        native PR_Init(bool:is_gamemode);
 
         #define BS_ReadInt8(%0,%1) BS_ReadValue(%0,PR_INT8,%1)
         #define BS_ReadInt16(%0,%1) BS_ReadValue(%0,PR_INT16,%1)
@@ -869,5 +867,53 @@
         forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
         forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
         forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
+
+        #if defined FILTERSCRIPT
+            public OnFilterScriptInit()
+            {
+                PR_Init(false);
+
+                #if defined PawnRakNet_OnFilterScriptInit
+                    PawnRakNet_OnFilterScriptInit();
+                #endif
+
+                return 1;
+            }
+
+            #if defined _ALS_OnFilterScriptInit
+                #undef OnFilterScriptInit
+            #else
+                #define _ALS_OnFilterScriptInit
+            #endif
+
+            #define OnFilterScriptInit PawnRakNet_OnFilterScriptInit
+
+            #if defined PawnRakNet_OnFilterScriptInit
+                forward PawnRakNet_OnFilterScriptInit();
+            #endif
+        #else
+            public OnGameModeInit()
+            {
+                PR_Init(true);
+
+                #if defined PawnRakNet_OnGameModeInit
+                    PawnRakNet_OnGameModeInit();
+                #endif
+
+                return 1;
+            }
+
+            #if defined _ALS_OnGameModeInit
+                #undef OnGameModeInit
+            #else
+                #define _ALS_OnGameModeInit
+            #endif
+
+            #define OnGameModeInit PawnRakNet_OnGameModeInit
+
+            #if defined PawnRakNet_OnGameModeInit
+                forward PawnRakNet_OnGameModeInit();
+            #endif
+        #endif
     #endif // !defined __cplusplus
 #endif // PAWNRAKNET_INC_

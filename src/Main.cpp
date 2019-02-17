@@ -85,21 +85,15 @@ namespace Plugin {
     }
 
     void AmxLoad(AMX *amx) {
-        cell include_version{}, is_gamemode{};
-
-        const bool exists = Functions::GetAmxPublicVar(amx, Settings::kPublicVarNameVersion, include_version) &&
-            Functions::GetAmxPublicVar(amx, Settings::kPublicVarNameIsGamemode, is_gamemode);
-
-        if (exists) {
+        cell include_version{};
+        if (Functions::GetAmxPublicVar(amx, Settings::kPublicVarNameVersion, include_version)) {
             if (include_version != PAWNRAKNET_INCLUDE_VERSION) {
-                Logger::instance()->Write("[%s] %s: Please update Pawn.RakNet.inc file to the latest version", Settings::kPluginName, __FUNCTION__);
+                Logger::instance()->Write("[%s] %s: mismatch between the plugin (%d) and include (%d) versions", Settings::kPluginName, __FUNCTION__, PAWNRAKNET_INCLUDE_VERSION, include_version);
 
                 return;
             }
 
             Natives::Register(amx);
-
-            Scripts::Load(amx, is_gamemode == 1);
         }
     }
 };

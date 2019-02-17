@@ -7,7 +7,6 @@ namespace Settings {
         *kPluginVersion = "1.2.0",
         *kConfigFile = "plugins/pawnraknet.cfg",
         *kPublicVarNameVersion = "_pawnraknet_version",
-        *kPublicVarNameIsGamemode = "_pawnraknet_is_gamemode",
         *kRegHandlerPublicRegExp = R"(^pr_r(?:ir|ip|or|op)_\w+$)",
 #ifdef _WIN32
         *kGetRakServerInterfacePattern =

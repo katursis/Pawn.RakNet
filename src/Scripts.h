@@ -8,17 +8,7 @@ namespace Scripts {
             _exists = (amx_FindPublic(_amx, _name.c_str(), &_index) == AMX_ERR_NONE && _index >= 0);
         }
 
-        explicit Public(int index, AMX *amx) : _index{index}, _amx{amx} {
-            char pname[sNAMEMAX + 1]{};
-
-            _exists = (amx_GetPublic(_amx, _index, pname) == AMX_ERR_NONE);
-
-            if (_exists) {
-                _name = pname;
-            }
-        }
-
-        template<typename... ARGS>
+        template<typename ... ARGS>
         inline cell call(ARGS ... args) {
             return Functions::AmxCallPublic(_amx, get_index(), args...);
         }
@@ -44,12 +34,7 @@ namespace Scripts {
 
     class Script {
     public:
-        explicit Script(AMX *amx) : _amx{amx} {
-            InitPublic(PR_INCOMING_RPC, "OnIncomingRPC");
-            InitPublic(PR_INCOMING_PACKET, "OnIncomingPacket");
-            InitPublic(PR_OUTCOMING_RPC, "OnOutcomingRPC");
-            InitPublic(PR_OUTCOMING_PACKET, "OnOutcomingPacket");
-        }
+        explicit Script(AMX *amx) : _amx{amx} {}
 
         template<PR_EventType eventType>
         inline bool OnEvent(int player_id, int id, RakNet::BitStream *bs) {
@@ -65,7 +50,7 @@ namespace Scripts {
 
             const auto &handler = _handlers[eventType][id];
 
-            if (handler && handler->exists()) {
+            if (handler) {
                 bs->ResetReadPointer();
 
                 if (!handler->call(player_id, bs)) {
@@ -76,45 +61,36 @@ namespace Scripts {
             return true;
         }
 
-        void InitPublic(PR_EventType type, const std::string &name) {
-            _publics.at(type) = std::unique_ptr<Public>{new Public{name, _amx}};
-        }
-
-        void InitHandlersRegistration() {
-            int num_publics{};
-
-            amx_NumPublics(_amx, &num_publics);
-
-            if (!num_publics) {
-                return;
-            }
-
-            std::regex r{Settings::kRegHandlerPublicRegExp};
-
-            for (int i{}; i < num_publics; i++) {
-                char public_name[32]{};
-
-                amx_GetPublic(_amx, i, public_name);
-
-                if (std::regex_match(public_name, r)) {
-                    if (_amx->flags & AMX_FLAG_NTVREG) { // all native functions are registered
-                        amx_Exec(_amx, nullptr, i);
-                    } else {
-                        _amx->flags |= AMX_FLAG_NTVREG;
-
-                        amx_Exec(_amx, nullptr, i);
-
-                        _amx->flags &= ~AMX_FLAG_NTVREG;
-                    }
-                }
-            }
+        void InitEvent(PR_EventType type, const std::string &public_name) {
+            _publics.at(type) = std::unique_ptr<Public>{new Public{public_name, _amx}};
         }
 
         void RegisterHandler(int id, const std::string &public_name, PR_EventType type) {
             _handlers.at(type).at(id) = std::unique_ptr<Public>{new Public{public_name, _amx}};
 
             if (!_handlers[type][id]->exists()) {
+                _handlers[type][id] = nullptr;
+
                 throw std::runtime_error{"public " + public_name + " not exists"};
+            }
+        }
+
+        void Init() {
+            InitEvent(PR_INCOMING_RPC, "OnIncomingRPC");
+            InitEvent(PR_INCOMING_PACKET, "OnIncomingPacket");
+            InitEvent(PR_OUTCOMING_RPC, "OnOutcomingRPC");
+            InitEvent(PR_OUTCOMING_PACKET, "OnOutcomingPacket");
+
+            int num_publics{};
+
+            amx_NumPublics(_amx, &num_publics);
+
+            std::regex r{Settings::kRegHandlerPublicRegExp};
+
+            for (std::size_t i{}; i < num_publics; ++i) {
+                if (std::regex_match(Functions::GetAmxPublicName(_amx, i), r)) {
+                    amx_Exec(_amx, nullptr, i);
+                }
             }
         }
 
@@ -155,7 +131,7 @@ namespace Scripts {
         const auto script = std::find(scripts.begin(), scripts.end(), amx);
 
         if (script == scripts.end()) {
-            throw std::runtime_error{"amx not found"};
+            throw std::runtime_error{"script not found"};
         }
 
         return *script;
@@ -168,7 +144,7 @@ namespace Scripts {
             scripts.emplace_front(amx);
         }
 
-        GetScript(amx).InitHandlersRegistration();
+        GetScript(amx).Init();
     }
 
     void Unload(AMX *amx) {

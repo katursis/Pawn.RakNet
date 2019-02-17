@@ -143,6 +143,16 @@ namespace Functions {
         return bs;
     }
 
+    std::string GetAmxPublicName(AMX *amx, int index) {
+        char name[32]{};
+
+        if (amx_GetPublic(amx, index, name) != AMX_ERR_NONE) {
+            throw std::runtime_error{"invalid public index"};
+        }
+
+        return name;
+    }
+
     cell & GetAmxParamRef(AMX *amx, cell amx_addr) {
         cell *phys_addr{};
 

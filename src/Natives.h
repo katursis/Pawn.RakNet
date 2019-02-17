@@ -630,6 +630,21 @@ namespace Natives {
         return 0;
     }
 
+    // native PR_Init(bool:is_gamemode);
+    cell AMX_NATIVE_CALL n_PR_Init(AMX *amx, cell *params) {
+        try {
+            Functions::AssertParams(1, params);
+
+            Scripts::Load(amx, params[1] == 1);
+
+            return 1;
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+        }
+
+        return 0;
+    }
+
     void Register(AMX *amx) {
         const std::vector<AMX_NATIVE_INFO> natives{
             {"BS_RPC", n_BS_RPC},
@@ -658,7 +673,8 @@ namespace Natives {
             {"BS_WriteValue", n_BS_WriteValue},
             {"BS_ReadValue", n_BS_ReadValue},
 
-            {"PR_RegHandler", n_PR_RegHandler}
+            {"PR_RegHandler", n_PR_RegHandler},
+            {"PR_Init", n_PR_Init}
         };
 
         amx_Register(amx, natives.data(), natives.size());
