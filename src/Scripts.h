@@ -87,7 +87,7 @@ namespace Scripts {
 
             std::regex r{Settings::kRegHandlerPublicRegExp};
 
-            for (std::size_t i{}; i < num_publics; ++i) {
+            for (int i{}; i < num_publics; ++i) {
                 if (std::regex_match(Functions::GetAmxPublicName(_amx, i), r)) {
                     amx_Exec(_amx, nullptr, i);
                 }
