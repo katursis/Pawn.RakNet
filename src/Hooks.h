@@ -152,11 +152,7 @@ namespace Hooks {
         };
 
         static void * GetRakServerInterface() {
-            const urmem::hook::raii scope(*hook_get_rakserver_interface);
-
-            const auto rakserver = urmem::call_function<urmem::calling_convention::cdeclcall, void *>(
-                hook_get_rakserver_interface->get_original_addr()
-            );
+            const auto rakserver = hook_get_rakserver_interface->call<urmem::calling_convention::cdeclcall, void *>();
 
             if (const auto vmt = Addresses::Init(reinterpret_cast<urmem::address_t>(rakserver))) {
                 const auto install_hook = [vmt](RakServerOffsets offset, urmem::address_t dest) {
@@ -195,12 +191,10 @@ namespace Hooks {
             return rakserver;
         }
 
-        static int AMXAPI _amx_Cleanup(AMX *amx) {
-            const urmem::hook::raii scope(*hook_amx_cleanup);
-
+        static int AMXAPI amx_Cleanup(AMX *amx) {
             Scripts::Unload(amx);
 
-            return amx_Cleanup(amx);
+            return hook_amx_cleanup->call<urmem::calling_convention::cdeclcall, int>(amx);
         }
     };
 
@@ -213,7 +207,7 @@ namespace Hooks {
         urmem::sig_scanner scanner;
         urmem::address_t get_rakserver_interface_addr{};
 
-        if (!scanner.init(addr_in_server)) {
+        if (!scanner.init(reinterpret_cast<urmem::address_t>(addr_in_server))) {
             throw std::runtime_error{"signature scanner init error"};
         }
 
@@ -238,7 +232,7 @@ namespace Hooks {
 
         hook_amx_cleanup = std::make_shared<urmem::hook>(
             reinterpret_cast<urmem::address_t *>(pAMXFunctions)[PLUGIN_AMX_EXPORT_Cleanup],
-            urmem::get_func_addr(&InternalHooks::_amx_Cleanup)
+            urmem::get_func_addr(&InternalHooks::amx_Cleanup)
         );
     }
 };
