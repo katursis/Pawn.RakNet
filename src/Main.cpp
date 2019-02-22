@@ -36,6 +36,7 @@
 #include <array>
 #include <string>
 #include <regex>
+#include <queue>
 
 #include "Pawn.RakNet.inc"
 

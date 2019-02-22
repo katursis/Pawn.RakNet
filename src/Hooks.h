@@ -10,6 +10,8 @@ namespace Hooks {
         original_rpc,
         custom_rpc;
 
+    std::queue<Packet *> emulating_packets;
+
     class InternalHooks {
     public:
         static bool THISCALL RakServer__Send(
@@ -78,6 +80,14 @@ namespace Hooks {
 
         static  Packet * THISCALL RakServer__Receive(void *_this) {
             Packet *packet{};
+
+            if (!emulating_packets.empty()) {
+                packet = emulating_packets.front();
+
+                emulating_packets.pop();
+
+                return packet;
+            }
 
             while (packet = Functions::RakServer::Receive()) {
                 if (packet->playerIndex == static_cast<PlayerIndex>(-1)) {

@@ -74,6 +74,27 @@ namespace Functions {
         int GetPacketId(Packet *packet) {
             return urmem::call_function<urmem::calling_convention::cdeclcall, unsigned char>(Addresses::FUNC_GET_PACKET_ID, packet);
         }
+
+        Packet * NewPacket(PlayerIndex index, const RakNet::BitStream &bs)
+        {
+            const std::size_t length = bs.GetNumberOfBytesUsed();
+
+            if (!length) {
+                throw std::runtime_error{"data is empty"};
+            }
+
+            Packet *p = reinterpret_cast<Packet *>(malloc(sizeof(Packet) + length));
+
+            p->playerIndex = index;
+            p->playerId = GetPlayerIDFromIndex(index);
+            p->length = length;
+            p->bitSize = BYTES_TO_BITS(length);
+            p->data = reinterpret_cast<unsigned char *>(&p[1]);
+            memcpy(p->data, bs.GetData(), length);
+            p->deleteData = false;
+
+            return p;
+        }
     }
 
     void AssertParams(int count, cell *params) {

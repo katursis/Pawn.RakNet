@@ -238,9 +238,10 @@
             PR_slotUpdated[PR_MAX_WEAPON_SLOTS] // helping field
         };
 
-        native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
         native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
+        native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
+        native BS_EmulateIncomingPacket(BitStream:bs, playerid);
         native BS_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
 
         native BitStream:BS_New();

@@ -2,6 +2,26 @@
 #define NATIVES_H_
 
 namespace Natives {
+    // native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
+    cell AMX_NATIVE_CALL n_BS_Send(AMX *amx, cell *params) {
+        try {
+            Functions::AssertParams(4, params);
+
+            return Functions::RakServer::Send(
+                Functions::GetAmxBitStream(params[1]),
+                params[3],
+                params[4],
+                '\0',
+                Functions::RakServer::GetPlayerIDFromIndex(params[2]),
+                params[2] == -1
+            );
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+        }
+
+        return 0;
+    }
+
     // native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
     cell AMX_NATIVE_CALL n_BS_RPC(AMX *amx, cell *params) {
         try {
@@ -26,19 +46,16 @@ namespace Natives {
         return 0;
     }
 
-    // native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
-    cell AMX_NATIVE_CALL n_BS_Send(AMX *amx, cell *params) {
+    // native BS_EmulateIncomingPacket(BitStream:bs, playerid);
+    cell AMX_NATIVE_CALL n_BS_EmulateIncomingPacket(AMX *amx, cell *params) {
         try {
-            Functions::AssertParams(4, params);
+            Functions::AssertParams(2, params);
 
-            return Functions::RakServer::Send(
-                Functions::GetAmxBitStream(params[1]),
-                params[3],
-                params[4],
-                '\0',
-                Functions::RakServer::GetPlayerIDFromIndex(params[2]),
-                params[2] == -1
-            );
+            const auto bs = Functions::GetAmxBitStream(params[1]);
+
+            Hooks::emulating_packets.push(Functions::RakServer::NewPacket(params[2], *bs));
+
+            return 1;
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
         }
@@ -617,9 +634,10 @@ namespace Natives {
 
     void Register(AMX *amx) {
         const std::vector<AMX_NATIVE_INFO> natives{
-            {"BS_RPC", n_BS_RPC},
             {"BS_Send", n_BS_Send},
+            {"BS_RPC", n_BS_RPC},
 
+            {"BS_EmulateIncomingPacket", n_BS_EmulateIncomingPacket},
             {"BS_EmulateIncomingRPC", n_BS_EmulateIncomingRPC},
 
             {"BS_New", n_BS_New},
