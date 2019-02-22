@@ -300,7 +300,7 @@ namespace Natives {
 
             for (std::size_t i = 1; i < (params[0] / sizeof(cell)) - 1; i += 2) {
                 const auto type = Functions::GetAmxParamRef(amx, params[i + 1]);
-                const auto value = Functions::GetAmxParamRef(amx, params[i + 2]);
+                const auto &value = Functions::GetAmxParamRef(amx, params[i + 2]);
 
                 switch (type) {
                     case PR_STRING:
@@ -379,38 +379,23 @@ namespace Natives {
                     case PR_FLOAT3:
                     case PR_FLOAT4: {
                         const std::size_t arr_size = (type == PR_FLOAT3 ? 3 : 4);
+                        const auto arr = &value;
 
                         for (std::size_t index{}; index < arr_size; ++index) {
-                            bs->Write(amx_ctof(Functions::GetAmxParamRef(amx, params[i + 2 + index])));
+                            bs->Write(amx_ctof(arr[index]));
                         }
-
-                        i += (arr_size - 1);
 
                         break;
                     }
+                    case PR_VECTOR:
                     case PR_NORM_QUAT: {
-                        std::array<float, 4> quat;
+                        const auto arr = reinterpret_cast<const float *>(&value);
 
-                        for (std::size_t index{}; index < quat.size(); ++index) {
-                            quat[index] = amx_ctof(Functions::GetAmxParamRef(amx, params[i + 2 + index]));
+                        if (type == PR_VECTOR) {
+                            bs->WriteVector(arr[0], arr[1], arr[2]);
+                        } else {
+                            bs->WriteNormQuat(arr[0], arr[1], arr[2], arr[3]);
                         }
-
-                        bs->WriteNormQuat(quat[0], quat[1], quat[2], quat[3]);
-
-                        i += (quat.size() - 1);
-
-                        break;
-                    }
-                    case PR_VECTOR: {
-                        std::array<float, 3> vec;
-
-                        for (std::size_t index{}; index < vec.size(); ++index) {
-                            vec[index] = amx_ctof(Functions::GetAmxParamRef(amx, params[i + 2 + index]));
-                        }
-
-                        bs->WriteVector(vec[0], vec[1], vec[2]);
-
-                        i += (vec.size() - 1);
 
                         break;
                     }
@@ -562,38 +547,23 @@ namespace Natives {
                     case PR_FLOAT3:
                     case PR_FLOAT4: {
                         const std::size_t arr_size = (type == PR_FLOAT3 ? 3 : 4);
+                        auto arr = &value;
 
                         for (std::size_t index{}; index < arr_size; ++index) {
-                            Functions::GetAmxParamRef(amx, params[i + 2 + index]) = Value<float>::Read(bs);
+                            arr[index] = Value<float>::Read(bs);
                         }
-
-                        i += (arr_size - 1);
 
                         break;
                     }
+                    case PR_VECTOR:
                     case PR_NORM_QUAT: {
-                        std::array<float, 4> quat;
+                        auto arr = reinterpret_cast<float *>(&value);
 
-                        bs->ReadNormQuat(quat[0], quat[1], quat[2], quat[3]);
-
-                        for (std::size_t index{}; index < quat.size(); ++index) {
-                            Functions::GetAmxParamRef(amx, params[i + 2 + index]) = amx_ftoc(quat[index]);
+                        if (type == PR_VECTOR) {
+                            bs->ReadVector(arr[0], arr[1], arr[2]);
+                        } else {
+                            bs->ReadNormQuat(arr[0], arr[1], arr[2], arr[3]);
                         }
-
-                        i += (quat.size() - 1);
-
-                        break;
-                    }
-                    case PR_VECTOR: {
-                        std::array<float, 3> vec;
-
-                        bs->ReadVector(vec[0], vec[1], vec[2]);
-
-                        for (std::size_t index{}; index < vec.size(); ++index) {
-                            Functions::GetAmxParamRef(amx, params[i + 2 + index]) = amx_ftoc(vec[index]);
-                        }
-
-                        i += (vec.size() - 1);
 
                         break;
                     }
