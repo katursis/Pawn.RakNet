@@ -27,7 +27,7 @@
 
 namespace Settings {
     constexpr char
-        *kPluginName = "Pawn.RakNet",
+        *kPluginName = "Pawn.RakNet 0.3e",
         *kPluginVersion = "1.2.0",
         *kConfigFile = "plugins/pawnraknet.cfg",
         *kPublicVarNameVersion = "_pawnraknet_version",

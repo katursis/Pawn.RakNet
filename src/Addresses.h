@@ -29,22 +29,22 @@ namespace Addresses {
 #ifdef _WIN32
     enum RakServerOffset {
         SEND = 7,
-        RPC = 32,
-        RECEIVE = 10,
-        REGISTER_AS_REMOTE_PROCEDURE_CALL = 29,
-        DEALLOCATE_PACKET = 12,
-        GET_INDEX_FROM_PLAYER_ID = 57,
-        GET_PLAYER_ID_FROM_INDEX = 58
+        RPC = 31,
+        RECEIVE = 9,
+        REGISTER_AS_REMOTE_PROCEDURE_CALL = 28,
+        DEALLOCATE_PACKET = 11,
+        GET_INDEX_FROM_PLAYER_ID = 55,
+        GET_PLAYER_ID_FROM_INDEX = 56
     };
 #else
     enum RakServerOffset {
         SEND = 9,
-        RPC = 35,
-        RECEIVE = 11,
-        REGISTER_AS_REMOTE_PROCEDURE_CALL = 30,
-        DEALLOCATE_PACKET = 13,
-        GET_INDEX_FROM_PLAYER_ID = 58,
-        GET_PLAYER_ID_FROM_INDEX = 59
+        RPC = 34,
+        RECEIVE = 10,
+        REGISTER_AS_REMOTE_PROCEDURE_CALL = 29,
+        DEALLOCATE_PACKET = 12,
+        GET_INDEX_FROM_PLAYER_ID = 56,
+        GET_PLAYER_ID_FROM_INDEX = 57
     };
 #endif
 
