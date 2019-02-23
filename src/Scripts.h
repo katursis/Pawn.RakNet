@@ -141,7 +141,7 @@ namespace Scripts {
         inline bool operator==(AMX *amx) {
             return _amx == amx;
         }
- 
+
     private:
         AMX *_amx;
         std::array<std::unique_ptr<Public>, PR_NUMBER_OF_EVENT_TYPES> _publics;
