@@ -51,10 +51,8 @@ namespace Natives {
         try {
             Functions::AssertParams(5, params);
 
-            RPCIndex rpc_id = params[3];
-
             return Functions::RakServer::RPC(
-                &rpc_id,
+                reinterpret_cast<RPCIndex *>(&params[3]),
                 Functions::GetAmxBitStream(params[1]),
                 params[4],
                 params[5],
