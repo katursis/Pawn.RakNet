@@ -25,6 +25,16 @@
 #ifndef HOOKS_H_
 #define HOOKS_H_
 
+#ifdef THISCALL
+#undef THISCALL
+#endif
+
+#ifdef _WIN32
+#define THISCALL __thiscall
+#else
+#define THISCALL
+#endif
+
 namespace Hooks {
     std::shared_ptr<urmem::hook>
         hook_get_rakserver_interface,
@@ -185,41 +195,40 @@ namespace Hooks {
             };
         };
 
-        static void * GetRakServerInterface() {
-            const auto rakserver = hook_get_rakserver_interface->call<urmem::calling_convention::cdeclcall, void *>();
+        static urmem::address_t GetRakServerInterface() {
+            const auto rakserver = hook_get_rakserver_interface->call<urmem::calling_convention::cdeclcall, urmem::address_t>();
+            const auto vmt = urmem::pointer(rakserver).field<urmem::address_t *>(0);
 
-            if (const auto vmt = Addresses::Init(reinterpret_cast<urmem::address_t>(rakserver))) {
-                const auto install_hook = [vmt](RakServerOffsets offset, urmem::address_t dest) {
-                    urmem::unprotect_scope scope{
-                        reinterpret_cast<urmem::address_t>(&vmt[offset]),
-                        sizeof(urmem::address_t)
-                    };
+            Addresses::InitRakServer(rakserver, vmt);
 
-                    vmt[offset] = dest;
+            const auto install_hook = [vmt](Addresses::RakServerOffset offset, urmem::address_t dest) {
+                urmem::unprotect_scope scope{
+                    reinterpret_cast<urmem::address_t>(&vmt[offset]),
+                    sizeof(urmem::address_t)
                 };
 
-                if (Settings::intercept_outcoming_packet) {
-                    install_hook(RakServerOffsets::SEND, urmem::get_func_addr(&RakServer__Send));
-                }
+                vmt[offset] = dest;
+            };
 
-                if (Settings::intercept_outcoming_rpc) {
-                    install_hook(RakServerOffsets::RPC, urmem::get_func_addr(&RakServer__RPC));
-                }
+            if (Settings::intercept_outcoming_packet) {
+                install_hook(Addresses::RakServerOffset::SEND, urmem::get_func_addr(&RakServer__Send));
+            }
 
-                if (Settings::intercept_incoming_packet) {
-                    install_hook(RakServerOffsets::RECEIVE, urmem::get_func_addr(&RakServer__Receive));
-                }
+            if (Settings::intercept_outcoming_rpc) {
+                install_hook(Addresses::RakServerOffset::RPC, urmem::get_func_addr(&RakServer__RPC));
+            }
 
-                if (Settings::intercept_incoming_rpc) {
-                    install_hook(
-                        RakServerOffsets::REGISTER_AS_REMOTE_PROCEDURE_CALL,
-                        urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall)
-                    );
+            if (Settings::intercept_incoming_packet) {
+                install_hook(Addresses::RakServerOffset::RECEIVE, urmem::get_func_addr(&RakServer__Receive));
+            }
 
-                    ReceiveRPC::Init();
-                }
-            } else {
-                Logger::instance()->Write("[%s] Invalid RakServer VMT", Settings::kPluginName);
+            if (Settings::intercept_incoming_rpc) {
+                install_hook(
+                    Addresses::RakServerOffset::REGISTER_AS_REMOTE_PROCEDURE_CALL,
+                    urmem::get_func_addr(&RakServer__RegisterAsRemoteProcedureCall)
+                );
+
+                ReceiveRPC::Init();
             }
 
             return rakserver;
