@@ -78,7 +78,7 @@
 
     enum PR_PacketReliability
     {
-        PR_UNRELIABLE = 6,
+        PR_UNRELIABLE,
         PR_UNRELIABLE_SEQUENCED,
         PR_RELIABLE,
         PR_RELIABLE_ORDERED,
