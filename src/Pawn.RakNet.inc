@@ -25,7 +25,7 @@
 #if !defined PAWNRAKNET_INC_
     #define PAWNRAKNET_INC_
 
-    #define PAWNRAKNET_INCLUDE_VERSION 120
+    #define PAWNRAKNET_INCLUDE_VERSION 130
 
     #define PR_MAX_HANDLERS 255
 
