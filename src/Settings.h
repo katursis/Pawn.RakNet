@@ -28,7 +28,7 @@
 namespace Settings {
     constexpr char
         *kPluginName = "Pawn.RakNet",
-        *kPluginVersion = "1.2.0",
+        *kPluginVersion = "1.3.0",
         *kConfigFile = "plugins/pawnraknet.cfg",
         *kPublicVarNameVersion = "_pawnraknet_version",
         *kRegHandlerPublicRegExp = R"(^pr_r(?:ir|ip|or|op)_\w+$)",
