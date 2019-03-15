@@ -73,7 +73,7 @@ namespace Hooks {
 
             RakNet::BitStream bs{bitStream->GetData(), length, false};
 
-            if (!Scripts::OnOutcomingPacket(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), *bs.GetData(), &bs)) {
+            if (!Scripts::OnEvent<PR_OUTCOMING_PACKET>(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), *bs.GetData(), &bs)) {
                 return false;
             }
 
@@ -105,7 +105,7 @@ namespace Hooks {
                 bs.SetWriteOffset(bitStream->GetWriteOffset());
             }
 
-            if (!Scripts::OnOutcomingRPC(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, &bs)) {
+            if (!Scripts::OnEvent<PR_OUTCOMING_RPC>(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, &bs)) {
                 return false;
             }
 
@@ -130,7 +130,7 @@ namespace Hooks {
 
                 RakNet::BitStream bs{packet->data, packet->length, false};
 
-                if (Scripts::OnIncomingPacket(packet->playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
+                if (Scripts::OnEvent<PR_INCOMING_PACKET>(packet->playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
                     break;
                 }
 
@@ -179,7 +179,7 @@ namespace Hooks {
                             bs.SetWriteOffset(p->numberOfBitsOfData);
                         }
 
-                        if (!Scripts::OnIncomingRPC(player_id, ID, &bs)) {
+                        if (!Scripts::OnEvent<PR_INCOMING_RPC>(player_id, ID, &bs)) {
                             return;
                         }
                     }
