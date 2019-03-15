@@ -646,6 +646,8 @@ namespace Natives {
 
             Scripts::Load(amx, params[1] == 1);
 
+            Scripts::GetScript(amx).Init();
+
             return 1;
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());

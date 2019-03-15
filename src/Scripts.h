@@ -151,24 +151,12 @@ namespace Scripts {
 
     std::list<Script> scripts;
 
-    Script & GetScript(AMX *amx) {
-        const auto script = std::find(scripts.begin(), scripts.end(), amx);
-
-        if (script == scripts.end()) {
-            throw std::runtime_error{"script not found"};
-        }
-
-        return *script;
-    }
-
     void Load(AMX *amx, bool is_gamemode) {
         if (is_gamemode) {
             scripts.emplace_back(amx);
         } else {
             scripts.emplace_front(amx);
         }
-
-        GetScript(amx).Init();
     }
 
     void Unload(AMX *amx) {
@@ -177,6 +165,16 @@ namespace Scripts {
         if (script != scripts.end()) {
             scripts.erase(script);
         }
+    }
+
+    Script & GetScript(AMX *amx) {
+        const auto script = std::find(scripts.begin(), scripts.end(), amx);
+
+        if (script == scripts.end()) {
+            throw std::runtime_error{"script not found"};
+        }
+
+        return *script;
     }
 
     template<PR_EventType eventType>
