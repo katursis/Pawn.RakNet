@@ -289,6 +289,10 @@
         #define BS_ReadCompressedString(%0,%1,%2) BS_ReadValue(%0,PR_CSTRING,%1,%2)
 
         #define BS_ReadBits(%0,%1,%2) BS_ReadValue(%0,PR_BITS,%1,%2)
+        #define BS_ReadFloat3(%0,%1) BS_ReadValue(%0,PR_FLOAT3,%1)
+        #define BS_ReadFloat4(%0,%1) BS_ReadValue(%0,PR_FLOAT4,%1)
+        #define BS_ReadVector(%0,%1) BS_ReadValue(%0,PR_VECTOR,%1)
+        #define BS_ReadNormQuat(%0,%1) BS_ReadValue(%0,PR_NORM_QUAT,%1)
 
         #define BS_WriteInt8(%0,%1) BS_WriteValue(%0,PR_INT8,%1)
         #define BS_WriteInt16(%0,%1) BS_WriteValue(%0,PR_INT16,%1)
@@ -311,6 +315,10 @@
         #define BS_WriteCompressedString(%0,%1) BS_WriteValue(%0,PR_CSTRING,%1)
 
         #define BS_WriteBits(%0,%1,%2) BS_WriteValue(%0,PR_BITS,%1,%2)
+        #define BS_WriteFloat3(%0,%1) BS_WriteValue(%0,PR_FLOAT3,%1)
+        #define BS_WriteFloat4(%0,%1) BS_WriteValue(%0,PR_FLOAT4,%1)
+        #define BS_WriteVector(%0,%1) BS_WriteValue(%0,PR_VECTOR,%1)
+        #define BS_WriteNormQuat(%0,%1) BS_WriteValue(%0,PR_NORM_QUAT,%1)
 
         #define PR_EXPAND_ARR3(%0) %0[0],%0[1],%0[2]
         #define PR_EXPAND_ARR4(%0) %0[0],%0[1],%0[2],%0[3]
