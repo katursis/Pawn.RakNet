@@ -157,25 +157,17 @@ namespace Functions {
     std::string GetAmxString(AMX *amx, cell amx_addr) {
         int len{};
         cell *addr{};
+        std::unique_ptr<char[]> str;
 
         if (
-            amx_GetAddr(amx, amx_addr, &addr) == AMX_ERR_NONE &&
-            amx_StrLen(addr, &len) == AMX_ERR_NONE &&
-            len
+            amx_GetAddr(amx, amx_addr, &addr) != AMX_ERR_NONE ||
+            amx_StrLen(addr, &len) != AMX_ERR_NONE ||
+            (str.reset(new char[++len]{}), amx_GetString(str.get(), addr, 0, len)) != AMX_ERR_NONE
         ) {
-            len++;
-
-            std::unique_ptr<char[]> buf{new char[len]{}};
-
-            if (
-                buf &&
-                amx_GetString(buf.get(), addr, 0, len) == AMX_ERR_NONE
-            ) {
-                return buf.get();
-            }
+            throw std::runtime_error{"invalid amx string"};
         }
 
-        return {};
+        return str.get();
     }
 
     RakNet::BitStream * GetAmxBitStream(cell amx_addr) {
