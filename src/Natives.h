@@ -26,8 +26,8 @@
 #define NATIVES_H_
 
 namespace Natives {
-    // native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
-    cell AMX_NATIVE_CALL n_BS_Send(AMX *amx, cell *params) {
+    // native BS_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
+    cell AMX_NATIVE_CALL n_BS_SendPacket(AMX *amx, cell *params) {
         try {
             Functions::AssertParams(4, params);
 
@@ -46,8 +46,8 @@ namespace Natives {
         return 0;
     }
 
-    // native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
-    cell AMX_NATIVE_CALL n_BS_RPC(AMX *amx, cell *params) {
+    // native BS_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
+    cell AMX_NATIVE_CALL n_BS_SendRPC(AMX *amx, cell *params) {
         try {
             Functions::AssertParams(5, params);
 
@@ -658,8 +658,8 @@ namespace Natives {
 
     void Register(AMX *amx) {
         const std::vector<AMX_NATIVE_INFO> natives{
-            {"BS_Send", n_BS_Send},
-            {"BS_RPC", n_BS_RPC},
+            {"BS_SendPacket", n_BS_SendPacket},
+            {"BS_SendRPC", n_BS_SendRPC},
 
             {"BS_EmulateIncomingPacket", n_BS_EmulateIncomingPacket},
             {"BS_EmulateIncomingRPC", n_BS_EmulateIncomingRPC},
