@@ -181,13 +181,15 @@ namespace Functions {
     }
 
     std::string GetAmxPublicName(AMX *amx, int index) {
-        char name[32]{};
+        int length;
+        amx_NameLength(_amx, &length);
+        std::unique_ptr<char[]> public_name(new char[length]);
 
-        if (amx_GetPublic(amx, index, name) != AMX_ERR_NONE) {
+        if (amx_GetPublic(amx, index, name.get()) != AMX_ERR_NONE) {
             throw std::runtime_error{"invalid public index"};
         }
 
-        return name;
+        return name.get();
     }
 
     cell & GetAmxParamRef(AMX *amx, cell amx_addr) {
