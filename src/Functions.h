@@ -181,9 +181,12 @@ namespace Functions {
     }
 
     std::string GetAmxPublicName(AMX *amx, int index) {
-        int length;
-        amx_NameLength(_amx, &length);
-        std::unique_ptr<char[]> public_name(new char[length]);
+        int len{};
+        if (amx_NameLength(amx, &len) != AMX_ERR_NONE) {
+            throw std::runtime_error{"name length error"};
+        }
+
+        std::unique_ptr<char[]> name{new char[len + 1]{}};
 
         if (amx_GetPublic(amx, index, name.get()) != AMX_ERR_NONE) {
             throw std::runtime_error{"invalid public index"};
