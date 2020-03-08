@@ -244,9 +244,9 @@
         native BS_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
         native BS_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
-        #pragma deprecated
+        #pragma deprecated Use BS_SendPacket instead
         native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED) = BS_SendPacket;
-        #pragma deprecated
+        #pragma deprecated Use BS_SendRPC instead
         native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED) = BS_SendRPC;
 
         native BS_EmulateIncomingPacket(BitStream:bs, playerid);
