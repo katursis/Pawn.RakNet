@@ -65,7 +65,10 @@
         PR_FLOAT3,
         PR_FLOAT4,
         PR_VECTOR,
-        PR_NORM_QUAT
+        PR_NORM_QUAT,
+
+        PR_STRING8,
+        PR_STRING32,
     };
 
     enum PR_PacketPriority
@@ -299,6 +302,9 @@
         #define BS_ReadVector(%0,%1) BS_ReadValue(%0,PR_VECTOR,%1)
         #define BS_ReadNormQuat(%0,%1) BS_ReadValue(%0,PR_NORM_QUAT,%1)
 
+        #define BS_ReadString8(%0,%1) BS_ReadValue(%0,PR_STRING8,%1)
+        #define BS_ReadString32(%0,%1) BS_ReadValue(%0,PR_STRING32,%1)
+
         #define BS_WriteInt8(%0,%1) BS_WriteValue(%0,PR_INT8,%1)
         #define BS_WriteInt16(%0,%1) BS_WriteValue(%0,PR_INT16,%1)
         #define BS_WriteInt32(%0,%1) BS_WriteValue(%0,PR_INT32,%1)
@@ -324,6 +330,9 @@
         #define BS_WriteFloat4(%0,%1) BS_WriteValue(%0,PR_FLOAT4,%1)
         #define BS_WriteVector(%0,%1) BS_WriteValue(%0,PR_VECTOR,%1)
         #define BS_WriteNormQuat(%0,%1) BS_WriteValue(%0,PR_NORM_QUAT,%1)
+
+        #define BS_WriteString8(%0,%1) BS_WriteValue(%0,PR_STRING8,%1)
+        #define BS_WriteString32(%0,%1) BS_WriteValue(%0,PR_STRING32,%1)
 
         #define PR_EXPAND_ARR3(%0) %0[0],%0[1],%0[2]
         #define PR_EXPAND_ARR4(%0) %0[0],%0[1],%0[2],%0[3]

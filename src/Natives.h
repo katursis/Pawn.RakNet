@@ -438,6 +438,20 @@ namespace Natives {
 
                         break;
                     }
+                    case PR_STRING8:
+                    case PR_STRING32: {
+                        auto str = Functions::GetAmxString(amx, params[i + 2]);
+
+                        if (type == PR_STRING8) {
+                            bs->Write(static_cast<unsigned char>(str.size()));
+                        } else {
+                            bs->Write(static_cast<unsigned int>(str.size()));
+                        }
+
+                        bs->Write(str.c_str(), str.size());
+
+                        break;
+                    }
                     default: {
                         throw std::runtime_error{"invalid type of value"};
                     }
@@ -602,6 +616,26 @@ namespace Natives {
                             bs->ReadVector(arr[0], arr[1], arr[2]);
                         } else {
                             bs->ReadNormQuat(arr[0], arr[1], arr[2], arr[3]);
+                        }
+
+                        break;
+                    }
+                    case PR_STRING8:
+                    case PR_STRING32: {
+                        cell size{};
+
+                        if (type == PR_STRING8) {
+                            size = Value<unsigned char>::Read(bs);
+                        } else {
+                            size = Value<unsigned int>::Read(bs);
+                        }
+
+                        if (size > 0) {
+                            std::unique_ptr<char[]> str{new char[size + 1]{}};
+
+                            bs->Read(str.get(), size);
+
+                            Functions::SetAmxString(amx, params[i + 2], str.get(), size);
                         }
 
                         break;
