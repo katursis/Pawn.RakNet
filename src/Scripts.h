@@ -72,9 +72,7 @@ namespace Scripts {
                 }
             }
 
-            const auto &handler = _handlers[eventType][id];
-
-            if (handler) {
+            for (const auto &handler : _handlers[eventType][id]) {
                 bs->ResetReadPointer();
 
                 if (!handler->call(player_id, bs)) {
@@ -90,13 +88,13 @@ namespace Scripts {
         }
 
         void RegisterHandler(int id, const std::string &public_name, PR_EventType type) {
-            _handlers.at(type).at(id) = std::unique_ptr<Public>{new Public{public_name, _amx}};
+            auto handler = std::make_shared<Public>(public_name, _amx);
 
-            if (!_handlers[type][id]->exists()) {
-                _handlers[type][id] = nullptr;
-
-                throw std::runtime_error{"public " + public_name + " not exists"};
+            if (!handler->exists()) {
+                throw std::runtime_error{"public " + public_name + " does not exist"};
             }
+
+            _handlers.at(type).at(id).push_back(handler);
         }
 
         void Init() {
@@ -145,7 +143,7 @@ namespace Scripts {
     private:
         AMX *_amx;
         std::array<std::unique_ptr<Public>, PR_NUMBER_OF_EVENT_TYPES> _publics;
-        std::array<std::array<std::unique_ptr<Public>, PR_MAX_HANDLERS>, PR_NUMBER_OF_EVENT_TYPES> _handlers;
+        std::array<std::array<std::list<std::shared_ptr<Public>>, PR_MAX_HANDLERS>, PR_NUMBER_OF_EVENT_TYPES> _handlers;
         std::unordered_set<std::shared_ptr<RakNet::BitStream>> _bitstreams;
     };
 
