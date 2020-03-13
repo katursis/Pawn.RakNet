@@ -58,7 +58,7 @@ namespace Scripts {
 
     class Script {
     public:
-        explicit Script(AMX *amx) : _amx{amx} {}
+        explicit Script(AMX *amx, bool is_gamemode) : _amx{amx}, _is_gamemode{is_gamemode} {}
 
         template<PR_EventType eventType>
         inline bool OnEvent(int player_id, int id, RakNet::BitStream *bs) {
@@ -136,12 +136,17 @@ namespace Scripts {
             _bitstreams.erase(bs);
         }
 
+        bool IsGamemode() const {
+            return _is_gamemode;
+        }
+
         inline bool operator==(AMX *amx) {
             return _amx == amx;
         }
 
     private:
-        AMX *_amx;
+        AMX *_amx{};
+        bool _is_gamemode{};
         std::array<std::unique_ptr<Public>, PR_NUMBER_OF_EVENT_TYPES> _publics;
         std::array<std::array<std::list<std::shared_ptr<Public>>, PR_MAX_HANDLERS>, PR_NUMBER_OF_EVENT_TYPES> _handlers;
         std::unordered_set<std::shared_ptr<RakNet::BitStream>> _bitstreams;
@@ -151,9 +156,13 @@ namespace Scripts {
 
     void Load(AMX *amx, bool is_gamemode) {
         if (is_gamemode) {
-            scripts.emplace_back(amx);
+            if (std::any_of(scripts.begin(), scripts.end(), [=](const Script &script) { return script.IsGamemode(); })) {
+                Logger::instance()->Write("[%s] %s: Warning! You probably forgot to define FILTERSCRIPT in one of your filterscripts", Settings::kPluginName, __FUNCTION__);
+            }
+
+            scripts.emplace_back(amx, is_gamemode);
         } else {
-            scripts.emplace_front(amx);
+            scripts.emplace_front(amx, is_gamemode);
         }
     }
 
