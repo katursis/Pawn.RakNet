@@ -69,6 +69,9 @@
 
         PR_STRING8,
         PR_STRING32,
+
+        // shift the write or read pointer
+        PR_IGNORE_BITS,
     };
 
     enum PR_PacketPriority

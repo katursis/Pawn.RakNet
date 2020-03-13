@@ -452,6 +452,10 @@ namespace Natives {
 
                         break;
                     }
+                    case PR_IGNORE_BITS: {
+                        bs->SetWriteOffset(bs->GetWriteOffset() + value);
+                        break;
+                    }
                     default: {
                         throw std::runtime_error{"invalid type of value"};
                     }
@@ -638,6 +642,10 @@ namespace Natives {
                             Functions::SetAmxString(amx, params[i + 2], str.get(), size);
                         }
 
+                        break;
+                    }
+                    case PR_IGNORE_BITS: {
+                        bs->IgnoreBits(value);
                         break;
                     }
                     default: {
