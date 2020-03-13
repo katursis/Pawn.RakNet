@@ -92,33 +92,16 @@
         public _pawnraknet_version = PAWNRAKNET_INCLUDE_VERSION;
         #pragma unused _pawnraknet_version
 
-        #define IPacket:%0(%1) \
-        forward pr_rip_%0(); \
-        public pr_rip_%0() \
-            PR_RegHandler(%0, "pr_ip_"#%0, PR_INCOMING_PACKET); \
-        forward pr_ip_%0(%1); \
-        public pr_ip_%0(%1)
+        #define PR_Handler<%0,%1>:%2(%3) \
+        forward pr_r%1_%2(); \
+        public pr_r%1_%2() PR_RegHandler(%2,"pr_"#%1"_"#%2,%0); \
+        forward pr_%1_%2(%3); \
+        public pr_%1_%2(%3)
 
-        #define IRPC:%0(%1) \
-        forward pr_rir_%0(); \
-        public pr_rir_%0() \
-            PR_RegHandler(%0, "pr_ir_"#%0, PR_INCOMING_RPC); \
-        forward pr_ir_%0(%1); \
-        public pr_ir_%0(%1)
-
-        #define OPacket:%0(%1) \
-        forward pr_rop_%0(); \
-        public pr_rop_%0() \
-            PR_RegHandler(%0, "pr_op_"#%0, PR_OUTCOMING_PACKET); \
-        forward pr_op_%0(%1); \
-        public pr_op_%0(%1)
-
-        #define ORPC:%0(%1) \
-        forward pr_ror_%0(); \
-        public pr_ror_%0() \
-            PR_RegHandler(%0, "pr_or_"#%0, PR_OUTCOMING_RPC); \
-        forward pr_or_%0(%1); \
-        public pr_or_%0(%1)
+        #define IPacket:%0(%1) PR_Handler<PR_INCOMING_PACKET,ip>:%0(%1)
+        #define IRPC:%0(%1) PR_Handler<PR_INCOMING_RPC,ir>:%0(%1)
+        #define OPacket:%0(%1) PR_Handler<PR_OUTCOMING_PACKET,op>:%0(%1)
+        #define ORPC:%0(%1) PR_Handler<PR_OUTCOMING_RPC,or>:%0(%1)
 
         #define IncomingPacket IPacket
         #define IncomingRPC IRPC
