@@ -26,8 +26,8 @@
 #define NATIVES_H_
 
 namespace Natives {
-    // native BS_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
-    cell AMX_NATIVE_CALL n_BS_SendPacket(AMX *amx, cell *params) {
+    // native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
+    cell AMX_NATIVE_CALL n_PR_SendPacket(AMX *amx, cell *params) {
         try {
             Functions::AssertParams(4, params);
 
@@ -46,8 +46,8 @@ namespace Natives {
         return 0;
     }
 
-    // native BS_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
-    cell AMX_NATIVE_CALL n_BS_SendRPC(AMX *amx, cell *params) {
+    // native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = HIGH_PRIORITY, PR_PacketReliability:reliability = RELIABLE_ORDERED);
+    cell AMX_NATIVE_CALL n_PR_SendRPC(AMX *amx, cell *params) {
         try {
             Functions::AssertParams(5, params);
 
@@ -68,8 +68,8 @@ namespace Natives {
         return 0;
     }
 
-    // native BS_EmulateIncomingPacket(BitStream:bs, playerid);
-    cell AMX_NATIVE_CALL n_BS_EmulateIncomingPacket(AMX *amx, cell *params) {
+    // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
+    cell AMX_NATIVE_CALL n_PR_EmulateIncomingPacket(AMX *amx, cell *params) {
         try {
             Functions::AssertParams(2, params);
 
@@ -85,8 +85,8 @@ namespace Natives {
         return 0;
     }
 
-    // native BS_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
-    cell AMX_NATIVE_CALL n_BS_EmulateIncomingRPC(AMX *amx, cell *params) {
+    // native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
+    cell AMX_NATIVE_CALL n_PR_EmulateIncomingRPC(AMX *amx, cell *params) {
         try {
             Functions::AssertParams(3, params);
 
@@ -715,11 +715,11 @@ namespace Natives {
 
     void Register(AMX *amx) {
         const std::vector<AMX_NATIVE_INFO> natives{
-            {"BS_SendPacket", n_BS_SendPacket},
-            {"BS_SendRPC", n_BS_SendRPC},
+            {"PR_SendPacket", n_PR_SendPacket},
+            {"PR_SendRPC", n_PR_SendRPC},
 
-            {"BS_EmulateIncomingPacket", n_BS_EmulateIncomingPacket},
-            {"BS_EmulateIncomingRPC", n_BS_EmulateIncomingRPC},
+            {"PR_EmulateIncomingPacket", n_PR_EmulateIncomingPacket},
+            {"PR_EmulateIncomingRPC", n_PR_EmulateIncomingRPC},
 
             {"BS_New", n_BS_New},
             {"BS_NewCopy", n_BS_NewCopy},

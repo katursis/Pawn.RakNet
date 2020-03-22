@@ -227,16 +227,21 @@
             PR_slotUpdated[PR_MAX_WEAPON_SLOTS] // helping field
         };
 
-        native BS_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
-        native BS_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
+        native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
+        native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
-        #pragma deprecated Use BS_SendPacket instead
-        native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED) = BS_SendPacket;
-        #pragma deprecated Use BS_SendRPC instead
-        native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED) = BS_SendRPC;
+        #pragma deprecated Use PR_SendPacket instead
+        native BS_Send(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED) = PR_SendPacket;
+        #pragma deprecated Use PR_SendRPC instead
+        native BS_RPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED) = PR_SendRPC;
 
-        native BS_EmulateIncomingPacket(BitStream:bs, playerid);
-        native BS_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
+        native PR_EmulateIncomingPacket(BitStream:bs, playerid);
+        native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
+
+        #pragma deprecated Use PR_EmulateIncomingPacket instead
+        native BS_EmulateIncomingPacket(BitStream:bs, playerid) = PR_EmulateIncomingPacket;
+        #pragma deprecated Use PR_EmulateIncomingRPC instead
+        native BS_EmulateIncomingRPC(BitStream:bs, playerid, rpcid) = PR_EmulateIncomingRPC;
 
         native BitStream:BS_New();
         native BitStream:BS_NewCopy(BitStream:bs);
