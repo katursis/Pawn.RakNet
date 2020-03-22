@@ -294,8 +294,8 @@
         #define BS_ReadVector(%0,%1) BS_ReadValue(%0,PR_VECTOR,%1)
         #define BS_ReadNormQuat(%0,%1) BS_ReadValue(%0,PR_NORM_QUAT,%1)
 
-        #define BS_ReadString8(%0,%1) BS_ReadValue(%0,PR_STRING8,%1)
-        #define BS_ReadString32(%0,%1) BS_ReadValue(%0,PR_STRING32,%1)
+        #define BS_ReadString8(%0,%1) BS_ReadValue(%0,PR_STRING8,%1,sizeof(%1)-1)
+        #define BS_ReadString32(%0,%1) BS_ReadValue(%0,PR_STRING32,%1,sizeof(%1)-1)
 
         #define BS_WriteInt8(%0,%1) BS_WriteValue(%0,PR_INT8,%1)
         #define BS_WriteInt16(%0,%1) BS_WriteValue(%0,PR_INT16,%1)

@@ -641,6 +641,8 @@ namespace Natives {
                     }
                     case PR_STRING8:
                     case PR_STRING32: {
+                        const auto max_size = Functions::GetAmxParamRef(amx, params[i + 3]);
+
                         cell size{};
 
                         if (type == PR_STRING8) {
@@ -650,12 +652,20 @@ namespace Natives {
                         }
 
                         if (size > 0) {
+                            if (size > max_size) {
+                                Logger::instance()->Write("[%s] %s: Warning! size (%d) > max_size (%d) (PR_STRING8/PR_STRING32)", Settings::kPluginName, __FUNCTION__, size, max_size);
+
+                                size = max_size;
+                            }
+
                             std::unique_ptr<char[]> str{new char[size + 1]{}};
 
                             bs->Read(str.get(), size);
 
                             Functions::SetAmxString(amx, params[i + 2], str.get(), size);
                         }
+
+                        ++i;
 
                         break;
                     }
