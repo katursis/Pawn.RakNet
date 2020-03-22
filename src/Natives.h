@@ -98,7 +98,7 @@ namespace Natives {
                 throw std::runtime_error{"invalid rpcid"};
             }
 
-            RPCParameters RPCParams;
+            RPCParameters RPCParams{};
             RPCParams.numberOfBitsOfData = bs->GetNumberOfBitsUsed();
             RPCParams.sender = Functions::RakServer::GetPlayerIDFromIndex(params[2]);
 
