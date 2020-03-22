@@ -876,6 +876,32 @@
             }
         }
 
+        stock PR_BroadcastPacket(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
+        {
+            new playerPoolSize = GetPlayerPoolSize();
+
+            for (new i = 0; i <= playerPoolSize; i++) {
+                if (!IsPlayerStreamedIn(i, playerid)) {
+                    continue;
+                }
+
+                PR_SendPacket(bs, i, priority, reliability);
+            }
+        }
+
+        stock PR_BroadcastRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
+        {
+            new playerPoolSize = GetPlayerPoolSize();
+
+            for (new i = 0; i <= playerPoolSize; i++) {
+                if (!IsPlayerStreamedIn(i, playerid)) {
+                    continue;
+                }
+
+                PR_SendRPC(bs, i, rpcid, priority, reliability);
+            }
+        }
+
         forward OnIncomingPacket(playerid, packetid, BitStream:bs);
         forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
         forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
