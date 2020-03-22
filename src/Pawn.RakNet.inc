@@ -239,6 +239,7 @@
         native BS_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
 
         native BitStream:BS_New();
+        native BitStream:BS_NewCopy(BitStream:bs);
         native BS_Delete(&BitStream:bs);
 
         native BS_Reset(BitStream:bs);

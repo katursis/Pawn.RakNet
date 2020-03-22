@@ -129,6 +129,21 @@ namespace Natives {
         return 0;
     }
 
+    // native BitStream:BS_NewCopy(BitStream:bs);
+    cell AMX_NATIVE_CALL n_BS_NewCopy(AMX *amx, cell *params) {
+        try {
+            Functions::AssertParams(1, params);
+
+            const auto bs = Functions::GetAmxBitStream(params[1]);
+
+            return Scripts::GetScript(amx).NewBitStreamCopy(bs);
+        } catch (const std::exception &e) {
+            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+        }
+
+        return 0;
+    }
+
     // native BS_Delete(&BitStream:bs);
     cell AMX_NATIVE_CALL n_BS_Delete(AMX *amx, cell *params) {
         try {
@@ -707,6 +722,7 @@ namespace Natives {
             {"BS_EmulateIncomingRPC", n_BS_EmulateIncomingRPC},
 
             {"BS_New", n_BS_New},
+            {"BS_NewCopy", n_BS_NewCopy},
             {"BS_Delete", n_BS_Delete},
 
             {"BS_Reset", n_BS_Reset},

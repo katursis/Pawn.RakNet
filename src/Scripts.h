@@ -124,6 +124,14 @@ namespace Scripts {
             return reinterpret_cast<cell>(bs.get());
         }
 
+        cell NewBitStreamCopy(RakNet::BitStream *src) {
+            const auto bs = std::make_shared<RakNet::BitStream>(src->GetData(), src->GetNumberOfBytesUsed(), true);
+
+            _bitstreams.insert(bs);
+
+            return reinterpret_cast<cell>(bs.get());
+        }
+
         void DeleteBitStream(cell handle) {
             const auto bs = std::find_if(_bitstreams.begin(), _bitstreams.end(), [handle](const std::shared_ptr<RakNet::BitStream> &bs) {
                 return reinterpret_cast<cell>(bs.get()) == handle;
