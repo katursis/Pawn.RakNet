@@ -227,6 +227,12 @@
             PR_slotUpdated[PR_MAX_WEAPON_SLOTS] // helping field
         };
 
+        enum PR_StatsUpdate
+        {
+            PR_money,
+            PR_drunkLevel
+        };
+
         native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
         native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
@@ -627,6 +633,15 @@
             }
         }
 
+        stock BS_ReadStatsUpdate(BitStream:bs, data[PR_StatsUpdate])
+        {
+            BS_ReadValue(
+                bs,
+                PR_INT32, data[PR_money],
+                PR_INT32, data[PR_drunkLevel]
+            );
+        }
+
         stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync], outcoming = false)
         {
             if (outcoming) {
@@ -874,6 +889,15 @@
                     PR_UINT16, data[PR_slotWeaponAmmo][slotId]
                 );
             }
+        }
+
+        stock BS_WriteStatsUpdate(BitStream:bs, data[PR_StatsUpdate])
+        {
+            BS_WriteValue(
+                bs,
+                PR_INT32, data[PR_money],
+                PR_INT32, data[PR_drunkLevel]
+            );
         }
 
         stock PR_BroadcastPacket(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
