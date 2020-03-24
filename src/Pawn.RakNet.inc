@@ -233,6 +233,11 @@
             PR_drunkLevel
         };
 
+        enum PR_RconCommand
+        {
+            PR_command[256]
+        };
+
         native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
         native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
@@ -642,6 +647,14 @@
             );
         }
 
+        stock BS_ReadRconCommand(BitStream:bs, data[PR_RconCommand])
+        {
+            BS_ReadValue(
+                bs,
+                PR_STRING32, data[PR_command], sizeof(data[PR_command]) - 1
+            );
+        }
+
         stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync], outcoming = false)
         {
             if (outcoming) {
@@ -897,6 +910,14 @@
                 bs,
                 PR_INT32, data[PR_money],
                 PR_INT32, data[PR_drunkLevel]
+            );
+        }
+
+        stock BS_WriteRconCommand(BitStream:bs, data[PR_RconCommand])
+        {
+            BS_WriteValue(
+                bs,
+                PR_STRING32, data[PR_command]
             );
         }
 
