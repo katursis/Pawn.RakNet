@@ -127,18 +127,6 @@ namespace Functions {
         }
     }
 
-    int SetAmxString(AMX *amx, cell amx_addr, const char *source, int max) {
-        cell *dest = reinterpret_cast<cell *>(amx->base + static_cast<int>(reinterpret_cast<AMX_HEADER *>(amx->base)->dat + amx_addr));
-        cell *start = dest;
-
-        while (max-- && *source) {
-            *dest++ = static_cast<cell>(*source++);
-        }
-        *dest = 0;
-
-        return dest - start;
-    }
-
     bool GetAmxPublicVar(AMX *amx, const char *name, cell &out) {
         cell addr{}, *phys_addr{};
 

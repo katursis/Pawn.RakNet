@@ -549,7 +549,7 @@ namespace Natives {
                             stringCompressor->DecodeString(str.get(), size, bs);
                         }
 
-                        Functions::SetAmxString(amx, params[i + 2], str.get(), size);
+                        amx_SetString(&value, str.get(), 0, 0, size + 1);
 
                         ++i;
 
@@ -662,7 +662,7 @@ namespace Natives {
 
                             bs->Read(str.get(), size);
 
-                            Functions::SetAmxString(amx, params[i + 2], str.get(), size);
+                            amx_SetString(&value, str.get(), 0, 0, size + 1);
                         }
 
                         ++i;
