@@ -70,6 +70,14 @@ namespace Functions {
             );
         }
 
+        void AttachPlugin(PluginInterface *messageHandler) {
+            urmem::call_function<urmem::calling_convention::thiscall>(
+                Addresses::FUNC_RAKSERVER__ATTACH_PLUGIN,
+                Addresses::PTR_RAKSERVER,
+                messageHandler
+            );
+        }
+
         void * RegisterAsRemoteProcedureCall(RPCIndex *uniqueID, RPCFunction functionPointer) {
             return urmem::call_function<urmem::calling_convention::thiscall, void *>(
                 Addresses::FUNC_RAKSERVER__REGISTER_AS_REMOTE_PROCEDURE_CALL,

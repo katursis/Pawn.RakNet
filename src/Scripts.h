@@ -102,6 +102,7 @@ namespace Scripts {
             InitEvent(PR_INCOMING_RPC, "OnIncomingRPC");
             InitEvent(PR_OUTCOMING_PACKET, "OnOutcomingPacket");
             InitEvent(PR_OUTCOMING_RPC, "OnOutcomingRPC");
+            InitEvent(PR_INCOMING_RAW_PACKET, "OnIncomingRawPacket");
 
             int num_publics{};
 

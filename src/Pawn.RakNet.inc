@@ -35,6 +35,8 @@
         PR_INCOMING_RPC,
         PR_OUTCOMING_PACKET,
         PR_OUTCOMING_RPC,
+        PR_INCOMING_RAW_PACKET,
+
         PR_NUMBER_OF_EVENT_TYPES
     };
 
@@ -105,11 +107,13 @@
         #define IRPC:%0(%1) PR_Handler<PR_INCOMING_RPC,ir>:%0(%1)
         #define OPacket:%0(%1) PR_Handler<PR_OUTCOMING_PACKET,op>:%0(%1)
         #define ORPC:%0(%1) PR_Handler<PR_OUTCOMING_RPC,or>:%0(%1)
+        #define IRawPacket:%0(%1) PR_Handler<PR_INCOMING_RAW_PACKET,irp>:%0(%1)
 
         #define IncomingPacket IPacket
         #define IncomingRPC IRPC
         #define OutcomingPacket OPacket
         #define OutcomingRPC ORPC
+        #define IncomingRawPacket IRawPacket
 
         #define PR_MAX_WEAPON_SLOTS 13
 
@@ -951,6 +955,7 @@
         forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
         forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
         forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
+        forward OnIncomingRawPacket(playerid, packetid, BitStream:bs);
 
         #if defined FILTERSCRIPT
             public OnFilterScriptInit()

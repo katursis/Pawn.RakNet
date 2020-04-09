@@ -27,6 +27,7 @@
 
 #include "RakNet/BitStream.h"
 #include "RakNet/StringCompressor.h"
+#include "RakNet/PluginInterface.h"
 #include "urmem/urmem.hpp"
 #include "crtp_singleton/crtp_singleton.hpp"
 #include "cpptoml/include/cpptoml.h"

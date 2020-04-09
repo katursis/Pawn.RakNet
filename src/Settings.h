@@ -65,6 +65,7 @@ namespace Settings {
         intercept_incoming_packet{},
         intercept_outcoming_rpc{},
         intercept_outcoming_packet{},
+        intercept_incoming_raw_packet{},
 
         use_caching{};
 
@@ -77,6 +78,7 @@ namespace Settings {
         intercept_incoming_packet = config->get_as<bool>("InterceptIncomingPacket").value_or(true);
         intercept_outcoming_rpc = config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
         intercept_outcoming_packet = config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
+        intercept_incoming_raw_packet = config->get_as<bool>("InterceptIncomingRawPacket").value_or(true);
 
         use_caching = config->get_as<bool>("UseCaching").value_or(false);
     }
@@ -88,6 +90,7 @@ namespace Settings {
         config->insert("InterceptIncomingPacket", intercept_incoming_packet);
         config->insert("InterceptOutcomingRPC", intercept_outcoming_rpc);
         config->insert("InterceptOutcomingPacket", intercept_outcoming_packet);
+        config->insert("InterceptIncomingRawPacket", intercept_incoming_raw_packet);
 
         config->insert("UseCaching", use_caching);
 

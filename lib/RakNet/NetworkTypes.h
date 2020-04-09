@@ -35,6 +35,14 @@ const int MAX_RPC_MAP_SIZE = ((RPCIndex)-1) - 1;
 
 using RPCFunction = void(*)(RPCParameters *p);
 
+#ifdef __GET_TIME_64BIT
+typedef long long RakNetTime;
+typedef long long RakNetTimeNS;
+#else
+typedef unsigned int RakNetTime;
+typedef long long RakNetTimeNS;
+#endif
+
 #pragma pack(push, 1)
 
 struct PlayerID

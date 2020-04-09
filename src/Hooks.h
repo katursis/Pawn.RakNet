@@ -40,11 +40,29 @@ namespace Hooks {
         hook_get_rakserver_interface,
         hook_amx_cleanup;
 
+    std::shared_ptr<PluginInterface> messageHandler;
+
     std::array<RPCFunction, PR_MAX_HANDLERS>
         original_rpc,
         custom_rpc;
 
     std::queue<Packet *> emulating_packets;
+
+    class MessageHandler : public PluginInterface {
+        PluginReceiveResult OnReceive(RakPeerInterface *peer, Packet *packet) {
+            if (packet->playerIndex == static_cast<PlayerIndex>(-1)) {
+                return PluginReceiveResult::RR_STOP_PROCESSING_AND_DEALLOCATE;
+            }
+
+            RakNet::BitStream bs{packet->data, packet->length, false};
+
+            if (!Scripts::OnEvent<PR_INCOMING_RAW_PACKET>(packet->playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
+                return PluginReceiveResult::RR_STOP_PROCESSING_AND_DEALLOCATE;
+            }
+
+            return PluginReceiveResult::RR_CONTINUE_PROCESSING;
+        }
+    };
 
     class InternalHooks {
     public:
@@ -229,6 +247,12 @@ namespace Hooks {
                 );
 
                 ReceiveRPC::Init();
+            }
+
+            if (Settings::intercept_incoming_raw_packet) {
+                messageHandler = std::make_shared<MessageHandler>();
+
+                Functions::RakServer::AttachPlugin(messageHandler.get());
             }
 
             return rakserver;

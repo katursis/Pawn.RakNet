@@ -81,6 +81,9 @@
     <ClInclude Include="lib\RakNet\DS_Queue.h">
       <Filter>Файлы исходного кода\RakNet</Filter>
     </ClInclude>
+    <ClInclude Include="lib\RakNet\PluginInterface.h">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -96,6 +99,9 @@
       <Filter>Файлы исходного кода\RakNet</Filter>
     </ClCompile>
     <ClCompile Include="lib\RakNet\DS_HuffmanEncodingTree.cpp">
+      <Filter>Файлы исходного кода\RakNet</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\RakNet\PluginInterface.cpp">
       <Filter>Файлы исходного кода\RakNet</Filter>
     </ClCompile>
   </ItemGroup>
