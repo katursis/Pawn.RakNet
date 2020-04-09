@@ -33,7 +33,7 @@ namespace Addresses {
         RECEIVE = 10,
         REGISTER_AS_REMOTE_PROCEDURE_CALL = 29,
         DEALLOCATE_PACKET = 12,
-		ATTACH_PLUGIN = 41,
+        ATTACH_PLUGIN = 41,
         GET_INDEX_FROM_PLAYER_ID = 57,
         GET_PLAYER_ID_FROM_INDEX = 58
     };
