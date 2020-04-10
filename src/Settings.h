@@ -31,7 +31,7 @@ namespace Settings {
         *kPluginVersion = "1.3.0",
         *kConfigFile = "plugins/pawnraknet.cfg",
         *kPublicVarNameVersion = "_pawnraknet_version",
-        *kRegHandlerPublicRegExp = R"(^pr_r(?:ir|ip|or|op)_\w+$)",
+        *kRegHandlerPublicRegExp = R"(^pr_r(?:ip|ir|op|or|irp)_\w+$)",
 #ifdef _WIN32
         *kGetRakServerInterfacePattern =
         "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00" \
@@ -61,10 +61,10 @@ namespace Settings {
         *kGetPacketIdMask = "?????xxxxxxxxxxxxxxxxx?xxxxxxxxxxxxxxx";
 #endif
     bool
-        intercept_incoming_rpc{},
         intercept_incoming_packet{},
-        intercept_outcoming_rpc{},
+        intercept_incoming_rpc{},
         intercept_outcoming_packet{},
+        intercept_outcoming_rpc{},
         intercept_incoming_raw_packet{},
 
         use_caching{};
@@ -74,10 +74,10 @@ namespace Settings {
 
         const auto config = cpptoml::parse_file(kConfigFile);
 
-        intercept_incoming_rpc = config->get_as<bool>("InterceptIncomingRPC").value_or(true);
         intercept_incoming_packet = config->get_as<bool>("InterceptIncomingPacket").value_or(true);
-        intercept_outcoming_rpc = config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
+        intercept_incoming_rpc = config->get_as<bool>("InterceptIncomingRPC").value_or(true);
         intercept_outcoming_packet = config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
+        intercept_outcoming_rpc = config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
         intercept_incoming_raw_packet = config->get_as<bool>("InterceptIncomingRawPacket").value_or(true);
 
         use_caching = config->get_as<bool>("UseCaching").value_or(false);
@@ -86,10 +86,10 @@ namespace Settings {
     void Save() {
         auto config = cpptoml::make_table();
 
-        config->insert("InterceptIncomingRPC", intercept_incoming_rpc);
         config->insert("InterceptIncomingPacket", intercept_incoming_packet);
-        config->insert("InterceptOutcomingRPC", intercept_outcoming_rpc);
+        config->insert("InterceptIncomingRPC", intercept_incoming_rpc);
         config->insert("InterceptOutcomingPacket", intercept_outcoming_packet);
+        config->insert("InterceptOutcomingRPC", intercept_outcoming_rpc);
         config->insert("InterceptIncomingRawPacket", intercept_incoming_raw_packet);
 
         config->insert("UseCaching", use_caching);
