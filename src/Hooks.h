@@ -228,14 +228,6 @@ namespace Hooks {
                 vmt[offset] = dest;
             };
 
-            if (Settings::intercept_outcoming_packet) {
-                install_hook(Addresses::RakServerOffset::SEND, urmem::get_func_addr(&RakServer__Send));
-            }
-
-            if (Settings::intercept_outcoming_rpc) {
-                install_hook(Addresses::RakServerOffset::RPC, urmem::get_func_addr(&RakServer__RPC));
-            }
-
             if (Settings::intercept_incoming_packet) {
                 install_hook(Addresses::RakServerOffset::RECEIVE, urmem::get_func_addr(&RakServer__Receive));
             }
@@ -247,6 +239,14 @@ namespace Hooks {
                 );
 
                 ReceiveRPC::Init();
+            }
+
+            if (Settings::intercept_outcoming_packet) {
+                install_hook(Addresses::RakServerOffset::SEND, urmem::get_func_addr(&RakServer__Send));
+            }
+
+            if (Settings::intercept_outcoming_rpc) {
+                install_hook(Addresses::RakServerOffset::RPC, urmem::get_func_addr(&RakServer__RPC));
             }
 
             if (Settings::intercept_incoming_raw_packet) {
