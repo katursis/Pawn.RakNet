@@ -951,7 +951,7 @@
             }
         }
 
-        stock PR_SendPacketToVehicleStream(BitStream:bs, vehicleid, excludedplayerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
+        stock PR_SendPacketToVehicleStream(BitStream:bs, vehicleid, excludedplayerid = INVALID_PLAYER_ID, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
         {
             new playerPoolSize = GetPlayerPoolSize();
 
@@ -964,7 +964,7 @@
             }
         }
 
-        stock PR_SendRPCToVehicleStream(BitStream:bs, vehicleid, excludedplayerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
+        stock PR_SendRPCToVehicleStream(BitStream:bs, vehicleid, rpcid, excludedplayerid = INVALID_PLAYER_ID, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
         {
             new playerPoolSize = GetPlayerPoolSize();
 
