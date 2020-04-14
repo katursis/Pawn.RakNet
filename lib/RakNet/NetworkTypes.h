@@ -68,6 +68,8 @@ struct RPCParameters
 	PlayerID sender;
 };
 
+const PlayerID UNASSIGNED_PLAYER_ID = {0xFFFFFFFF, 0xFFFF};
+
 #pragma pack(pop)
 
 #endif

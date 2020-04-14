@@ -31,13 +31,15 @@ namespace Natives {
         try {
             Functions::AssertParams(4, params);
 
+            bool broadcast = params[2] == -1;
+
             return Functions::RakServer::Send(
                 Functions::GetAmxBitStream(params[1]),
                 params[3],
                 params[4],
                 '\0',
-                Functions::RakServer::GetPlayerIDFromIndex(params[2]),
-                params[2] == -1
+                broadcast ? UNASSIGNED_PLAYER_ID : Functions::RakServer::GetPlayerIDFromIndex(params[2]),
+                broadcast
             );
         } catch (const std::exception &e) {
             Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
@@ -51,14 +53,16 @@ namespace Natives {
         try {
             Functions::AssertParams(5, params);
 
+            bool broadcast = params[2] == -1;
+
             return Functions::RakServer::RPC(
                 reinterpret_cast<RPCIndex *>(&params[3]),
                 Functions::GetAmxBitStream(params[1]),
                 params[4],
                 params[5],
                 '\0',
-                Functions::RakServer::GetPlayerIDFromIndex(params[2]),
-                params[2] == -1,
+                broadcast ? UNASSIGNED_PLAYER_ID : Functions::RakServer::GetPlayerIDFromIndex(params[2]),
+                broadcast,
                 false
             );
         } catch (const std::exception &e) {
