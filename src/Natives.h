@@ -42,7 +42,7 @@ namespace Natives {
                 broadcast
             );
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -66,7 +66,7 @@ namespace Natives {
                 false
             );
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -83,7 +83,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -114,7 +114,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -127,7 +127,7 @@ namespace Natives {
 
             return Scripts::GetScript(amx).NewBitStream();
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -142,7 +142,7 @@ namespace Natives {
 
             return Scripts::GetScript(amx).NewBitStreamCopy(bs);
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -161,7 +161,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -176,7 +176,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -191,7 +191,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -206,7 +206,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -221,7 +221,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -236,7 +236,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -251,7 +251,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -266,7 +266,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -281,7 +281,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -296,7 +296,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -311,7 +311,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -326,7 +326,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -341,7 +341,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -483,7 +483,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -657,7 +657,7 @@ namespace Natives {
 
                         if (size > 0) {
                             if (size > max_size) {
-                                Logger::instance()->Write("[%s] %s: Warning! size (%d) > max_size (%d) (PR_STRING8/PR_STRING32)", Settings::kPluginName, __FUNCTION__, size, max_size);
+                                Logger::instance()->Write("%s: Warning! size (%d) > max_size (%d) (PR_STRING8/PR_STRING32)", __FUNCTION__, size, max_size);
 
                                 size = max_size;
                             }
@@ -685,7 +685,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -704,7 +704,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;
@@ -721,7 +721,7 @@ namespace Natives {
 
             return 1;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return 0;

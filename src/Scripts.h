@@ -166,7 +166,7 @@ namespace Scripts {
     void Load(AMX *amx, bool is_gamemode) {
         if (is_gamemode) {
             if (std::any_of(scripts.begin(), scripts.end(), [=](const Script &script) { return script.IsGamemode(); })) {
-                Logger::instance()->Write("[%s] %s: Warning! You probably forgot to define FILTERSCRIPT in one of your filterscripts", Settings::kPluginName, __FUNCTION__);
+                Logger::instance()->Write("%s: Warning! You probably forgot to define FILTERSCRIPT in one of your filterscripts", __FUNCTION__);
             }
 
             scripts.emplace_back(amx, is_gamemode);

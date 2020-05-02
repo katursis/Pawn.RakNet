@@ -27,10 +27,9 @@
 
 class Logger : public Singleton<Logger> {
 public:
-    using logprintf_t = void(*)(const char *format, ...);
-
-    void Init(void *logprintf) {
-        _logprintf = reinterpret_cast<logprintf_t>(logprintf);
+    void Init(logprintf_t logprintf, const std::string &prefix = "") {
+        _logprintf = logprintf;
+        _prefix = prefix;
     }
 
     template<typename ... ARGS>
@@ -39,7 +38,7 @@ public:
             throw std::runtime_error{"logger was not initialized"};
         }
 
-        _logprintf(fmt.c_str(), args...);
+        _logprintf(("%s" + fmt).c_str(), _prefix.c_str(), args...);
     }
 
 private:
@@ -48,6 +47,7 @@ private:
     Logger() : _logprintf{nullptr} {}
 
     logprintf_t _logprintf;
+    std::string _prefix;
 };
 
 #endif // LOGGER_H_

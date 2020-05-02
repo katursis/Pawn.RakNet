@@ -29,6 +29,8 @@ namespace Settings {
     constexpr char
         *kPluginName = "Pawn.RakNet",
         *kPluginVersion = "1.3.0",
+        *kPluginThreadUrl = "https://forum.sa-mp.com/showthread.php?t=640306",
+        *kPluginRepositoryUrl = "https://github.com/urShadow/Pawn.RakNet",
         *kConfigFile = "plugins/pawnraknet.cfg",
         *kPublicVarNameVersion = "_pawnraknet_version",
         *kRegHandlerPublicRegExp = R"(^pr_r(?:ip|ir|op|or|irp)_\w+$)",

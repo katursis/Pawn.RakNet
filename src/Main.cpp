@@ -42,6 +42,7 @@
 #include "Pawn.RakNet.inc"
 
 extern void *pAMXFunctions;
+using logprintf_t = void(*)(const char *format, ...);
 
 #include "Logger.h"
 #include "Settings.h"
@@ -53,22 +54,47 @@ extern void *pAMXFunctions;
 
 namespace Plugin {
     bool Load(void **ppData) {
+        pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
+
+        Logger::instance()->Init(reinterpret_cast<logprintf_t>(ppData[PLUGIN_DATA_LOGPRINTF]), "[" + std::string(Settings::kPluginName) + "] ");
+
+        Logger::instance()->Write(
+            "\n\n" \
+            "    | %s %s | 2016 - %s" \
+            "\n" \
+            "    |--------------------------------" \
+            "\n" \
+            "    | Author and maintainer: urShadow" \
+            "\n\n\n" \
+            "    | Compiled: %s at %s" \
+            "\n" \
+            "    |--------------------------------------------------------------" \
+            "\n" \
+            "    | Forum thread: %s" \
+            "\n" \
+            "    |--------------------------------------------------------------" \
+            "\n" \
+            "    | Repository: %s" \
+            "\n",
+            Settings::kPluginName,
+            Settings::kPluginVersion,
+            &__DATE__[7],
+			__DATE__,
+			__TIME__,
+            Settings::kPluginThreadUrl,
+            Settings::kPluginRepositoryUrl
+        );
+
         try {
-            pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
-
-            Logger::instance()->Init(ppData[PLUGIN_DATA_LOGPRINTF]);
-
             Settings::Read();
 
             Hooks::Init(*ppData);
 
             StringCompressor::AddReference();
 
-            Logger::instance()->Write("%s plugin v%s by urShadow has been loaded", Settings::kPluginName, Settings::kPluginVersion);
-
             return true;
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
 
         return false;
@@ -80,9 +106,9 @@ namespace Plugin {
 
             Settings::Save();
 
-            Logger::instance()->Write("%s plugin v%s by urShadow has been unloaded", Settings::kPluginName, Settings::kPluginVersion);
+            Logger::instance()->Write("plugin unloaded");
         } catch (const std::exception &e) {
-            Logger::instance()->Write("[%s] %s: %s", Settings::kPluginName, __FUNCTION__, e.what());
+            Logger::instance()->Write("%s: %s", __FUNCTION__, e.what());
         }
     }
 
@@ -90,7 +116,7 @@ namespace Plugin {
         cell include_version{};
         if (Functions::GetAmxPublicVar(amx, Settings::kPublicVarNameVersion, include_version)) {
             if (include_version != PAWNRAKNET_INCLUDE_VERSION) {
-                Logger::instance()->Write("[%s] %s: mismatch between the plugin (%d) and include (%d) versions", Settings::kPluginName, __FUNCTION__, PAWNRAKNET_INCLUDE_VERSION, include_version);
+                Logger::instance()->Write("%s: mismatch between the plugin (%d) and include (%d) versions", __FUNCTION__, PAWNRAKNET_INCLUDE_VERSION, include_version);
 
                 return;
             }
