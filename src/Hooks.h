@@ -50,14 +50,27 @@ namespace Hooks {
 
     class MessageHandler : public PluginInterface {
         PluginReceiveResult OnReceive(RakPeerInterface *peer, Packet *packet) {
-            if (packet->playerIndex == static_cast<PlayerIndex>(-1)) {
+            const auto playerIndex = packet->playerIndex;
+
+            if (playerIndex == static_cast<PlayerIndex>(-1)) {
                 return PluginReceiveResult::RR_STOP_PROCESSING_AND_DEALLOCATE;
             }
 
             RakNet::BitStream bs{packet->data, packet->length, false};
 
-            if (!Scripts::OnEvent<PR_INCOMING_RAW_PACKET>(packet->playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
+            if (!Scripts::OnEvent<PR_INCOMING_RAW_PACKET>(playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
                 return PluginReceiveResult::RR_STOP_PROCESSING_AND_DEALLOCATE;
+            }
+
+            if (packet->data != bs.GetData()) {
+                if (packet->deleteData) {
+                    delete packet->data;
+                }
+
+                const auto numberOfBitsUsed = bs.CopyData(&packet->data);
+                packet->length = BITS_TO_BYTES(numberOfBitsUsed);
+                packet->bitSize = numberOfBitsUsed;
+                packet->deleteData = true;
             }
 
             return PluginReceiveResult::RR_CONTINUE_PROCESSING;
@@ -75,23 +88,11 @@ namespace Hooks {
             PlayerID playerId,
             bool broadcast
         ) {
-            if (!bitStream) {
+            if (!bitStream || !bitStream->GetData()) {
                 return false;
             }
 
-            const std::size_t length = bitStream->GetNumberOfBytesUsed();
-
-            if (!length) {
-                return false;
-            }
-
-            if (!bitStream->GetData()) {
-                return false;
-            }
-
-            RakNet::BitStream bs{bitStream->GetData(), length, false};
-
-            if (!Scripts::OnEvent<PR_OUTCOMING_PACKET>(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), *bs.GetData(), &bs)) {
+            if (!Scripts::OnEvent<PR_OUTCOMING_PACKET>(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), *bitStream->GetData(), bitStream)) {
                 return false;
             }
 
@@ -115,15 +116,13 @@ namespace Hooks {
 
             const int rpc_id = *uniqueID;
 
-            RakNet::BitStream bs;
+            RakNet::BitStream emptyBitStream;
 
-            if (bitStream) {
-                bs.SetData(bitStream->GetData());
-                bs.SetNumberOfBitsAllocated(bitStream->GetNumberOfBitsAllocated());
-                bs.SetWriteOffset(bitStream->GetWriteOffset());
+            if (!bitStream) {
+                bitStream = &emptyBitStream;
             }
 
-            if (!Scripts::OnEvent<PR_OUTCOMING_RPC>(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, &bs)) {
+            if (!Scripts::OnEvent<PR_OUTCOMING_RPC>(broadcast ? -1 : Functions::RakServer::GetIndexFromPlayerID(playerId), rpc_id, bitStream)) {
                 return false;
             }
 
@@ -142,13 +141,21 @@ namespace Hooks {
             }
 
             while (packet = Functions::RakServer::Receive()) {
-                if (packet->playerIndex == static_cast<PlayerIndex>(-1)) {
+                const auto playerIndex = packet->playerIndex;
+
+                if (playerIndex == static_cast<PlayerIndex>(-1)) {
                     break;
                 }
 
                 RakNet::BitStream bs{packet->data, packet->length, false};
 
-                if (Scripts::OnEvent<PR_INCOMING_PACKET>(packet->playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
+                if (Scripts::OnEvent<PR_INCOMING_PACKET>(playerIndex, Functions::RakServer::GetPacketId(packet), &bs)) {
+                    if (packet->data != bs.GetData()) {
+                        Functions::RakServer::DeallocatePacket(packet);
+
+                        packet = Functions::RakServer::NewPacket(playerIndex, bs);
+                    }
+
                     break;
                 }
 
@@ -188,9 +195,9 @@ namespace Hooks {
                 static void Interlayer(RPCParameters *p) {
                     const int player_id = Functions::RakServer::GetIndexFromPlayerID(p->sender);
 
-                    if (player_id != -1) {
-                        RakNet::BitStream bs;
+                    RakNet::BitStream bs;
 
+                    if (player_id != -1) {
                         if (p->input) {
                             bs.SetData(p->input);
                             bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
@@ -199,6 +206,13 @@ namespace Hooks {
 
                         if (!Scripts::OnEvent<PR_INCOMING_RPC>(player_id, ID, &bs)) {
                             return;
+                        }
+
+                        const auto numberOfBitsUsed = bs.GetNumberOfBitsUsed();
+
+                        if (p->numberOfBitsOfData != numberOfBitsUsed) {
+                            p->input = numberOfBitsUsed > 0 ? bs.GetData() : nullptr;
+                            p->numberOfBitsOfData = numberOfBitsUsed;
                         }
                     }
 

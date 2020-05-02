@@ -602,10 +602,6 @@ void BitStream::AddBitsAndReallocate(const int numberOfBitsToWrite)
 		// It needs to reallocate to hold all the data and can't do it unless we allocated to begin with
 		assert(copyData == true);
 #endif
-		if (copyData == false)
-		{
-			throw std::runtime_error{"copyData == false (AddBitsAndReallocate)"};
-		}
 
 		// Less memory efficient but saves on news and deletes
 		newNumberOfBitsAllocated = (numberOfBitsToWrite + numberOfBitsUsed) * 2;
@@ -624,7 +620,27 @@ void BitStream::AddBitsAndReallocate(const int numberOfBitsToWrite)
 		}
 		else
 		{
-			data = (unsigned char*)realloc(data, amountToAllocate);
+			if (copyData)
+			{
+				data = (unsigned char*)realloc(data, amountToAllocate);
+			}
+			else
+			{
+				auto originalData = data;
+
+				if (amountToAllocate > BITSTREAM_STACK_ALLOCATION_SIZE)
+				{
+					data = (unsigned char*)malloc(amountToAllocate);
+				}
+				else
+				{
+					data = (unsigned char*)stackData;
+				}
+
+				memcpy(data, originalData, BITS_TO_BYTES(numberOfBitsAllocated));
+
+				copyData = true;
+			}
 		}
 
 #ifdef _DEBUG

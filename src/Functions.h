@@ -120,7 +120,7 @@ namespace Functions {
             p->playerIndex = index;
             p->playerId = GetPlayerIDFromIndex(index);
             p->length = length;
-            p->bitSize = BYTES_TO_BITS(length);
+            p->bitSize = bs.GetNumberOfBitsUsed();
             p->data = reinterpret_cast<unsigned char *>(&p[1]);
             memcpy(p->data, bs.GetData(), length);
             p->deleteData = false;
