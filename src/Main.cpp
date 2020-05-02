@@ -79,8 +79,8 @@ namespace Plugin {
             Settings::kPluginName,
             Settings::kPluginVersion,
             &__DATE__[7],
-			__DATE__,
-			__TIME__,
+            __DATE__,
+            __TIME__,
             Settings::kPluginThreadUrl,
             Settings::kPluginRepositoryUrl
         );
