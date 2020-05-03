@@ -1,12 +1,12 @@
 # Pawn.RakNet
 [![GitHub Release](https://img.shields.io/github/release/urShadow/Pawn.RakNet.svg)](https://github.com/urShadow/Pawn.RakNet/releases/latest)
 
-Plugin for **SA:MP** server that allows you to work with RakNet in Pawn
+Plugin for **SA:MP** server that allows you to analyze RakNet traffic in Pawn
 
 ## Main features
-* Intercept and modify incoming/outcoming packets
-* Send packets to player
-* Emulate packets from player
+* Capture, modify, and stop processing incoming/outcoming packets and RPCs
+* Send packets and RPCs to player
+* Emulate packets and RPCs from player
 
 ## Simple example
 ```pawn
@@ -24,7 +24,7 @@ IPacket:AIM_SYNC(playerid, BitStream:bs) // incoming packet
         aimData[PR_aimZ] = 0.0;
 
         BS_SetWriteOffset(bs, 8);
-        BS_WriteAimSync(bs, aimData); // rewrite data
+        BS_WriteAimSync(bs, aimData); // modify data
     }
 
     return 1; // continue processing
