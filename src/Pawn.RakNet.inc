@@ -97,6 +97,9 @@
         public _pawnraknet_version = PAWNRAKNET_INCLUDE_VERSION;
         #pragma unused _pawnraknet_version
 
+        #define PR_BITS_TO_BYTES(%0) (((%0)+7)>>3)
+        #define PR_BYTES_TO_BITS(%0) ((%0)<<3)
+
         #define PR_Handler<%0,%1>:%2(%3) \
         forward pr_r%1_%2(); \
         public pr_r%1_%2() PR_RegHandler(%2,"pr_"#%1"_"#%2,%0); \
