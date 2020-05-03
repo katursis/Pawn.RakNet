@@ -193,30 +193,7 @@ namespace Hooks {
             template<std::size_t ID>
             struct Handler {
                 static void Interlayer(RPCParameters *p) {
-                    const int player_id = Functions::RakServer::GetIndexFromPlayerID(p->sender);
-
-                    RakNet::BitStream bs;
-
-                    if (player_id != -1) {
-                        if (p->input) {
-                            bs.SetData(p->input);
-                            bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
-                            bs.SetWriteOffset(p->numberOfBitsOfData);
-                        }
-
-                        if (!Scripts::OnEvent<PR_INCOMING_RPC>(player_id, ID, &bs)) {
-                            return;
-                        }
-
-                        const auto numberOfBitsUsed = bs.GetNumberOfBitsUsed();
-
-                        if (p->numberOfBitsOfData != numberOfBitsUsed) {
-                            p->input = numberOfBitsUsed > 0 ? bs.GetData() : nullptr;
-                            p->numberOfBitsOfData = numberOfBitsUsed;
-                        }
-                    }
-
-                    original_rpc[ID](p);
+                    HandleRPC(ID, p);
                 }
 
                 static void Init() {
@@ -226,6 +203,33 @@ namespace Hooks {
                 }
             };
         };
+
+        static void HandleRPC(int rpc_id, RPCParameters *p) {
+            const int player_id = Functions::RakServer::GetIndexFromPlayerID(p->sender);
+
+            RakNet::BitStream bs;
+
+            if (player_id != -1) {
+                if (p->input) {
+                    bs.SetData(p->input);
+                    bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
+                    bs.SetWriteOffset(p->numberOfBitsOfData);
+                }
+
+                if (!Scripts::OnEvent<PR_INCOMING_RPC>(player_id, rpc_id, &bs)) {
+                    return;
+                }
+
+                const auto numberOfBitsUsed = bs.GetNumberOfBitsUsed();
+
+                if (p->numberOfBitsOfData != numberOfBitsUsed) {
+                    p->input = numberOfBitsUsed > 0 ? bs.GetData() : nullptr;
+                    p->numberOfBitsOfData = numberOfBitsUsed;
+                }
+            }
+
+            original_rpc[rpc_id](p);
+        }
 
         static urmem::address_t GetRakServerInterface() {
             const auto rakserver = hook_get_rakserver_interface->call<urmem::calling_convention::cdeclcall, urmem::address_t>();
