@@ -1,7 +1,7 @@
 # Pawn.RakNet
 [![GitHub Release](https://img.shields.io/github/release/urShadow/Pawn.RakNet.svg)](https://github.com/urShadow/Pawn.RakNet/releases/latest)
 
-Plugin for **SA:MP** server that allows you to analyze RakNet traffic in Pawn
+Plugin for **SA:MP** server that allows you to analyze RakNet traffic
 
 ## Main features
 * Capture, modify, and stop processing incoming/outcoming packets and RPCs
