@@ -645,7 +645,7 @@ namespace Natives {
                     }
                     case PR_STRING8:
                     case PR_STRING32: {
-                        const auto max_size = Functions::GetAmxParamRef(amx, params[i + 3]);
+                        const auto max_size = Functions::GetAmxParamRef(amx, params[i + 3]) - 1;
 
                         cell size{};
 
