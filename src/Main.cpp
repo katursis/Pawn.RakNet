@@ -75,6 +75,10 @@ namespace Plugin {
             "    |--------------------------------------------------------------" \
             "\n" \
             "    | Repository: %s" \
+            "\n" \
+            "    |--------------------------------------------------------------" \
+            "\n" \
+            "    | Wiki: %s/wiki" \
             "\n",
             Settings::kPluginName,
             Settings::kPluginVersion,
@@ -82,6 +86,7 @@ namespace Plugin {
             __DATE__,
             __TIME__,
             Settings::kPluginThreadUrl,
+            Settings::kPluginRepositoryUrl,
             Settings::kPluginRepositoryUrl
         );
 
