@@ -231,7 +231,7 @@
             PR_slotWeaponId[PR_MAX_WEAPON_SLOTS],
             PR_slotWeaponAmmo[PR_MAX_WEAPON_SLOTS],
 
-            PR_slotUpdated[PR_MAX_WEAPON_SLOTS] // helping field
+            PR_slotUpdated[PR_MAX_WEAPON_SLOTS] // internal helping field
         };
 
         enum PR_StatsUpdate
