@@ -53,7 +53,7 @@ namespace Hooks {
             const auto playerIndex = packet->playerIndex;
 
             if (playerIndex == static_cast<PlayerIndex>(-1)) {
-                return PluginReceiveResult::RR_STOP_PROCESSING_AND_DEALLOCATE;
+                return PluginReceiveResult::RR_CONTINUE_PROCESSING;
             }
 
             RakNet::BitStream bs{packet->data, packet->length, false};
