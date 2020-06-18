@@ -27,7 +27,7 @@
 
     #define PAWNRAKNET_INCLUDE_VERSION 140
 
-    #define PR_MAX_HANDLERS 255
+    #define PR_MAX_HANDLERS 256
 
     enum PR_EventType
     {
