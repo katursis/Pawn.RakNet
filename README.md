@@ -1,5 +1,5 @@
 # Pawn.RakNet
-[![GitHub Release](https://img.shields.io/github/release/urShadow/Pawn.RakNet.svg)](https://github.com/urShadow/Pawn.RakNet/releases/latest)
+[![GitHub Release](https://img.shields.io/github/release/katursis/Pawn.RakNet.svg)](https://github.com/katursis/Pawn.RakNet/releases/latest)
 
 Plugin for **SA:MP** server that allows you to analyze RakNet traffic
 
@@ -32,4 +32,4 @@ IPacket:AIM_SYNC(playerid, BitStream:bs) // incoming packet
 ```
 ## Documentation
 
-[Wiki](https://github.com/urShadow/Pawn.RakNet/wiki)
+[Wiki](https://github.com/katursis/Pawn.RakNet/wiki)

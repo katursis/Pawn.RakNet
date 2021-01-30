@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2016-2020 urShadow
+ * Copyright (c) 2016-2021 katursis
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,13 +64,9 @@ namespace Plugin {
             "\n" \
             "    |--------------------------------" \
             "\n" \
-            "    | Author and maintainer: urShadow" \
+            "    | Author and maintainer: katursis" \
             "\n\n\n" \
             "    | Compiled: %s at %s" \
-            "\n" \
-            "    |--------------------------------------------------------------" \
-            "\n" \
-            "    | Forum thread: %s" \
             "\n" \
             "    |--------------------------------------------------------------" \
             "\n" \
@@ -85,7 +81,6 @@ namespace Plugin {
             &__DATE__[7],
             __DATE__,
             __TIME__,
-            Settings::kPluginThreadUrl,
             Settings::kPluginRepositoryUrl,
             Settings::kPluginRepositoryUrl
         );
