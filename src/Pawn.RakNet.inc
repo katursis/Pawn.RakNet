@@ -438,7 +438,7 @@
                         PR_INT16, data[PR_animationFlags]
                     );
                 } else {
-                    data[PR_animationId] = 0;
+                    data[PR_animationId] =
                     data[PR_animationFlags] = 0;
                 }
             } else {
