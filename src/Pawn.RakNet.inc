@@ -25,7 +25,8 @@
 #if !defined PAWNRAKNET_INC_
     #define PAWNRAKNET_INC_
 
-    #define PAWNRAKNET_INCLUDE_VERSION 141
+    #define PAWNRAKNET_VERSION 141
+    #define PAWNRAKNET_INCLUDE_VERSION PAWNRAKNET_VERSION // backward compatibility
 
     #define PR_MAX_HANDLERS 256
 
@@ -94,8 +95,11 @@
     };
 
     #if !defined __cplusplus
-        public _pawnraknet_version = PAWNRAKNET_INCLUDE_VERSION;
+        public _pawnraknet_version = PAWNRAKNET_VERSION;
         #pragma unused _pawnraknet_version
+
+        public bool:_pawnraknet_is_gamemode = !defined FILTERSCRIPT;
+        #pragma unused _pawnraknet_is_gamemode
 
         #define PR_BITS_TO_BYTES(%0) (((%0)+7)>>3)
         #define PR_BYTES_TO_BITS(%0) ((%0)<<3)
@@ -245,6 +249,8 @@
             PR_command[256]
         };
 
+        native PR_Init(); // internal
+
         native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
         native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
 
@@ -284,7 +290,6 @@
         native BS_ReadValue(BitStream:bs, {PR_ValueType, Float, _}:...);
 
         native PR_RegHandler(id, const publicname[], PR_EventType:type);
-        native PR_Init(bool:is_gamemode);
 
         #define BS_ReadInt8(%0,%1) BS_ReadValue(%0,PR_INT8,%1)
         #define BS_ReadInt16(%0,%1) BS_ReadValue(%0,PR_INT16,%1)
@@ -997,7 +1002,7 @@
         #if defined FILTERSCRIPT
             public OnFilterScriptInit()
             {
-                PR_Init(false);
+                PR_Init();
 
                 #if defined PawnRakNet_OnFilterScriptInit
                     PawnRakNet_OnFilterScriptInit();
@@ -1020,7 +1025,7 @@
         #else
             public OnGameModeInit()
             {
-                PR_Init(true);
+                PR_Init();
 
                 #if defined PawnRakNet_OnGameModeInit
                     PawnRakNet_OnGameModeInit();

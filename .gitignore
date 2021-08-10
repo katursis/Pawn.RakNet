@@ -1,9 +1,41 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Directories
 .vscode/
 .vs/
-bin/
 Release/
 Debug/
-*.o
-*.gch
-*.so
-*.user
+bin/
+
+# Visual Studio user-specific files
+*.vcxproj.user
+
+# macOS files
+.DS_Store

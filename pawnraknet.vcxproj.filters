@@ -1,113 +1,75 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Файлы исходного кода">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Заголовочные файлы">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Файлы ресурсов">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Файлы исходного кода\RakNet">
-      <UniqueIdentifier>{dce4a11f-2ea0-4b56-8dff-99ce49668217}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Файлы исходного кода\SDK">
-      <UniqueIdentifier>{5e53a73b-247b-4d25-af78-0c128bd25e04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Файлы исходного кода\urmem">
-      <UniqueIdentifier>{e01603a3-f377-4055-b8ea-a06643d2d97b}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="lib\RakNet\BitStream.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\urmem\urmem.hpp">
-      <Filter>Файлы исходного кода\urmem</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scripts.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Settings.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utils.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Logger.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Natives.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Hooks.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Addresses.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Functions.h">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\StringCompressor.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_Map.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_OrderedList.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_List.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTree.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTreeNode.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_LinkedList.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\NetworkTypes.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_Queue.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\PluginInterface.h">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Main.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
+    <ClCompile Include="src\hooks.cc" />
+    <ClCompile Include="src\main.cc" />
+    <ClCompile Include="src\plugin.cc" />
+    <ClCompile Include="src\rakserver.cc" />
+    <ClCompile Include="src\script.cc" />
     <ClCompile Include="lib\RakNet\BitStream.cpp">
-      <Filter>Файлы исходного кода\RakNet</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\SDK\amxplugin.cpp">
-      <Filter>Файлы исходного кода\SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\RakNet\StringCompressor.cpp">
-      <Filter>Файлы исходного кода\RakNet</Filter>
+      <Filter>lib\RakNet</Filter>
     </ClCompile>
     <ClCompile Include="lib\RakNet\DS_HuffmanEncodingTree.cpp">
-      <Filter>Файлы исходного кода\RakNet</Filter>
+      <Filter>lib\RakNet</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\RakNet\StringCompressor.cpp">
+      <Filter>lib\RakNet</Filter>
     </ClCompile>
     <ClCompile Include="lib\RakNet\PluginInterface.cpp">
-      <Filter>Файлы исходного кода\RakNet</Filter>
+      <Filter>lib\RakNet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\Pawn.RakNet.inc">
-      <Filter>Файлы исходного кода</Filter>
-    </None>
+    <ClInclude Include="src\config.h" />
+    <ClInclude Include="src\hooks.h" />
+    <ClInclude Include="src\main.h" />
+    <ClInclude Include="src\native_param.h" />
+    <ClInclude Include="src\plugin.h" />
+    <ClInclude Include="src\rakserver.h" />
+    <ClInclude Include="src\script.h" />
+    <ClInclude Include="lib\RakNet\BitStream.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTree.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTreeNode.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_LinkedList.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_List.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_Map.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_OrderedList.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\DS_Queue.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\NetworkTypes.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\StringCompressor.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\RakNet\PluginInterface.h">
+      <Filter>lib\RakNet</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Pawn.RakNet.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="lib">
+      <UniqueIdentifier>{54f99fb2-bf52-4b38-a51f-7c513982e748}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\RakNet">
+      <UniqueIdentifier>{9266a405-70c6-4fdb-975b-6f2ead8978d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

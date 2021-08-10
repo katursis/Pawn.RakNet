@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -22,32 +22,16 @@
  * SOFTWARE.
  */
 
-#ifndef LOGGER_H_
-#define LOGGER_H_
+#include "main.h"
 
-class Logger : public Singleton<Logger> {
-public:
-    void Init(logprintf_t logprintf, const std::string &prefix = "") {
-        _logprintf = logprintf;
-        _prefix = prefix;
-    }
+PLUGIN_EXPORT unsigned int PLUGIN_CALL Supports() {
+  return SUPPORTS_VERSION | SUPPORTS_AMX_NATIVES;
+}
 
-    template<typename ... ARGS>
-    void Write(const std::string &fmt, ARGS ... args) {
-        if (!_logprintf) {
-            throw std::runtime_error{"logger was not initialized"};
-        }
+PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData) {
+  return Plugin::DoLoad(ppData);
+}
 
-        _logprintf(("%s" + fmt).c_str(), _prefix.c_str(), args...);
-    }
+PLUGIN_EXPORT void PLUGIN_CALL Unload() { Plugin::DoUnload(); }
 
-private:
-    friend class Singleton<Logger>;
-
-    Logger() : _logprintf{nullptr} {}
-
-    logprintf_t _logprintf;
-    std::string _prefix;
-};
-
-#endif // LOGGER_H_
+PLUGIN_EXPORT void PLUGIN_CALL AmxLoad(AMX *amx) { Plugin::DoAmxLoad(amx); }

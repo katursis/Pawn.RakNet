@@ -1,9 +1,9 @@
 [submodule "lib/urmem"]
 	path = lib/urmem
 	url = https://github.com/katursis/urmem
-[submodule "lib/crtp_singleton"]
-	path = lib/crtp_singleton
-	url = https://gist.github.com/katursis/ee2947632cd7eef662352f863a76c8c8
 [submodule "lib/cpptoml"]
 	path = lib/cpptoml
 	url = https://github.com/skystrife/cpptoml
+[submodule "lib/samp-ptl"]
+	path = lib/samp-ptl
+	url = https://github.com/katursis/samp-ptl
