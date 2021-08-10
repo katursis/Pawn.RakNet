@@ -18,6 +18,8 @@
 #ifndef __NETWORK_TYPES_H
 #define __NETWORK_TYPES_H
 
+#define __BITSTREAM_NATIVE_END
+
 /// Forward declaration
 namespace RakNet
 {
