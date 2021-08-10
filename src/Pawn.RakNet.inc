@@ -38,60 +38,59 @@
         PR_OUTCOMING_RPC,
         PR_INCOMING_RAW_PACKET,
 
-        PR_NUMBER_OF_EVENT_TYPES
+        PR_NUMBER_OF_EVENT_TYPES,
     };
 
     enum PR_ValueType
     {
-        PR_INT8,
-        PR_INT16,
-        PR_INT32,
-        PR_UINT8,
-        PR_UINT16,
-        PR_UINT32,
-        PR_FLOAT,
-        PR_BOOL,
-        PR_STRING,
+        PR_INT8, // char
+        PR_INT16, // short
+        PR_INT32, // int
+        PR_UINT8, // unsigned char
+        PR_UINT16, // unsigned short
+        PR_UINT32, // unsigned int
+        PR_FLOAT, // float
+        PR_BOOL, // bool
+        PR_STRING, // char[]
 
-        // compressed
+        // compressed types. For non-floating point, this is lossless, but only has benefit if you use less than half the range of the type
         PR_CINT8,
         PR_CINT16,
         PR_CINT32,
         PR_CUINT8,
         PR_CUINT16,
         PR_CUINT32,
-        PR_CFLOAT,
+        PR_CFLOAT, // read/write a float using 2 bytes instead of 4. Lossy. The range must be between -1 and +1
         PR_CBOOL,
         PR_CSTRING,
 
         PR_BITS,
-        PR_FLOAT3,
-        PR_FLOAT4,
-        PR_VECTOR,
-        PR_NORM_QUAT,
+        PR_FLOAT3, // float * 3
+        PR_FLOAT4, // float * 4
+        PR_VECTOR, // read/write a float vector, using 10 bytes instead of 12. Loses accuracy to about 3/10ths and only saves 2 bytes, so only use if accuracy is not important
+        PR_NORM_QUAT, // read/write a normalized float quaternion in 6 bytes + 4 bits instead of 16 bytes. Slightly lossy
 
-        PR_STRING8,
-        PR_STRING32,
+        PR_STRING8, // unsigned char + char[]
+        PR_STRING32, // unsigned int + char[]
 
-        // shift the write or read pointer
-        PR_IGNORE_BITS,
+        PR_IGNORE_BITS, // shift read/write pointer
     };
 
     enum PR_PacketPriority
     {
-        PR_SYSTEM_PRIORITY,
-        PR_HIGH_PRIORITY,
-        PR_MEDIUM_PRIORITY,
-        PR_LOW_PRIORITY
+        PR_SYSTEM_PRIORITY, // used by RakNet to send above-high priority messages
+        PR_HIGH_PRIORITY, // high priority messages are send before medium priority messages
+        PR_MEDIUM_PRIORITY, // medium priority messages are send before low priority messages
+        PR_LOW_PRIORITY, // low priority messages are only sent when no other messages are waiting
     };
 
     enum PR_PacketReliability
     {
-        PR_UNRELIABLE = 6,
-        PR_UNRELIABLE_SEQUENCED,
-        PR_RELIABLE,
-        PR_RELIABLE_ORDERED,
-        PR_RELIABLE_SEQUENCED
+        PR_UNRELIABLE = 6, // same as regular UDP, except that it will also discard duplicate datagrams. RakNet adds (6 to 17) + 21 bits of overhead, 16 of which is used to detect duplicate packets and 6 to 17 of which is used for message length
+        PR_UNRELIABLE_SEQUENCED, // regular UDP with a sequence counter. Out of order messages will be discarded. This adds an additional 13 bits on top what is used for UNRELIABLE
+        PR_RELIABLE, // the message is sent reliably, but not necessarily in any order. Same overhead as UNRELIABLE
+        PR_RELIABLE_ORDERED, // this message is reliable and will arrive in the order you sent it. Messages will be delayed while waiting for out of order messages. Same overhead as UNRELIABLE_SEQUENCED
+        PR_RELIABLE_SEQUENCED, // this message is reliable and will arrive in the sequence you sent it. Out or order messages will be dropped. Same overhead as UNRELIABLE_SEQUENCED
     };
 
     #if !defined __cplusplus
@@ -140,7 +139,7 @@
             Float:PR_surfingOffsets[3],
             PR_surfingVehicleId,
             PR_animationId,
-            PR_animationFlags
+            PR_animationFlags,
         };
 
         enum PR_InCarSync
@@ -160,7 +159,7 @@
             PR_sirenState,
             PR_landingGearState,
             PR_trailerId,
-            Float:PR_trainSpeed
+            Float:PR_trainSpeed,
         };
 
         enum PR_TrailerSync
@@ -169,7 +168,7 @@
             Float:PR_position[3],
             Float:PR_quaternion[4],
             Float:PR_velocity[3],
-            Float:PR_angularVelocity[3]
+            Float:PR_angularVelocity[3],
         };
 
         enum PR_PassengerSync
@@ -184,7 +183,7 @@
             PR_lrKey,
             PR_udKey,
             PR_keys,
-            Float:PR_position[3]
+            Float:PR_position[3],
         };
 
         enum PR_UnoccupiedSync
@@ -196,7 +195,7 @@
             Float:PR_position[3],
             Float:PR_velocity[3],
             Float:PR_angularVelocity[3],
-            Float:PR_vehicleHealth
+            Float:PR_vehicleHealth,
         };
 
         enum PR_AimSync
@@ -207,7 +206,7 @@
             Float:PR_aimZ,
             PR_camZoom,
             PR_weaponState,
-            PR_aspectRatio
+            PR_aspectRatio,
         };
 
         enum PR_BulletSync
@@ -217,7 +216,7 @@
             Float:PR_origin[3],
             Float:PR_hitPos[3],
             Float:PR_offsets[3],
-            PR_weaponId
+            PR_weaponId,
         };
 
         enum PR_SpectatingSync
@@ -225,7 +224,7 @@
             PR_lrKey,
             PR_udKey,
             PR_keys,
-            Float:PR_position[3]
+            Float:PR_position[3],
         };
 
         enum PR_WeaponsUpdate
@@ -235,18 +234,18 @@
             PR_slotWeaponId[PR_MAX_WEAPON_SLOTS],
             PR_slotWeaponAmmo[PR_MAX_WEAPON_SLOTS],
 
-            PR_slotUpdated[PR_MAX_WEAPON_SLOTS] // internal helping field
+            PR_slotUpdated[PR_MAX_WEAPON_SLOTS], // internal helping field
         };
 
         enum PR_StatsUpdate
         {
             PR_money,
-            PR_drunkLevel
+            PR_drunkLevel,
         };
 
         enum PR_RconCommand
         {
-            PR_command[256]
+            PR_command[256],
         };
 
         native PR_Init(); // internal
