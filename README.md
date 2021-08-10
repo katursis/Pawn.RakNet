@@ -12,6 +12,8 @@ Plugin for **SA:MP 0.3.7** server that allows you to capture and analyze RakNet 
 
 [Pawn.RakNet wiki](https://github.com/katursis/Pawn.RakNet/wiki)
 
+[Official RakNet manual](http://www.jenkinssoftware.com/raknet/manual/index.html)
+
 ## Simple example
 ```pawn
 const PLAYER_SYNC = 207;
