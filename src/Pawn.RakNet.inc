@@ -358,7 +358,9 @@
             if (health > 0 && health < 100) {
                 healthArmour = (health / 7) << 4;
             } else if (health >= 100) {
-                healthArmour = 0xF << 4;
+                healthArmour = 0xF0; // 0xF << 4
+            } else {
+                healthArmour = 0;
             }
 
             if (armour > 0 && armour < 100) {
@@ -369,25 +371,18 @@
         }
 
         stock BS_UnpackHealthArmour(healthArmour, &health, &armour) {
-            new armourTemp, healthTemp;
-
-            armourTemp = (healthArmour & 0x0F);
-            healthTemp = (healthArmour >> 4);
-
-            if (armourTemp == 0xF) {
-                armour = 100;
-            } else if (armourTemp == 0) {
-                armour = 0;
+            health = healthArmour >> 4;
+            if (health == 0xF) {
+                health = 100;
             } else {
-                armour = armourTemp * 7;
+                health *= 7;
             }
 
-            if (healthTemp == 0xF) {
-                health = 100;
-            } else if (healthTemp == 0) {
-                health = 0;
+            armour = healthArmour & 0xF;
+            if (armour == 0xF) {
+                armour = 100;
             } else {
-                health = healthTemp * 7;
+                armour *= 7;
             }
         }
 
