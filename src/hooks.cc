@@ -32,10 +32,12 @@ PluginReceiveResult MessageHandler::OnReceive(RakPeerInterface *peer,
     return PluginReceiveResult::RR_CONTINUE_PROCESSING;
   }
 
+  auto &plugin = Plugin::Get();
+
   RakNet::BitStream bs{packet->data, packet->length, false};
 
   if (!Plugin::OnEvent(PR_INCOMING_RAW_PACKET, player_id,
-                       Plugin::Get().GetPacketId(packet), &bs)) {
+                       plugin.GetPacketId(packet), &bs)) {
     return PluginReceiveResult::RR_STOP_PROCESSING_AND_DEALLOCATE;
   }
 
@@ -44,9 +46,9 @@ PluginReceiveResult MessageHandler::OnReceive(RakPeerInterface *peer,
       delete packet->data;
     }
 
-    const auto numberOfBitsUsed = bs.CopyData(&packet->data);
-    packet->length = BITS_TO_BYTES(numberOfBitsUsed);
-    packet->bitSize = numberOfBitsUsed;
+    const auto number_of_bits_used = bs.CopyData(&packet->data);
+    packet->length = BITS_TO_BYTES(number_of_bits_used);
+    packet->bitSize = number_of_bits_used;
     packet->deleteData = true;
   }
 
@@ -61,17 +63,17 @@ bool THISCALL Hooks::RakServer__Send(void *_this, RakNet::BitStream *bs,
     return false;
   }
 
+  auto &rakserver = Plugin::Get().GetRakServer();
+
   if (!Plugin::OnEvent(
           PR_OUTCOMING_PACKET,
-          broadcast
-              ? -1
-              : Plugin::Get().GetRakServer()->GetIndexFromPlayerID(playerId),
+          broadcast ? -1 : rakserver->GetIndexFromPlayerID(playerId),
           *bs->GetData(), bs)) {
     return false;
   }
 
-  return Plugin::Get().GetRakServer()->Send(
-      bs, priority, reliability, orderingChannel, playerId, broadcast);
+  return rakserver->Send(bs, priority, reliability, orderingChannel, playerId,
+                         broadcast);
 }
 
 bool THISCALL Hooks::RakServer__RPC(void *_this, RPCIndex *uniqueID,
@@ -90,27 +92,29 @@ bool THISCALL Hooks::RakServer__RPC(void *_this, RPCIndex *uniqueID,
     bs = &empty_bs;
   }
 
+  auto &rakserver = Plugin::Get().GetRakServer();
+
   if (!Plugin::OnEvent(
           PR_OUTCOMING_RPC,
-          broadcast
-              ? -1
-              : Plugin::Get().GetRakServer()->GetIndexFromPlayerID(playerId),
-          rpc_id, bs)) {
+          broadcast ? -1 : rakserver->GetIndexFromPlayerID(playerId), rpc_id,
+          bs)) {
     return false;
   }
 
-  return Plugin::Get().GetRakServer()->RPC(uniqueID, bs, priority, reliability,
-                                           orderingChannel, playerId, broadcast,
-                                           shiftTimestamp);
+  return rakserver->RPC(uniqueID, bs, priority, reliability, orderingChannel,
+                        playerId, broadcast, shiftTimestamp);
 }
 
 Packet *THISCALL Hooks::RakServer__Receive(void *_this) {
-  auto packet = Plugin::Get().GetNextPacketToEmulate();
+  auto &plugin = Plugin::Get();
+  auto &rakserver = plugin.GetRakServer();
+
+  auto packet = plugin.GetNextPacketToEmulate();
   if (packet) {
     return packet;
   }
 
-  while (packet = Plugin::Get().GetRakServer()->Receive()) {
+  while (packet = rakserver->Receive()) {
     const auto player_id = packet->playerIndex;
     if (player_id == static_cast<PlayerIndex>(-1)) {
       break;
@@ -118,17 +122,17 @@ Packet *THISCALL Hooks::RakServer__Receive(void *_this) {
 
     RakNet::BitStream bs{packet->data, packet->length, false};
     if (Plugin::OnEvent(PR_INCOMING_PACKET, player_id,
-                        Plugin::Get().GetPacketId(packet), &bs)) {
+                        plugin.GetPacketId(packet), &bs)) {
       if (packet->data != bs.GetData()) {
-        Plugin::Get().GetRakServer()->DeallocatePacket(packet);
+        rakserver->DeallocatePacket(packet);
 
-        packet = Plugin::Get().NewPacket(player_id, bs);
+        packet = plugin.NewPacket(player_id, bs);
       }
 
       break;
     }
 
-    Plugin::Get().GetRakServer()->DeallocatePacket(packet);
+    rakserver->DeallocatePacket(packet);
   }
 
   return packet;
@@ -140,17 +144,22 @@ void *THISCALL Hooks::RakServer__RegisterAsRemoteProcedureCall(
     return nullptr;
   }
 
+  auto &plugin = Plugin::Get();
+  auto &rakserver = plugin.GetRakServer();
+
   const int rpc_id = *uniqueID;
 
-  Plugin::Get().SetOriginalRPCHandler(rpc_id, functionPointer);
+  plugin.SetOriginalRPCHandler(rpc_id, functionPointer);
 
-  return Plugin::Get().GetRakServer()->RegisterAsRemoteProcedureCall(
-      uniqueID, Plugin::Get().GetFakeRPCHandler(rpc_id));
+  return rakserver->RegisterAsRemoteProcedureCall(
+      uniqueID, plugin.GetFakeRPCHandler(rpc_id));
 }
 
 void Hooks::HandleRPC(int rpc_id, RPCParameters *p) {
-  const int player_id =
-      Plugin::Get().GetRakServer()->GetIndexFromPlayerID(p->sender);
+  auto &plugin = Plugin::Get();
+  auto &rakserver = plugin.GetRakServer();
+
+  const int player_id = rakserver->GetIndexFromPlayerID(p->sender);
 
   RakNet::BitStream bs;
 
@@ -172,7 +181,7 @@ void Hooks::HandleRPC(int rpc_id, RPCParameters *p) {
     }
   }
 
-  Plugin::Get().GetOriginalRPCHandler(rpc_id)(p);
+  plugin.GetOriginalRPCHandler(rpc_id)(p);
 }
 
 urmem::address_t Hooks::GetRakServerInterface() {

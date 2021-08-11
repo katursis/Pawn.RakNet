@@ -45,12 +45,12 @@ cell Script::PR_SendPacket(RakNet::BitStream *bs, int player_id,
                            PR_PacketReliability reliability) {
   const bool broadcast = player_id == -1;
 
-  return Plugin::Get().GetRakServer()->Send(
-             bs, priority, reliability, '\0',
-             broadcast ? UNASSIGNED_PLAYER_ID
-                       : Plugin::Get().GetRakServer()->GetPlayerIDFromIndex(
-                             player_id),
-             broadcast)
+  auto &rakserver = Plugin::Get().GetRakServer();
+
+  return rakserver->Send(bs, priority, reliability, '\0',
+                         broadcast ? UNASSIGNED_PLAYER_ID
+                                   : rakserver->GetPlayerIDFromIndex(player_id),
+                         broadcast)
              ? 1
              : 0;
 }
@@ -63,22 +63,22 @@ cell Script::PR_SendRPC(RakNet::BitStream *bs, int player_id, int rpc_id,
                         PR_PacketReliability reliability) {
   const bool broadcast = player_id == -1;
 
-  return Plugin::Get().GetRakServer()->RPC(
-             reinterpret_cast<RPCIndex *>(&rpc_id), bs, priority, reliability,
-             '\0',
-             broadcast ? UNASSIGNED_PLAYER_ID
-                       : Plugin::Get().GetRakServer()->GetPlayerIDFromIndex(
-                             player_id),
-             broadcast, false)
+  auto &rakserver = Plugin::Get().GetRakServer();
+
+  return rakserver->RPC(reinterpret_cast<RPCIndex *>(&rpc_id), bs, priority,
+                        reliability, '\0',
+                        broadcast ? UNASSIGNED_PLAYER_ID
+                                  : rakserver->GetPlayerIDFromIndex(player_id),
+                        broadcast, false)
              ? 1
              : 0;
 }
 
 // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
 cell Script::PR_EmulateIncomingPacket(RakNet::BitStream *bs, int player_id) {
-  auto packet = Plugin::Get().NewPacket(player_id, *bs);
+  auto &plugin = Plugin::Get();
 
-  Plugin::Get().PushPacketToEmulate(packet);
+  plugin.PushPacketToEmulate(plugin.NewPacket(player_id, *bs));
 
   return 1;
 }
@@ -86,21 +86,23 @@ cell Script::PR_EmulateIncomingPacket(RakNet::BitStream *bs, int player_id) {
 // native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
 cell Script::PR_EmulateIncomingRPC(RakNet::BitStream *bs, int player_id,
                                    int rpc_id) {
-  const auto &handler = Plugin::Get().GetOriginalRPCHandler(rpc_id);
+  auto &plugin = Plugin::Get();
+  auto &rakserver = plugin.GetRakServer();
+
+  const auto &handler = plugin.GetOriginalRPCHandler(rpc_id);
   if (!handler) {
     throw std::runtime_error{"Invalid rpcid"};
   }
 
-  RPCParameters RPCParams{};
-  RPCParams.numberOfBitsOfData = bs->GetNumberOfBitsUsed();
-  RPCParams.sender =
-      Plugin::Get().GetRakServer()->GetPlayerIDFromIndex(player_id);
+  RPCParameters rpc_params{};
 
-  if (RPCParams.numberOfBitsOfData) {
-    RPCParams.input = bs->GetData();
+  rpc_params.numberOfBitsOfData = bs->GetNumberOfBitsUsed();
+  rpc_params.sender = rakserver->GetPlayerIDFromIndex(player_id);
+  if (rpc_params.numberOfBitsOfData) {
+    rpc_params.input = bs->GetData();
   }
 
-  handler(&RPCParams);
+  handler(&rpc_params);
 
   return 1;
 }
@@ -535,6 +537,8 @@ cell Script::BS_ReadValue(cell *params) {
 }
 
 bool Script::OnLoad() {
+  config_ = Plugin::Get().GetConfig();
+
   int num_publics{};
   amx_->NumPublics(&num_publics);
 
@@ -581,13 +585,12 @@ bool Script::OnEvent(PR_EventType event_type, int player_id, int id,
 }
 
 void Script::InitPublic(PR_EventType type, const std::string &public_name) {
-  publics_.at(type) =
-      MakePublic(public_name, Plugin::Get().GetConfig()->UseCaching());
+  publics_.at(type) = MakePublic(public_name, config_->UseCaching());
 }
 
 void Script::InitHandler(int id, const std::string &public_name,
                          PR_EventType type) {
-  auto pub = MakePublic(public_name, Plugin::Get().GetConfig()->UseCaching());
+  auto pub = MakePublic(public_name, config_->UseCaching());
   if (!pub->Exists()) {
     throw std::runtime_error{"Public " + public_name + " does not exist"};
   }
