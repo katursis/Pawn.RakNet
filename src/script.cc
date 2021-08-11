@@ -40,7 +40,7 @@ cell Script::PR_RegHandler(int id, std::string public_name, PR_EventType type) {
 
 // native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority =
 // PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
-cell Script::PR_SendPacket(RakNet::BitStream *bs, int player_id,
+cell Script::PR_SendPacket(BitStream *bs, int player_id,
                            PR_PacketPriority priority,
                            PR_PacketReliability reliability) {
   const bool broadcast = player_id == -1;
@@ -58,7 +58,7 @@ cell Script::PR_SendPacket(RakNet::BitStream *bs, int player_id,
 // native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority
 // = PR_HIGH_PRIORITY, PR_PacketReliability:reliability =
 // PR_RELIABLE_ORDERED);
-cell Script::PR_SendRPC(RakNet::BitStream *bs, int player_id, int rpc_id,
+cell Script::PR_SendRPC(BitStream *bs, int player_id, int rpc_id,
                         PR_PacketPriority priority,
                         PR_PacketReliability reliability) {
   const bool broadcast = player_id == -1;
@@ -75,7 +75,7 @@ cell Script::PR_SendRPC(RakNet::BitStream *bs, int player_id, int rpc_id,
 }
 
 // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
-cell Script::PR_EmulateIncomingPacket(RakNet::BitStream *bs, int player_id) {
+cell Script::PR_EmulateIncomingPacket(BitStream *bs, int player_id) {
   auto &plugin = Plugin::Get();
 
   plugin.PushPacketToEmulate(plugin.NewPacket(player_id, *bs));
@@ -84,8 +84,7 @@ cell Script::PR_EmulateIncomingPacket(RakNet::BitStream *bs, int player_id) {
 }
 
 // native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
-cell Script::PR_EmulateIncomingRPC(RakNet::BitStream *bs, int player_id,
-                                   int rpc_id) {
+cell Script::PR_EmulateIncomingRPC(BitStream *bs, int player_id, int rpc_id) {
   auto &plugin = Plugin::Get();
   auto &rakserver = plugin.GetRakServer();
 
@@ -111,7 +110,7 @@ cell Script::PR_EmulateIncomingRPC(RakNet::BitStream *bs, int player_id,
 cell Script::BS_New() { return NewBitStream(); }
 
 // native BitStream:BS_NewCopy(BitStream:bs);
-cell Script::BS_NewCopy(RakNet::BitStream *bs) { return NewBitStreamCopy(bs); }
+cell Script::BS_NewCopy(BitStream *bs) { return NewBitStreamCopy(bs); }
 
 // native BS_Delete(&BitStream:bs);
 cell Script::BS_Delete(cell *bs) {
@@ -123,84 +122,84 @@ cell Script::BS_Delete(cell *bs) {
 }
 
 // native BS_Reset(BitStream:bs);
-cell Script::BS_Reset(RakNet::BitStream *bs) {
+cell Script::BS_Reset(BitStream *bs) {
   bs->Reset();
 
   return 1;
 }
 
 // native BS_ResetReadPointer(BitStream:bs);
-cell Script::BS_ResetReadPointer(RakNet::BitStream *bs) {
+cell Script::BS_ResetReadPointer(BitStream *bs) {
   bs->ResetReadPointer();
 
   return 1;
 }
 
 // native BS_ResetWritePointer(BitStream:bs);
-cell Script::BS_ResetWritePointer(RakNet::BitStream *bs) {
+cell Script::BS_ResetWritePointer(BitStream *bs) {
   bs->ResetWritePointer();
 
   return 1;
 }
 
 // native BS_IgnoreBits(BitStream:bs, number_of_bits);
-cell Script::BS_IgnoreBits(RakNet::BitStream *bs, int number_of_bits) {
+cell Script::BS_IgnoreBits(BitStream *bs, int number_of_bits) {
   bs->IgnoreBits(number_of_bits);
 
   return 1;
 }
 
 // native BS_SetWriteOffset(BitStream:bs, offset);
-cell Script::BS_SetWriteOffset(RakNet::BitStream *bs, int offset) {
+cell Script::BS_SetWriteOffset(BitStream *bs, int offset) {
   bs->SetWriteOffset(offset);
 
   return 1;
 }
 
 // native BS_GetWriteOffset(BitStream:bs, &offset);
-cell Script::BS_GetWriteOffset(RakNet::BitStream *bs, cell *offset) {
+cell Script::BS_GetWriteOffset(BitStream *bs, cell *offset) {
   *offset = bs->GetWriteOffset();
 
   return 1;
 }
 
 // native BS_SetReadOffset(BitStream:bs, offset);
-cell Script::BS_SetReadOffset(RakNet::BitStream *bs, int offset) {
+cell Script::BS_SetReadOffset(BitStream *bs, int offset) {
   bs->SetReadOffset(offset);
 
   return 1;
 }
 
 // native BS_GetReadOffset(BitStream:bs, &offset);
-cell Script::BS_GetReadOffset(RakNet::BitStream *bs, cell *offset) {
+cell Script::BS_GetReadOffset(BitStream *bs, cell *offset) {
   *offset = bs->GetReadOffset();
 
   return 1;
 }
 
 // native BS_GetNumberOfBitsUsed(BitStream:bs, &number);
-cell Script::BS_GetNumberOfBitsUsed(RakNet::BitStream *bs, cell *number) {
+cell Script::BS_GetNumberOfBitsUsed(BitStream *bs, cell *number) {
   *number = bs->GetNumberOfBitsUsed();
 
   return 1;
 }
 
 // native BS_GetNumberOfBytesUsed(BitStream:bs, &number);
-cell Script::BS_GetNumberOfBytesUsed(RakNet::BitStream *bs, cell *number) {
+cell Script::BS_GetNumberOfBytesUsed(BitStream *bs, cell *number) {
   *number = bs->GetNumberOfBytesUsed();
 
   return 1;
 }
 
 // native BS_GetNumberOfUnreadBits(BitStream:bs, &number);
-cell Script::BS_GetNumberOfUnreadBits(RakNet::BitStream *bs, cell *number) {
+cell Script::BS_GetNumberOfUnreadBits(BitStream *bs, cell *number) {
   *number = bs->GetNumberOfUnreadBits();
 
   return 1;
 }
 
 // native BS_GetNumberOfBitsAllocated(BitStream:bs, &number);
-cell Script::BS_GetNumberOfBitsAllocated(RakNet::BitStream *bs, cell *number) {
+cell Script::BS_GetNumberOfBitsAllocated(BitStream *bs, cell *number) {
   *number = bs->GetNumberOfBitsAllocated();
 
   return 1;
@@ -342,7 +341,7 @@ cell Script::BS_WriteValue(cell *params) {
 
 template <typename T>
 struct Value {
-  static inline cell Read(RakNet::BitStream *bs) {
+  static inline cell Read(BitStream *bs) {
     T value{};
 
     bs->Read<T>(value);
@@ -350,7 +349,7 @@ struct Value {
     return static_cast<cell>(value);
   }
 
-  static inline cell ReadCompressed(RakNet::BitStream *bs) {
+  static inline cell ReadCompressed(BitStream *bs) {
     T value{};
 
     bs->ReadCompressed<T>(value);
@@ -361,7 +360,7 @@ struct Value {
 
 template <>
 struct Value<float> {
-  static inline cell Read(RakNet::BitStream *bs) {
+  static inline cell Read(BitStream *bs) {
     float value{};
 
     bs->Read<float>(value);
@@ -369,7 +368,7 @@ struct Value<float> {
     return amx_ftoc(value);
   }
 
-  static inline cell ReadCompressed(RakNet::BitStream *bs) {
+  static inline cell ReadCompressed(BitStream *bs) {
     float value{};
 
     bs->ReadCompressed<float>(value);
@@ -563,7 +562,7 @@ bool Script::OnLoad() {
 }
 
 bool Script::OnEvent(PR_EventType event_type, int player_id, int id,
-                     RakNet::BitStream *bs) {
+                     BitStream *bs) {
   const auto &pub = publics_[event_type];
   if (pub && pub->Exists()) {
     bs->ResetReadPointer();
@@ -607,15 +606,15 @@ void Script::InitHandlers() {
 }
 
 cell Script::NewBitStream() {
-  const auto bs = std::make_shared<RakNet::BitStream>();
+  const auto bs = std::make_shared<BitStream>();
 
   bitstreams_.insert(bs);
 
   return reinterpret_cast<cell>(bs.get());
 }
 
-cell Script::NewBitStreamCopy(RakNet::BitStream *src) {
-  const auto bs = std::make_shared<RakNet::BitStream>(
+cell Script::NewBitStreamCopy(BitStream *src) {
+  const auto bs = std::make_shared<BitStream>(
       src->GetData(), src->GetNumberOfBytesUsed(), true);
 
   bitstreams_.insert(bs);
@@ -623,8 +622,8 @@ cell Script::NewBitStreamCopy(RakNet::BitStream *src) {
   return reinterpret_cast<cell>(bs.get());
 }
 
-RakNet::BitStream *Script::GetBitStream(cell handle) {
-  const auto bs = reinterpret_cast<RakNet::BitStream *>(handle);
+BitStream *Script::GetBitStream(cell handle) {
+  const auto bs = reinterpret_cast<BitStream *>(handle);
   if (!bs) {
     throw std::runtime_error{"Invalid BitStream handle"};
   }
@@ -632,8 +631,8 @@ RakNet::BitStream *Script::GetBitStream(cell handle) {
   return bs;
 }
 
-std::unordered_set<std::shared_ptr<RakNet::BitStream>>::iterator
-Script::FindBitStream(cell handle) {
+std::unordered_set<std::shared_ptr<BitStream>>::iterator Script::FindBitStream(
+    cell handle) {
   const auto bs =
       std::find_if(bitstreams_.begin(), bitstreams_.end(), [=](const auto &bs) {
         return reinterpret_cast<cell>(bs.get()) == handle;

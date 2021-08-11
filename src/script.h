@@ -41,66 +41,65 @@ class Script : public ptl::AbstractScript<Script> {
 
   // native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority =
   // PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
-  cell PR_SendPacket(RakNet::BitStream *bs, int player_id,
-                     PR_PacketPriority priority,
+  cell PR_SendPacket(BitStream *bs, int player_id, PR_PacketPriority priority,
                      PR_PacketReliability reliability);
 
   // native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority
   // = PR_HIGH_PRIORITY, PR_PacketReliability:reliability =
   // PR_RELIABLE_ORDERED);
-  cell PR_SendRPC(RakNet::BitStream *bs, int player_id, int rpc_id,
+  cell PR_SendRPC(BitStream *bs, int player_id, int rpc_id,
                   PR_PacketPriority priority, PR_PacketReliability reliability);
 
   // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
-  cell PR_EmulateIncomingPacket(RakNet::BitStream *bs, int player_id);
+  cell PR_EmulateIncomingPacket(BitStream *bs, int player_id);
 
   // native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
-  cell PR_EmulateIncomingRPC(RakNet::BitStream *bs, int player_id, int rpc_id);
+  cell PR_EmulateIncomingRPC(BitStream *bs, int player_id, int rpc_id);
 
   // native BitStream:BS_New();
   cell BS_New();
 
   // native BitStream:BS_NewCopy(BitStream:bs);
-  cell BS_NewCopy(RakNet::BitStream *bs);
+  cell BS_NewCopy(BitStream *bs);
 
   // native BS_Delete(&BitStream:bs);
   cell BS_Delete(cell *bs);
 
   // native BS_Reset(BitStream:bs);
-  cell BS_Reset(RakNet::BitStream *bs);
+  cell BS_Reset(BitStream *bs);
 
   // native BS_ResetReadPointer(BitStream:bs);
-  cell BS_ResetReadPointer(RakNet::BitStream *bs);
+  cell BS_ResetReadPointer(BitStream *bs);
 
   // native BS_ResetWritePointer(BitStream:bs);
-  cell BS_ResetWritePointer(RakNet::BitStream *bs);
+  cell BS_ResetWritePointer(BitStream *bs);
 
   // native BS_IgnoreBits(BitStream:bs, number_of_bits);
-  cell BS_IgnoreBits(RakNet::BitStream *bs, int number_of_bits);
+  cell BS_IgnoreBits(BitStream *bs, int number_of_bits);
 
   // native BS_SetWriteOffset(BitStream:bs, offset);
-  cell BS_SetWriteOffset(RakNet::BitStream *bs, int offset);
+  cell BS_SetWriteOffset(BitStream *bs, int offset);
 
   // native BS_GetWriteOffset(BitStream:bs, &offset);
-  cell BS_GetWriteOffset(RakNet::BitStream *bs, cell *offset);
+  cell BS_GetWriteOffset(BitStream *bs, cell *offset);
 
   // native BS_SetReadOffset(BitStream:bs, offset);
-  cell BS_SetReadOffset(RakNet::BitStream *bs, int offset);
+  cell BS_SetReadOffset(BitStream *bs, int offset);
 
   // native BS_GetReadOffset(BitStream:bs, &offset);
-  cell BS_GetReadOffset(RakNet::BitStream *bs, cell *offset);
+  cell BS_GetReadOffset(BitStream *bs, cell *offset);
 
   // native BS_GetNumberOfBitsUsed(BitStream:bs, &number);
-  cell BS_GetNumberOfBitsUsed(RakNet::BitStream *bs, cell *number);
+  cell BS_GetNumberOfBitsUsed(BitStream *bs, cell *number);
 
   // native BS_GetNumberOfBytesUsed(BitStream:bs, &number);
-  cell BS_GetNumberOfBytesUsed(RakNet::BitStream *bs, cell *number);
+  cell BS_GetNumberOfBytesUsed(BitStream *bs, cell *number);
 
   // native BS_GetNumberOfUnreadBits(BitStream:bs, &number);
-  cell BS_GetNumberOfUnreadBits(RakNet::BitStream *bs, cell *number);
+  cell BS_GetNumberOfUnreadBits(BitStream *bs, cell *number);
 
   // native BS_GetNumberOfBitsAllocated(BitStream:bs, &number);
-  cell BS_GetNumberOfBitsAllocated(RakNet::BitStream *bs, cell *number);
+  cell BS_GetNumberOfBitsAllocated(BitStream *bs, cell *number);
 
   // native BS_WriteValue(BitStream:bs, {PR_ValueType, Float, _}:...);
   cell BS_WriteValue(cell *params);
@@ -110,8 +109,7 @@ class Script : public ptl::AbstractScript<Script> {
 
   bool OnLoad();
 
-  bool OnEvent(PR_EventType event_type, int player_id, int id,
-               RakNet::BitStream *bs);
+  bool OnEvent(PR_EventType event_type, int player_id, int id, BitStream *bs);
 
   void InitPublic(PR_EventType type, const std::string &public_name);
 
@@ -121,12 +119,12 @@ class Script : public ptl::AbstractScript<Script> {
 
   cell NewBitStream();
 
-  cell NewBitStreamCopy(RakNet::BitStream *src);
+  cell NewBitStreamCopy(BitStream *src);
 
-  std::unordered_set<std::shared_ptr<RakNet::BitStream>>::iterator
-  FindBitStream(cell handle);
+  std::unordered_set<std::shared_ptr<BitStream>>::iterator FindBitStream(
+      cell handle);
 
-  RakNet::BitStream *GetBitStream(cell handle);
+  BitStream *GetBitStream(cell handle);
 
   void DeleteBitStream(cell handle);
 
@@ -143,7 +141,7 @@ class Script : public ptl::AbstractScript<Script> {
              PR_NUMBER_OF_EVENT_TYPES>
       handlers_;
 
-  std::unordered_set<std::shared_ptr<RakNet::BitStream>> bitstreams_;
+  std::unordered_set<std::shared_ptr<BitStream>> bitstreams_;
 };
 
 #endif  // PAWNRAKNET_SCRIPT_H_

@@ -41,7 +41,7 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   int GetPacketId(Packet *packet);
 
-  Packet *NewPacket(PlayerIndex index, const RakNet::BitStream &bs);
+  Packet *NewPacket(PlayerIndex index, const BitStream &bs);
 
   void PushPacketToEmulate(Packet *packet);
 
@@ -64,7 +64,7 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
   const std::shared_ptr<RakServer> &GetRakServer();
 
   static bool OnEvent(PR_EventType event_type, int player_id, int id,
-                      RakNet::BitStream *bs);
+                      BitStream *bs);
 
   static Plugin &Get() { return Instance(); }
 

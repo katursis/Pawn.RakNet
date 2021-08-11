@@ -44,17 +44,16 @@ RakServer::RakServer(urmem::address_t addr_rakserver)
       GetMethodAddrFromTable(MethodIndex::kGetPlayerIDFromIndex);
 }
 
-bool RakServer::Send(RakNet::BitStream *bitStream, int priority,
-                     int reliability, char orderingChannel, PlayerID playerId,
-                     bool broadcast) {
+bool RakServer::Send(BitStream *bitStream, int priority, int reliability,
+                     char orderingChannel, PlayerID playerId, bool broadcast) {
   return urmem::call_function<urmem::calling_convention::thiscall, bool>(
       addr_rakserver_send_, addr_rakserver_, bitStream, priority, reliability,
       orderingChannel, playerId, broadcast);
 }
 
-bool RakServer::RPC(RPCIndex *uniqueID, RakNet::BitStream *bitStream,
-                    int priority, int reliability, char orderingChannel,
-                    PlayerID playerId, bool broadcast, bool shiftTimestamp) {
+bool RakServer::RPC(RPCIndex *uniqueID, BitStream *bitStream, int priority,
+                    int reliability, char orderingChannel, PlayerID playerId,
+                    bool broadcast, bool shiftTimestamp) {
   return urmem::call_function<urmem::calling_convention::thiscall, bool>(
       addr_rakserver_rpc_, addr_rakserver_, uniqueID, bitStream, priority,
       reliability, orderingChannel, playerId, broadcast, shiftTimestamp);

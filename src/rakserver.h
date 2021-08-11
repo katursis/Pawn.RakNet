@@ -51,10 +51,10 @@ class RakServer {
 
   RakServer(urmem::address_t addr_rakserver);
 
-  bool Send(RakNet::BitStream *bitStream, int priority, int reliability,
+  bool Send(BitStream *bitStream, int priority, int reliability,
             char orderingChannel, PlayerID playerId, bool broadcast);
 
-  bool RPC(RPCIndex *uniqueID, RakNet::BitStream *bitStream, int priority,
+  bool RPC(RPCIndex *uniqueID, BitStream *bitStream, int priority,
            int reliability, char orderingChannel, PlayerID playerId,
            bool broadcast, bool shiftTimestamp);
 

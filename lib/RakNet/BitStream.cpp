@@ -50,8 +50,6 @@
 #define _copysign copysign
 #endif
 
-using namespace RakNet;
-
 #ifdef _MSC_VER
 #pragma warning( push )
 #endif

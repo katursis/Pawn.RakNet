@@ -21,10 +21,7 @@
 #include "DS_Map.h"
 
 /// Forward declaration
-namespace RakNet
-{
-	class BitStream;
-};
+class BitStream;
 
 class HuffmanEncodingTree;
 
@@ -56,14 +53,14 @@ public:
 	/// \param[in] maxCharsToWrite The max number of bytes to write of \a input.  Use 0 to mean no limit.
 	/// \param[out] output The bitstream to write the compressed string to
 	/// \param[in] languageID Which language to use
-	void EncodeString( const char *input, int maxCharsToWrite, RakNet::BitStream *output, int languageID=0 );
+	void EncodeString( const char *input, int maxCharsToWrite, BitStream *output, int languageID=0 );
 	
 	/// Writes input to output, uncompressed.  Takes care of the null terminator for you.
 	/// \param[out] output A block of bytes to receive the output
 	/// \param[in] maxCharsToWrite Size, in bytes, of \a output .  A NULL terminator will always be appended to the output string.  If the maxCharsToWrite is not large enough, the string will be truncated.
 	/// \param[in] input The bitstream containing the compressed string
 	/// \param[in] languageID Which language to use
-	bool DecodeString( char *output, int maxCharsToWrite, RakNet::BitStream *input, int languageID=0 );
+	bool DecodeString( char *output, int maxCharsToWrite, BitStream *input, int languageID=0 );
 
 	/// Used so I can allocate and deallocate this singleton at runtime
 	static void AddReference(void);

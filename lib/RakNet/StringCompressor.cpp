@@ -353,7 +353,7 @@ StringCompressor::~StringCompressor()
 		delete huffmanEncodingTrees[i];
 }
 
-void StringCompressor::EncodeString( const char *input, int maxCharsToWrite, RakNet::BitStream *output, int languageID )
+void StringCompressor::EncodeString( const char *input, int maxCharsToWrite, BitStream *output, int languageID )
 {
 	HuffmanEncodingTree *huffmanEncodingTree;
 	if (huffmanEncodingTrees.Has(languageID)==false)
@@ -366,7 +366,7 @@ void StringCompressor::EncodeString( const char *input, int maxCharsToWrite, Rak
 		return;
 	}
 
-	RakNet::BitStream encodedBitStream;
+	BitStream encodedBitStream;
 
 	unsigned short stringBitLength;
 
@@ -386,7 +386,7 @@ void StringCompressor::EncodeString( const char *input, int maxCharsToWrite, Rak
 	output->WriteBits( encodedBitStream.GetData(), stringBitLength );
 }
 
-bool StringCompressor::DecodeString( char *output, int maxCharsToWrite, RakNet::BitStream *input, int languageID )
+bool StringCompressor::DecodeString( char *output, int maxCharsToWrite, BitStream *input, int languageID )
 {
 	HuffmanEncodingTree *huffmanEncodingTree;
 	if (huffmanEncodingTrees.Has(languageID)==false)

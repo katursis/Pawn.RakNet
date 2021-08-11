@@ -155,7 +155,7 @@ int Plugin::GetPacketId(Packet *packet) {
                               unsigned char>(addr_get_packet_id_, packet);
 }
 
-Packet *Plugin::NewPacket(PlayerIndex index, const RakNet::BitStream &bs) {
+Packet *Plugin::NewPacket(PlayerIndex index, const BitStream &bs) {
   const std::size_t length = bs.GetNumberOfBytesUsed();
   if (!length) {
     throw std::runtime_error{"Data is empty"};
@@ -219,7 +219,7 @@ const std::shared_ptr<Config> &Plugin::GetConfig() { return config_; }
 const std::shared_ptr<RakServer> &Plugin::GetRakServer() { return rakserver_; }
 
 bool Plugin::OnEvent(PR_EventType event_type, int player_id, int id,
-                     RakNet::BitStream *bs) {
+                     BitStream *bs) {
   return EveryScript([=](const std::shared_ptr<Script> &script) {
     return script->OnEvent(event_type, player_id, id, bs);
   });

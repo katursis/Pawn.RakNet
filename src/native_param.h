@@ -26,7 +26,7 @@
 #define PAWNRAKNET_NATIVE_PARAM_H_
 
 struct NativeParam : Script::NativeParam {
-  operator RakNet::BitStream*() { return script.GetBitStream(raw_value); }
+  operator BitStream*() { return script.GetBitStream(raw_value); }
 
   operator PR_PacketPriority() {
     return static_cast<PR_PacketPriority>(raw_value);

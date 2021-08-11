@@ -34,11 +34,11 @@ public:
 	/// \param [in] input Array of bytes to encode
 	/// \param [in] sizeInBytes size of \a input
 	/// \param [out] output The bitstream to write to
-	void EncodeArray( unsigned char *input, unsigned sizeInBytes, RakNet::BitStream * output );
+	void EncodeArray( unsigned char *input, unsigned sizeInBytes, BitStream * output );
 	
 	// Decodes an array encoded by EncodeArray()
-	unsigned DecodeArray( RakNet::BitStream * input, unsigned sizeInBits, unsigned maxCharsToWrite, unsigned char *output );
-	void DecodeArray( unsigned char *input, unsigned sizeInBits, RakNet::BitStream * output );
+	unsigned DecodeArray( BitStream * input, unsigned sizeInBits, unsigned maxCharsToWrite, unsigned char *output );
+	void DecodeArray( unsigned char *input, unsigned sizeInBits, BitStream * output );
 	
 	/// Given a frequency table of 256 elements, all with a frequency of 1 or more, generate the tree
 	void GenerateFromFrequencyTable( unsigned int frequencyTable[ 256 ] );

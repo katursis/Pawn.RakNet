@@ -34,7 +34,7 @@ PluginReceiveResult MessageHandler::OnReceive(RakPeerInterface *peer,
 
   auto &plugin = Plugin::Get();
 
-  RakNet::BitStream bs{packet->data, packet->length, false};
+  BitStream bs{packet->data, packet->length, false};
 
   if (!Plugin::OnEvent(PR_INCOMING_RAW_PACKET, player_id,
                        plugin.GetPacketId(packet), &bs)) {
@@ -55,10 +55,9 @@ PluginReceiveResult MessageHandler::OnReceive(RakPeerInterface *peer,
   return PluginReceiveResult::RR_CONTINUE_PROCESSING;
 }
 
-bool THISCALL Hooks::RakServer__Send(void *_this, RakNet::BitStream *bs,
-                                     int priority, int reliability,
-                                     char orderingChannel, PlayerID playerId,
-                                     bool broadcast) {
+bool THISCALL Hooks::RakServer__Send(void *_this, BitStream *bs, int priority,
+                                     int reliability, char orderingChannel,
+                                     PlayerID playerId, bool broadcast) {
   if (!bs || !bs->GetData()) {
     return false;
   }
@@ -77,7 +76,7 @@ bool THISCALL Hooks::RakServer__Send(void *_this, RakNet::BitStream *bs,
 }
 
 bool THISCALL Hooks::RakServer__RPC(void *_this, RPCIndex *uniqueID,
-                                    RakNet::BitStream *bs, int priority,
+                                    BitStream *bs, int priority,
                                     int reliability, char orderingChannel,
                                     PlayerID playerId, bool broadcast,
                                     bool shiftTimestamp) {
@@ -87,7 +86,7 @@ bool THISCALL Hooks::RakServer__RPC(void *_this, RPCIndex *uniqueID,
 
   const int rpc_id = *uniqueID;
 
-  RakNet::BitStream empty_bs;
+  BitStream empty_bs;
   if (!bs) {
     bs = &empty_bs;
   }
@@ -120,7 +119,7 @@ Packet *THISCALL Hooks::RakServer__Receive(void *_this) {
       break;
     }
 
-    RakNet::BitStream bs{packet->data, packet->length, false};
+    BitStream bs{packet->data, packet->length, false};
     if (Plugin::OnEvent(PR_INCOMING_PACKET, player_id,
                         plugin.GetPacketId(packet), &bs)) {
       if (packet->data != bs.GetData()) {
@@ -161,7 +160,7 @@ void Hooks::HandleRPC(int rpc_id, RPCParameters *p) {
 
   const int player_id = rakserver->GetIndexFromPlayerID(p->sender);
 
-  RakNet::BitStream bs;
+  BitStream bs;
 
   if (player_id != -1) {
     if (p->input) {

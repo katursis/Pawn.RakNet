@@ -21,10 +21,7 @@
 #define __BITSTREAM_NATIVE_END
 
 /// Forward declaration
-namespace RakNet
-{
-	class BitStream;
-};
+class BitStream;
 
 struct RPCParameters;
 

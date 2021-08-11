@@ -129,7 +129,7 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 	bool tempPath[ 256 ]; // Maximum path length is 256
 	unsigned short tempPathLength;
 	HuffmanEncodingTreeNode *currentNode;
-	RakNet::BitStream bitStream;
+	BitStream bitStream;
 	
 	// Generate the encryption table. From before, we have an array of pointers to all the leaves which contain pointers to their parents.
 	// This can be done more efficiently but this isn't bad and it's way easier to program and debug
@@ -172,7 +172,7 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 }
 
 // Pass an array of bytes to array and a preallocated BitStream to receive the output
-void HuffmanEncodingTree::EncodeArray( unsigned char *input, unsigned sizeInBytes, RakNet::BitStream * output )
+void HuffmanEncodingTree::EncodeArray( unsigned char *input, unsigned sizeInBytes, BitStream * output )
 {		
 	unsigned counter;
 	
@@ -203,7 +203,7 @@ void HuffmanEncodingTree::EncodeArray( unsigned char *input, unsigned sizeInByte
 	}
 }
 
-unsigned HuffmanEncodingTree::DecodeArray( RakNet::BitStream * input, unsigned sizeInBits, unsigned maxCharsToWrite, unsigned char *output )
+unsigned HuffmanEncodingTree::DecodeArray( BitStream * input, unsigned sizeInBits, unsigned maxCharsToWrite, unsigned char *output )
 {
 	HuffmanEncodingTreeNode * currentNode;
 	
@@ -236,14 +236,14 @@ unsigned HuffmanEncodingTree::DecodeArray( RakNet::BitStream * input, unsigned s
 }
 
 // Pass an array of encoded bytes to array and a preallocated BitStream to receive the output
-void HuffmanEncodingTree::DecodeArray( unsigned char *input, unsigned sizeInBits, RakNet::BitStream * output )
+void HuffmanEncodingTree::DecodeArray( unsigned char *input, unsigned sizeInBits, BitStream * output )
 {
 	HuffmanEncodingTreeNode * currentNode;
 	
 	if ( sizeInBits <= 0 )
 		return ;
 		
-	RakNet::BitStream bitStream( input, BITS_TO_BYTES(sizeInBits), false );
+	BitStream bitStream( input, BITS_TO_BYTES(sizeInBits), false );
 	
 	currentNode = root;
 	

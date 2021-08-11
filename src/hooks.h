@@ -32,13 +32,12 @@ class MessageHandler : public PluginInterface {
 
 class Hooks {
  public:
-  static bool THISCALL RakServer__Send(void *_this, RakNet::BitStream *bs,
-                                       int priority, int reliability,
-                                       char orderingChannel, PlayerID playerId,
-                                       bool broadcast);
+  static bool THISCALL RakServer__Send(void *_this, BitStream *bs, int priority,
+                                       int reliability, char orderingChannel,
+                                       PlayerID playerId, bool broadcast);
 
   static bool THISCALL RakServer__RPC(void *_this, RPCIndex *uniqueID,
-                                      RakNet::BitStream *bs, int priority,
+                                      BitStream *bs, int priority,
                                       int reliability, char orderingChannel,
                                       PlayerID playerId, bool broadcast,
                                       bool shiftTimestamp);
