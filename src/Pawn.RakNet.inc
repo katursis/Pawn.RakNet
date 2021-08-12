@@ -351,10 +351,28 @@
         #define PR_EXPAND_ARR3(%0) %0[0],%0[1],%0[2]
         #define PR_EXPAND_ARR4(%0) %0[0],%0[1],%0[2],%0[3]
 
-        #define BS_UnpackAspectRatio(%0) (float(%0) / 255.0 + 1.0)
-        #define BS_UnpackCameraZoom(%0) ((float(%0) / 63.0) * 35.0 + 35.0)
+        stock BS_PackAspectRatio(Float:value)
+        {
+            return floatround((value - 1.0) * 255.0);
+        }
 
-        stock BS_PackHealthArmour(health, armour, &healthArmour) {
+        stock Float:BS_UnpackAspectRatio(value)
+        {
+            return float(value) / 255.0 + 1.0;
+        }
+
+        stock BS_PackCameraZoom(Float:value)
+        {
+            return floatround(((value - 35.0) / 35.0) * 63.0);
+        }
+
+        stock Float:BS_UnpackCameraZoom(value)
+        {
+            return (float(value) / 63.0) * 35.0 + 35.0;
+        }
+
+        stock BS_PackHealthArmour(health, armour, &healthArmour)
+        {
             if (health > 0 && health < 100) {
                 healthArmour = (health / 7) << 4;
             } else if (health >= 100) {
@@ -370,7 +388,8 @@
             }
         }
 
-        stock BS_UnpackHealthArmour(healthArmour, &health, &armour) {
+        stock BS_UnpackHealthArmour(healthArmour, &health, &armour)
+        {
             health = healthArmour >> 4;
             if (health == 0xF) {
                 health = 100;
