@@ -145,13 +145,17 @@ void *THISCALL Hooks::RakServer__RegisterAsRemoteProcedureCall(
 
   auto &plugin = Plugin::Get();
   auto &rakserver = plugin.GetRakServer();
+  auto &config = plugin.GetConfig();
 
   const int rpc_id = *uniqueID;
 
   plugin.SetOriginalRPCHandler(rpc_id, functionPointer);
 
-  return rakserver->RegisterAsRemoteProcedureCall(
-      uniqueID, plugin.GetFakeRPCHandler(rpc_id));
+  if (config->InterceptIncomingRPC()) {
+    functionPointer = plugin.GetFakeRPCHandler(rpc_id);
+  }
+
+  return rakserver->RegisterAsRemoteProcedureCall(uniqueID, functionPointer);
 }
 
 void Hooks::HandleRPC(int rpc_id, RPCParameters *p) {

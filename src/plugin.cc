@@ -125,11 +125,11 @@ void Plugin::InstallRakServerHooks(urmem::address_t addr_rakserver) {
                             &Hooks::RakServer__Receive);
   }
 
-  if (config_->InterceptIncomingRPC()) {
-    rakserver_->InstallHook(
-        RakServer::MethodIndex::kRegisterAsRemoteProcedureCall,
-        &Hooks::RakServer__RegisterAsRemoteProcedureCall);
+  rakserver_->InstallHook(
+      RakServer::MethodIndex::kRegisterAsRemoteProcedureCall,
+      &Hooks::RakServer__RegisterAsRemoteProcedureCall);
 
+  if (config_->InterceptIncomingRPC()) {
     Hooks::ReceiveRPC::Init();
   }
 
