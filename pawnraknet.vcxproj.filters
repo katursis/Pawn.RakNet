@@ -36,21 +36,6 @@
     <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTreeNode.h">
       <Filter>lib\RakNet</Filter>
     </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_LinkedList.h">
-      <Filter>lib\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_List.h">
-      <Filter>lib\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_Map.h">
-      <Filter>lib\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_OrderedList.h">
-      <Filter>lib\RakNet</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\RakNet\DS_Queue.h">
-      <Filter>lib\RakNet</Filter>
-    </ClInclude>
     <ClInclude Include="lib\RakNet\NetworkTypes.h">
       <Filter>lib\RakNet</Filter>
     </ClInclude>

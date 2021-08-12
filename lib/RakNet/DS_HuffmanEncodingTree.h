@@ -20,7 +20,7 @@
 
 #include "DS_HuffmanEncodingTreeNode.h"
 #include "BitStream.h"
-#include "DS_LinkedList.h" 
+#include <list>
 
 /// This generates special cases of the huffman encoding tree using 8 bit keys with the additional condition that unused combinations of 8 bits are treated as a frequency of 1
 class HuffmanEncodingTree
@@ -38,7 +38,6 @@ public:
 	
 	// Decodes an array encoded by EncodeArray()
 	unsigned DecodeArray( BitStream * input, unsigned sizeInBits, unsigned maxCharsToWrite, unsigned char *output );
-	void DecodeArray( unsigned char *input, unsigned sizeInBits, BitStream * output );
 	
 	/// Given a frequency table of 256 elements, all with a frequency of 1 or more, generate the tree
 	void GenerateFromFrequencyTable( unsigned int frequencyTable[ 256 ] );
@@ -63,7 +62,7 @@ private:
 	
 	CharacterEncoding encodingTable[ 256 ];
 	
-	void InsertNodeIntoSortedList( HuffmanEncodingTreeNode * node, DataStructures::LinkedList<HuffmanEncodingTreeNode *> *huffmanEncodingTreeNodeList ) const;
+	void InsertNodeIntoSortedList( HuffmanEncodingTreeNode * node, std::list<HuffmanEncodingTreeNode *> *huffmanEncodingTreeNodeList ) const;
 };
 
 #endif

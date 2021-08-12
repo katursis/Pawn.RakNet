@@ -66,11 +66,6 @@
     <ClInclude Include="lib\RakNet\BitStream.h" />
     <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTree.h" />
     <ClInclude Include="lib\RakNet\DS_HuffmanEncodingTreeNode.h" />
-    <ClInclude Include="lib\RakNet\DS_LinkedList.h" />
-    <ClInclude Include="lib\RakNet\DS_List.h" />
-    <ClInclude Include="lib\RakNet\DS_Map.h" />
-    <ClInclude Include="lib\RakNet\DS_OrderedList.h" />
-    <ClInclude Include="lib\RakNet\DS_Queue.h" />
     <ClInclude Include="lib\RakNet\NetworkTypes.h" />
     <ClInclude Include="lib\RakNet\PluginInterface.h" />
     <ClInclude Include="lib\RakNet\StringCompressor.h" />

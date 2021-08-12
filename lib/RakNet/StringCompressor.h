@@ -18,8 +18,6 @@
 #ifndef __STRING_COMPRESSOR_H
 #define __STRING_COMPRESSOR_H
 
-#include "DS_Map.h"
-
 /// Forward declaration
 class BitStream;
 
@@ -41,13 +39,6 @@ public:
 	/// \return the unique instance of the StringCompressor 
 	static StringCompressor* Instance(void);
 
-	/// Given an array of strings, such as a chat log, generate the optimal encoding tree for it.
-	/// This function is optional and if it is not called a default tree will be used instead.
-	/// \param[in] input An array of bytes which should point to text.
-	/// \param[in] inputLength Length of \a input
-	/// \param[in] languageID An identifier for the language / string table to generate the tree for.  English is automatically created with ID 0 in the constructor.
-	void GenerateTreeFromStrings( unsigned char *input, unsigned inputLength, int languageID );
-	
  	/// Writes input to output, compressed.  Takes care of the null terminator for you.
 	/// \param[in] input Pointer to an ASCII string
 	/// \param[in] maxCharsToWrite The max number of bytes to write of \a input.  Use 0 to mean no limit.
@@ -76,8 +67,8 @@ private:
 	/// Singleton instance
 	static StringCompressor *instance;
 	
-	/// Pointer to the huffman encoding trees.
-	DataStructures::Map<int, HuffmanEncodingTree *> huffmanEncodingTrees;
+	/// Pointer to the huffman encoding tree.
+	HuffmanEncodingTree *huffmanEncodingTree;
 
 	static int referenceCount;
 };

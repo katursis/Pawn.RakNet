@@ -15,7 +15,7 @@
 /// option) any later version.
 
 #include "DS_HuffmanEncodingTree.h"
-#include "DS_Queue.h"
+#include <queue>
 #include "BitStream.h"
 #include <assert.h> 
 
@@ -39,21 +39,21 @@ void HuffmanEncodingTree::FreeMemory( void )
 		return ;
 		
 	// Use an in-order traversal to delete the tree
-	DataStructures::Queue<HuffmanEncodingTreeNode *> nodeQueue;
+	std::queue<HuffmanEncodingTreeNode *> nodeQueue;
 	
 	HuffmanEncodingTreeNode *node;
 	
-	nodeQueue.Push( root );
+	nodeQueue.push( root );
 	
-	while ( nodeQueue.Size() > 0 )
+	while ( nodeQueue.size() > 0 )
 	{
-		node = nodeQueue.Pop();
+		node = nodeQueue.front(); nodeQueue.pop();
 		
 		if ( node->left )
-			nodeQueue.Push( node->left );
+			nodeQueue.push( node->left );
 			
 		if ( node->right )
-			nodeQueue.Push( node->right );
+			nodeQueue.push( node->right );
 			
 		delete node;
 	}
@@ -75,7 +75,7 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 	HuffmanEncodingTreeNode * node;
 	HuffmanEncodingTreeNode *leafList[ 256 ]; // Keep a copy of the pointers to all the leaves so we can generate the encryption table bottom-up, which is easier
 	// 1.  Make 256 trees each with a weight equal to the frequency of the corresponding character
-	DataStructures::LinkedList<HuffmanEncodingTreeNode *> huffmanEncodingTreeNodeList;
+	std::list<HuffmanEncodingTreeNode *> huffmanEncodingTreeNodeList;
 	
 	FreeMemory();
 	
@@ -103,10 +103,9 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 #endif
 	while ( 1 )
 	{
-		huffmanEncodingTreeNodeList.Beginning();
 		HuffmanEncodingTreeNode *lesser, *greater;
-		lesser = huffmanEncodingTreeNodeList.Pop();
-		greater = huffmanEncodingTreeNodeList.Pop();
+		lesser = huffmanEncodingTreeNodeList.front(); huffmanEncodingTreeNodeList.pop_front();
+		greater = huffmanEncodingTreeNodeList.front(); huffmanEncodingTreeNodeList.pop_front();
 		node = new HuffmanEncodingTreeNode;
 		node->left = lesser;
 		node->right = greater;
@@ -114,7 +113,7 @@ void HuffmanEncodingTree::GenerateFromFrequencyTable( unsigned int frequencyTabl
 		lesser->parent = node;  // This is done to make generating the encryption table easier
 		greater->parent = node;  // This is done to make generating the encryption table easier
 		
-		if ( huffmanEncodingTreeNodeList.Size() == 0 )
+		if ( huffmanEncodingTreeNodeList.empty() )
 		{
 			// 3. Assign the one remaining node in the list to the root node.
 			root = node;
@@ -235,44 +234,16 @@ unsigned HuffmanEncodingTree::DecodeArray( BitStream * input, unsigned sizeInBit
 	return outputWriteIndex;
 }
 
-// Pass an array of encoded bytes to array and a preallocated BitStream to receive the output
-void HuffmanEncodingTree::DecodeArray( unsigned char *input, unsigned sizeInBits, BitStream * output )
-{
-	HuffmanEncodingTreeNode * currentNode;
-	
-	if ( sizeInBits <= 0 )
-		return ;
-		
-	BitStream bitStream( input, BITS_TO_BYTES(sizeInBits), false );
-	
-	currentNode = root;
-	
-	// For each bit, go left if it is a 0 and right if it is a 1.  When we reach a leaf, that gives us the desired value and we restart from the root
-	for ( unsigned counter = 0; counter < sizeInBits; counter++ )
-	{
-		if ( bitStream.ReadBit() == false )   // left!
-			currentNode = currentNode->left;
-		else
-			currentNode = currentNode->right;
-			
-		if ( currentNode->left == 0 && currentNode->right == 0 )   // Leaf
-		{
-			output->WriteBits( &( currentNode->value ), sizeof( char ) * 8, true ); // Use WriteBits instead of Write(char) because we want to avoid TYPE_CHECKING
-			currentNode = root;
-		}
-	}
-}
-
 // Insertion sort.  Slow but easy to write in this case
-void HuffmanEncodingTree::InsertNodeIntoSortedList( HuffmanEncodingTreeNode * node, DataStructures::LinkedList<HuffmanEncodingTreeNode *> *huffmanEncodingTreeNodeList ) const
+void HuffmanEncodingTree::InsertNodeIntoSortedList( HuffmanEncodingTreeNode * node, std::list<HuffmanEncodingTreeNode *> *huffmanEncodingTreeNodeList ) const
 {
-	if ( huffmanEncodingTreeNodeList->Size() == 0 )
+	if ( huffmanEncodingTreeNodeList->empty() )
 	{
-		huffmanEncodingTreeNodeList->Insert( node );
+		huffmanEncodingTreeNodeList->push_back( node );
 		return ;
 	}
 	
-	huffmanEncodingTreeNodeList->Beginning();
+	std::list<HuffmanEncodingTreeNode *>::iterator currentIter = huffmanEncodingTreeNodeList->begin();
 	
 	unsigned counter = 0;
 #ifdef _MSC_VER
@@ -280,20 +251,18 @@ void HuffmanEncodingTree::InsertNodeIntoSortedList( HuffmanEncodingTreeNode * no
 #endif
 	while ( 1 )
 	{
-		if ( huffmanEncodingTreeNodeList->Peek()->weight < node->weight )
-			++( *huffmanEncodingTreeNodeList );
+		if ( (*currentIter)->weight < node->weight )
+			++currentIter;
 		else
 		{
-			huffmanEncodingTreeNodeList->Insert( node );
+			huffmanEncodingTreeNodeList->insert( currentIter, node );
 			break;
 		}
 		
 		// Didn't find a spot in the middle - add to the end
-		if ( ++counter == huffmanEncodingTreeNodeList->Size() )
+		if ( ++counter == huffmanEncodingTreeNodeList->size() )
 		{
-			huffmanEncodingTreeNodeList->End();
-			
-			huffmanEncodingTreeNodeList->Add( node )
+			huffmanEncodingTreeNodeList->push_back( node )
 			
 			; // Add to the end
 			break;
