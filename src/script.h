@@ -128,6 +128,9 @@ class Script : public ptl::AbstractScript<Script> {
 
   void DeleteBitStream(cell handle);
 
+  template <typename T, bool compressed = false>
+  cell ReadValue(BitStream *bs);
+
  private:
   const std::regex regex_reg_handler_public_name_{
       R"(^pr_r(?:ip|ir|op|or|irp)_\w+$)"};

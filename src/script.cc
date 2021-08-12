@@ -339,44 +339,6 @@ cell Script::BS_WriteValue(cell *params) {
   return 1;
 }
 
-template <typename T>
-struct Value {
-  static inline cell Read(BitStream *bs) {
-    T value{};
-
-    bs->Read<T>(value);
-
-    return static_cast<cell>(value);
-  }
-
-  static inline cell ReadCompressed(BitStream *bs) {
-    T value{};
-
-    bs->ReadCompressed<T>(value);
-
-    return static_cast<cell>(value);
-  }
-};
-
-template <>
-struct Value<float> {
-  static inline cell Read(BitStream *bs) {
-    float value{};
-
-    bs->Read<float>(value);
-
-    return amx_ftoc(value);
-  }
-
-  static inline cell ReadCompressed(BitStream *bs) {
-    float value{};
-
-    bs->ReadCompressed<float>(value);
-
-    return amx_ftoc(value);
-  }
-};
-
 // native BS_ReadValue(BitStream:bs, {PR_ValueType, Float, _}:...);
 cell Script::BS_ReadValue(cell *params) {
   AssertMinParams(3, params);
@@ -407,52 +369,52 @@ cell Script::BS_ReadValue(cell *params) {
         break;
       }
       case PR_INT8:
-        value = Value<char>::Read(bs);
+        value = ReadValue<char>(bs);
         break;
       case PR_INT16:
-        value = Value<short>::Read(bs);
+        value = ReadValue<short>(bs);
         break;
       case PR_INT32:
-        value = Value<int>::Read(bs);
+        value = ReadValue<int>(bs);
         break;
       case PR_UINT8:
-        value = Value<unsigned char>::Read(bs);
+        value = ReadValue<unsigned char>(bs);
         break;
       case PR_UINT16:
-        value = Value<unsigned short>::Read(bs);
+        value = ReadValue<unsigned short>(bs);
         break;
       case PR_UINT32:
-        value = Value<unsigned int>::Read(bs);
+        value = ReadValue<unsigned int>(bs);
         break;
       case PR_FLOAT:
-        value = Value<float>::Read(bs);
+        value = ReadValue<float>(bs);
         break;
       case PR_BOOL:
-        value = Value<bool>::Read(bs);
+        value = ReadValue<bool>(bs);
         break;
       case PR_CINT8:
-        value = Value<char>::ReadCompressed(bs);
+        value = ReadValue<char, true>(bs);
         break;
       case PR_CINT16:
-        value = Value<short>::ReadCompressed(bs);
+        value = ReadValue<short, true>(bs);
         break;
       case PR_CINT32:
-        value = Value<int>::ReadCompressed(bs);
+        value = ReadValue<int, true>(bs);
         break;
       case PR_CUINT8:
-        value = Value<unsigned char>::ReadCompressed(bs);
+        value = ReadValue<unsigned char, true>(bs);
         break;
       case PR_CUINT16:
-        value = Value<unsigned short>::ReadCompressed(bs);
+        value = ReadValue<unsigned short, true>(bs);
         break;
       case PR_CUINT32:
-        value = Value<unsigned int>::ReadCompressed(bs);
+        value = ReadValue<unsigned int, true>(bs);
         break;
       case PR_CFLOAT:
-        value = Value<float>::ReadCompressed(bs);
+        value = ReadValue<float, true>(bs);
         break;
       case PR_CBOOL:
-        value = Value<bool>::ReadCompressed(bs);
+        value = ReadValue<bool, true>(bs);
         break;
       case PR_BITS: {
         const auto number_of_bits = *GetPhysAddr(params[i + 3]);
@@ -473,7 +435,7 @@ cell Script::BS_ReadValue(cell *params) {
         auto arr = &value;
 
         for (std::size_t index{}; index < arr_size; ++index) {
-          arr[index] = Value<float>::Read(bs);
+          arr[index] = ReadValue<float>(bs);
         }
 
         break;
@@ -497,9 +459,9 @@ cell Script::BS_ReadValue(cell *params) {
         cell size{};
 
         if (type == PR_STRING8) {
-          size = Value<unsigned char>::Read(bs);
+          size = ReadValue<unsigned char>(bs);
         } else {
-          size = Value<unsigned int>::Read(bs);
+          size = ReadValue<unsigned int>(bs);
         }
 
         if (size > 0) {
@@ -646,4 +608,21 @@ std::unordered_set<std::shared_ptr<BitStream>>::iterator Script::FindBitStream(
 
 void Script::DeleteBitStream(cell handle) {
   bitstreams_.erase(FindBitStream(handle));
+}
+
+template <typename T, bool compressed>
+cell Script::ReadValue(BitStream *bs) {
+  T value{};
+
+  if constexpr (compressed) {
+    bs->ReadCompressed<T>(value);
+  } else {
+    bs->Read<T>(value);
+  }
+
+  if constexpr (std::is_same<float, T>::value) {
+    return amx_ftoc(value);
+  }
+
+  return static_cast<cell>(value);
 }
