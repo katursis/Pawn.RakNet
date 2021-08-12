@@ -129,6 +129,9 @@ class Script : public ptl::AbstractScript<Script> {
   void DeleteBitStream(cell handle);
 
   template <typename T, bool compressed = false>
+  void WriteValue(BitStream *bs, cell value);
+
+  template <typename T, bool compressed = false>
   cell ReadValue(BitStream *bs);
 
  private:

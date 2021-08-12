@@ -229,52 +229,52 @@ cell Script::BS_WriteValue(cell *params) {
         break;
       }
       case PR_INT8:
-        bs->Write(static_cast<char>(value));
+        WriteValue<char>(bs, value);
         break;
       case PR_INT16:
-        bs->Write(static_cast<short>(value));
+        WriteValue<short>(bs, value);
         break;
       case PR_INT32:
-        bs->Write(static_cast<int>(value));
+        WriteValue<int>(bs, value);
         break;
       case PR_UINT8:
-        bs->Write(static_cast<unsigned char>(value));
+        WriteValue<unsigned char>(bs, value);
         break;
       case PR_UINT16:
-        bs->Write(static_cast<unsigned short>(value));
+        WriteValue<unsigned short>(bs, value);
         break;
       case PR_UINT32:
-        bs->Write(static_cast<unsigned int>(value));
+        WriteValue<unsigned int>(bs, value);
         break;
       case PR_FLOAT:
-        bs->Write(amx_ctof(value));
+        WriteValue<float>(bs, value);
         break;
       case PR_BOOL:
-        bs->Write(!!value);
+        WriteValue<bool>(bs, value);
         break;
       case PR_CINT8:
-        bs->WriteCompressed(static_cast<char>(value));
+        WriteValue<char, true>(bs, value);
         break;
       case PR_CINT16:
-        bs->WriteCompressed(static_cast<short>(value));
+        WriteValue<short, true>(bs, value);
         break;
       case PR_CINT32:
-        bs->WriteCompressed(static_cast<int>(value));
+        WriteValue<int, true>(bs, value);
         break;
       case PR_CUINT8:
-        bs->WriteCompressed(static_cast<unsigned char>(value));
+        WriteValue<unsigned char, true>(bs, value);
         break;
       case PR_CUINT16:
-        bs->WriteCompressed(static_cast<unsigned short>(value));
+        WriteValue<unsigned short, true>(bs, value);
         break;
       case PR_CUINT32:
-        bs->WriteCompressed(static_cast<unsigned int>(value));
+        WriteValue<unsigned int, true>(bs, value);
         break;
       case PR_CFLOAT:
-        bs->WriteCompressed(amx_ctof(value));
+        WriteValue<float, true>(bs, value);
         break;
       case PR_CBOOL:
-        bs->WriteCompressed(!!value);
+        WriteValue<bool, true>(bs, value);
         break;
       case PR_BITS: {
         const auto number_of_bits = *GetPhysAddr(params[i + 3]);
@@ -295,7 +295,7 @@ cell Script::BS_WriteValue(cell *params) {
         const auto arr = &value;
 
         for (std::size_t index{}; index < arr_size; ++index) {
-          bs->Write(amx_ctof(arr[index]));
+          WriteValue<float>(bs, arr[index]);
         }
 
         break;
@@ -317,9 +317,9 @@ cell Script::BS_WriteValue(cell *params) {
         auto str = GetString(params[i + 2]);
 
         if (type == PR_STRING8) {
-          bs->Write(static_cast<unsigned char>(str.size()));
+          WriteValue<unsigned char>(bs, str.size());
         } else {
-          bs->Write(static_cast<unsigned int>(str.size()));
+          WriteValue<unsigned int>(bs, str.size());
         }
 
         bs->Write(str.c_str(), str.size());
@@ -608,6 +608,23 @@ std::unordered_set<std::shared_ptr<BitStream>>::iterator Script::FindBitStream(
 
 void Script::DeleteBitStream(cell handle) {
   bitstreams_.erase(FindBitStream(handle));
+}
+
+template <typename T, bool compressed>
+void Script::WriteValue(BitStream *bs, cell value) {
+  T prepared_value{};
+
+  if constexpr (std::is_same<float, T>::value) {
+    prepared_value = amx_ctof(value);
+  } else {
+    prepared_value = static_cast<T>(value);
+  }
+
+  if constexpr (compressed) {
+    bs->WriteCompressed<T>(prepared_value);
+  } else {
+    bs->Write<T>(prepared_value);
+  }
 }
 
 template <typename T, bool compressed>
