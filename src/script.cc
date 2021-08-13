@@ -511,38 +511,35 @@ bool Script::OnLoad() {
       InitPublic(PR_INCOMING_PACKET, public_name);
     } else if (public_name == "OnIncomingRPC") {
       InitPublic(PR_INCOMING_RPC, public_name);
-    } else if (public_name == "OnOutcomingPacket") {
-      InitPublic(PR_OUTCOMING_PACKET, public_name);
-    } else if (public_name == "OnOutcomingRPC") {
-      InitPublic(PR_OUTCOMING_RPC, public_name);
+    } else if (public_name == "OnOutgoingPacket") {
+      InitPublic(PR_OUTGOING_PACKET, public_name);
+    } else if (public_name == "OnOutgoingRPC") {
+      InitPublic(PR_OUTGOING_RPC, public_name);
     } else if (public_name == "OnIncomingRawPacket") {
       InitPublic(PR_INCOMING_RAW_PACKET, public_name);
+    }
+
+    // backward compatibility
+    if (public_name == "OnOutcomingPacket") {
+      public_on_outcoming_packet_ =
+          MakePublic(public_name, config_->UseCaching());
+    } else if (public_name == "OnOutcomingRPC") {
+      public_on_outcoming_rpc_ = MakePublic(public_name, config_->UseCaching());
     }
   }
 
   return true;
 }
 
-bool Script::OnEvent(PR_EventType event_type, int player_id, int id,
-                     BitStream *bs) {
-  const auto &pub = publics_[event_type];
-  if (pub && pub->Exists()) {
-    bs->ResetReadPointer();
-
-    if (!pub->Exec(player_id, id, bs)) {
-      return false;
-    }
+bool Script::ExecPublic(const PublicPtr &pub, int player_id, int event_id,
+                        BitStream *bs) {
+  if (!pub || !pub->Exists()) {
+    return true;
   }
 
-  for (const auto &handler : handlers_[event_type][id]) {
-    bs->ResetReadPointer();
+  bs->ResetReadPointer();
 
-    if (!handler->Exec(player_id, bs)) {
-      return false;
-    }
-  }
-
-  return true;
+  return pub->Exec(player_id, event_id, bs);
 }
 
 void Script::InitPublic(PR_EventType type, const std::string &public_name) {

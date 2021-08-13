@@ -34,11 +34,15 @@
     {
         PR_INCOMING_PACKET,
         PR_INCOMING_RPC,
-        PR_OUTCOMING_PACKET,
-        PR_OUTCOMING_RPC,
+        PR_OUTGOING_PACKET,
+        PR_OUTGOING_RPC,
         PR_INCOMING_RAW_PACKET,
 
         PR_NUMBER_OF_EVENT_TYPES,
+
+        // backward compatibility
+        PR_OUTCOMING_PACKET = PR_OUTGOING_PACKET,
+        PR_OUTCOMING_RPC = PR_OUTGOING_RPC,
     };
 
     enum PR_ValueType
@@ -111,15 +115,19 @@
 
         #define IPacket:%0(%1) PR_Handler<PR_INCOMING_PACKET,ip>:%0(%1)
         #define IRPC:%0(%1) PR_Handler<PR_INCOMING_RPC,ir>:%0(%1)
-        #define OPacket:%0(%1) PR_Handler<PR_OUTCOMING_PACKET,op>:%0(%1)
-        #define ORPC:%0(%1) PR_Handler<PR_OUTCOMING_RPC,or>:%0(%1)
+        #define OPacket:%0(%1) PR_Handler<PR_OUTGOING_PACKET,op>:%0(%1)
+        #define ORPC:%0(%1) PR_Handler<PR_OUTGOING_RPC,or>:%0(%1)
         #define IRawPacket:%0(%1) PR_Handler<PR_INCOMING_RAW_PACKET,irp>:%0(%1)
 
         #define IncomingPacket IPacket
         #define IncomingRPC IRPC
-        #define OutcomingPacket OPacket
-        #define OutcomingRPC ORPC
+        #define OutgoingPacket OPacket
+        #define OutgoingRPC ORPC
         #define IncomingRawPacket IRawPacket
+
+        // backward compatibility
+        #define OutcomingPacket OutgoingPacket
+        #define OutcomingRPC OutgoingRPC
 
         #define PR_MAX_WEAPON_SLOTS 13
 
@@ -405,9 +413,9 @@
             }
         }
 
-        stock BS_ReadOnFootSync(BitStream:bs, data[PR_OnFootSync], outcoming = false)
+        stock BS_ReadOnFootSync(BitStream:bs, data[PR_OnFootSync], outgoing = false)
         {
-            if (outcoming) {
+            if (outgoing) {
                 new hasLeftRight, hasUpDown, hasSurfInfo, hasAnimation, healthArmour;
 
                 BS_ReadValue(bs, PR_BOOL, hasLeftRight);
@@ -484,9 +492,9 @@
             }
         }
 
-        stock BS_ReadInCarSync(BitStream:bs, data[PR_InCarSync], outcoming = false)
+        stock BS_ReadInCarSync(BitStream:bs, data[PR_InCarSync], outgoing = false)
         {
-            if (outcoming) {
+            if (outgoing) {
                 new vehicleHealth, healthArmour;
 
                 BS_ReadValue(
@@ -683,9 +691,9 @@
             );
         }
 
-        stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync], outcoming = false)
+        stock BS_WriteOnFootSync(BitStream:bs, data[PR_OnFootSync], outgoing = false)
         {
-            if (outcoming) {
+            if (outgoing) {
                 new healthArmour;
 
                 if (data[PR_lrKey]) {
@@ -764,9 +772,9 @@
             }
         }
 
-        stock BS_WriteInCarSync(BitStream:bs, data[PR_InCarSync], outcoming = false)
+        stock BS_WriteInCarSync(BitStream:bs, data[PR_InCarSync], outgoing = false)
         {
-            if (outcoming) {
+            if (outgoing) {
                 new healthArmour;
 
                 BS_PackHealthArmour(data[PR_playerHealth], data[PR_armour], healthArmour);
@@ -1011,9 +1019,14 @@
 
         forward OnIncomingPacket(playerid, packetid, BitStream:bs);
         forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
-        forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
-        forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
+        forward OnOutgoingPacket(playerid, packetid, BitStream:bs);
+        forward OnOutgoingRPC(playerid, rpcid, BitStream:bs);
         forward OnIncomingRawPacket(playerid, packetid, BitStream:bs);
+
+        #pragma deprecated Use OnOutgoingPacket instead
+        forward OnOutcomingPacket(playerid, packetid, BitStream:bs);
+        #pragma deprecated Use OnOutgoingRPC instead
+        forward OnOutcomingRPC(playerid, rpcid, BitStream:bs);
 
         #if defined FILTERSCRIPT
             public OnFilterScriptInit()

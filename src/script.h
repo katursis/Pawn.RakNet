@@ -109,7 +109,35 @@ class Script : public ptl::AbstractScript<Script> {
 
   bool OnLoad();
 
-  bool OnEvent(PR_EventType event_type, int player_id, int id, BitStream *bs);
+  template <PR_EventType event_type>
+  bool OnEvent(int player_id, int id, BitStream *bs) {
+    if constexpr (event_type == PR_OUTGOING_PACKET) {
+      if (!ExecPublic(public_on_outcoming_packet_, player_id, id, bs)) {
+        return false;
+      }
+    } else if constexpr (event_type == PR_OUTGOING_RPC) {
+      if (!ExecPublic(public_on_outcoming_rpc_, player_id, id, bs)) {
+        return false;
+      }
+    }
+
+    if (!ExecPublic(publics_[event_type], player_id, id, bs)) {
+      return false;
+    }
+
+    for (const auto &handler : handlers_[event_type][id]) {
+      bs->ResetReadPointer();
+
+      if (!handler->Exec(player_id, bs)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  bool ExecPublic(const PublicPtr &pub, int player_id, int event_id,
+                  BitStream *bs);
 
   void InitPublic(PR_EventType type, const std::string &public_name);
 
@@ -146,6 +174,10 @@ class Script : public ptl::AbstractScript<Script> {
   std::array<std::array<std::list<PublicPtr>, PR_MAX_HANDLERS>,
              PR_NUMBER_OF_EVENT_TYPES>
       handlers_;
+
+  // backward compatibility
+  PublicPtr public_on_outcoming_packet_;
+  PublicPtr public_on_outcoming_rpc_;
 
   std::unordered_set<std::shared_ptr<BitStream>> bitstreams_;
 };

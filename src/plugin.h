@@ -63,8 +63,12 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   const std::shared_ptr<RakServer> &GetRakServer();
 
-  static bool OnEvent(PR_EventType event_type, int player_id, int id,
-                      BitStream *bs);
+  template <PR_EventType event_type>
+  static bool OnEvent(int player_id, int id, BitStream *bs) {
+    return EveryScript([=](const std::shared_ptr<Script> &script) {
+      return script->OnEvent<event_type>(player_id, id, bs);
+    });
+  }
 
   static Plugin &Get() { return Instance(); }
 

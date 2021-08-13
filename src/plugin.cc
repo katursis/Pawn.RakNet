@@ -133,12 +133,12 @@ void Plugin::InstallRakServerHooks(urmem::address_t addr_rakserver) {
     Hooks::ReceiveRPC::Init();
   }
 
-  if (config_->InterceptOutcomingPacket()) {
+  if (config_->InterceptOutgoingPacket()) {
     rakserver_->InstallHook(RakServer::MethodIndex::kSend,
                             &Hooks::RakServer__Send);
   }
 
-  if (config_->InterceptOutcomingRPC()) {
+  if (config_->InterceptOutgoingRPC()) {
     rakserver_->InstallHook(RakServer::MethodIndex::kRPC,
                             &Hooks::RakServer__RPC);
   }
@@ -217,10 +217,3 @@ const std::shared_ptr<urmem::hook> &Plugin::GetHookAmxCleanup() {
 const std::shared_ptr<Config> &Plugin::GetConfig() { return config_; }
 
 const std::shared_ptr<RakServer> &Plugin::GetRakServer() { return rakserver_; }
-
-bool Plugin::OnEvent(PR_EventType event_type, int player_id, int id,
-                     BitStream *bs) {
-  return EveryScript([=](const std::shared_ptr<Script> &script) {
-    return script->OnEvent(event_type, player_id, id, bs);
-  });
-}

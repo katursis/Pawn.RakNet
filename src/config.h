@@ -46,14 +46,20 @@ class Config {
 
     const auto config = cpptoml::parse_file(file_path_);
 
+    // backward compatibility
+    bool intercept_outcoming_packet =
+        config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
+    bool intercept_outcoming_rpc =
+        config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
+
     intercept_incoming_packet_ =
         config->get_as<bool>("InterceptIncomingPacket").value_or(true);
     intercept_incoming_rpc_ =
         config->get_as<bool>("InterceptIncomingRPC").value_or(true);
-    intercept_outcoming_packet_ =
-        config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
-    intercept_outcoming_rpc_ =
-        config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
+    intercept_outgoing_packet_ = config->get_as<bool>("InterceptOutgoingPacket")
+                                     .value_or(intercept_outcoming_packet);
+    intercept_outgoing_rpc_ = config->get_as<bool>("InterceptOutgoingRPC")
+                                  .value_or(intercept_outcoming_rpc);
     intercept_incoming_raw_packet_ =
         config->get_as<bool>("InterceptIncomingRawPacket").value_or(true);
     use_caching_ = config->get_as<bool>("UseCaching").value_or(false);
@@ -64,8 +70,8 @@ class Config {
 
     config->insert("InterceptIncomingPacket", intercept_incoming_packet_);
     config->insert("InterceptIncomingRPC", intercept_incoming_rpc_);
-    config->insert("InterceptOutcomingPacket", intercept_outcoming_packet_);
-    config->insert("InterceptOutcomingRPC", intercept_outcoming_rpc_);
+    config->insert("InterceptOutgoingPacket", intercept_outgoing_packet_);
+    config->insert("InterceptOutgoingRPC", intercept_outgoing_rpc_);
     config->insert("InterceptIncomingRawPacket",
                    intercept_incoming_raw_packet_);
     config->insert("UseCaching", use_caching_);
@@ -78,9 +84,9 @@ class Config {
 
   bool InterceptIncomingRPC() const { return intercept_incoming_rpc_; }
 
-  bool InterceptOutcomingPacket() const { return intercept_outcoming_packet_; }
+  bool InterceptOutgoingPacket() const { return intercept_outgoing_packet_; }
 
-  bool InterceptOutcomingRPC() const { return intercept_outcoming_rpc_; }
+  bool InterceptOutgoingRPC() const { return intercept_outgoing_rpc_; }
 
   bool InterceptIncomingRawPacket() const {
     return intercept_incoming_raw_packet_;
@@ -93,8 +99,8 @@ class Config {
 
   bool intercept_incoming_packet_{};
   bool intercept_incoming_rpc_{};
-  bool intercept_outcoming_packet_{};
-  bool intercept_outcoming_rpc_{};
+  bool intercept_outgoing_packet_{};
+  bool intercept_outgoing_rpc_{};
   bool intercept_incoming_raw_packet_{};
   bool use_caching_{};
 };

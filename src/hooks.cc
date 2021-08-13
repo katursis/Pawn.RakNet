@@ -36,8 +36,8 @@ PluginReceiveResult MessageHandler::OnReceive(RakPeerInterface *peer,
 
   BitStream bs{packet->data, packet->length, false};
 
-  if (!Plugin::OnEvent(PR_INCOMING_RAW_PACKET, player_id,
-                       plugin.GetPacketId(packet), &bs)) {
+  if (!Plugin::OnEvent<PR_INCOMING_RAW_PACKET>(
+          player_id, plugin.GetPacketId(packet), &bs)) {
     return PluginReceiveResult::RR_STOP_PROCESSING_AND_DEALLOCATE;
   }
 
@@ -64,8 +64,7 @@ bool THISCALL Hooks::RakServer__Send(void *_this, BitStream *bs, int priority,
 
   auto &rakserver = Plugin::Get().GetRakServer();
 
-  if (!Plugin::OnEvent(
-          PR_OUTCOMING_PACKET,
+  if (!Plugin::OnEvent<PR_OUTGOING_PACKET>(
           broadcast ? -1 : rakserver->GetIndexFromPlayerID(playerId),
           *bs->GetData(), bs)) {
     return false;
@@ -93,8 +92,7 @@ bool THISCALL Hooks::RakServer__RPC(void *_this, RPCIndex *uniqueID,
 
   auto &rakserver = Plugin::Get().GetRakServer();
 
-  if (!Plugin::OnEvent(
-          PR_OUTCOMING_RPC,
+  if (!Plugin::OnEvent<PR_OUTGOING_RPC>(
           broadcast ? -1 : rakserver->GetIndexFromPlayerID(playerId), rpc_id,
           bs)) {
     return false;
@@ -120,8 +118,8 @@ Packet *THISCALL Hooks::RakServer__Receive(void *_this) {
     }
 
     BitStream bs{packet->data, packet->length, false};
-    if (Plugin::OnEvent(PR_INCOMING_PACKET, player_id,
-                        plugin.GetPacketId(packet), &bs)) {
+    if (Plugin::OnEvent<PR_INCOMING_PACKET>(player_id,
+                                            plugin.GetPacketId(packet), &bs)) {
       if (packet->data != bs.GetData()) {
         rakserver->DeallocatePacket(packet);
 
@@ -173,7 +171,7 @@ void Hooks::HandleRPC(int rpc_id, RPCParameters *p) {
       bs.SetWriteOffset(p->numberOfBitsOfData);
     }
 
-    if (!Plugin::OnEvent(PR_INCOMING_RPC, player_id, rpc_id, &bs)) {
+    if (!Plugin::OnEvent<PR_INCOMING_RPC>(player_id, rpc_id, &bs)) {
       return;
     }
 
