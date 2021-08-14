@@ -36,8 +36,9 @@ class Script : public ptl::AbstractScript<Script> {
   // native PR_Init();
   cell PR_Init();
 
-  // native PR_RegHandler(id, const publicname[], PR_EventType:type);
-  cell PR_RegHandler(int id, std::string public_name, PR_EventType type);
+  // native PR_RegHandler(eventid, const publicname[], PR_EventType:type);
+  cell PR_RegHandler(unsigned char event_id, std::string public_name,
+                     PR_EventType type);
 
   // native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority =
   // PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
@@ -47,14 +48,14 @@ class Script : public ptl::AbstractScript<Script> {
   // native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority
   // = PR_HIGH_PRIORITY, PR_PacketReliability:reliability =
   // PR_RELIABLE_ORDERED);
-  cell PR_SendRPC(BitStream *bs, int player_id, int rpc_id,
+  cell PR_SendRPC(BitStream *bs, int player_id, RPCIndex rpc_id,
                   PR_PacketPriority priority, PR_PacketReliability reliability);
 
   // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
   cell PR_EmulateIncomingPacket(BitStream *bs, int player_id);
 
   // native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
-  cell PR_EmulateIncomingRPC(BitStream *bs, int player_id, int rpc_id);
+  cell PR_EmulateIncomingRPC(BitStream *bs, int player_id, RPCIndex rpc_id);
 
   // native BitStream:BS_New();
   cell BS_New();
@@ -110,22 +111,22 @@ class Script : public ptl::AbstractScript<Script> {
   bool OnLoad();
 
   template <PR_EventType event_type>
-  bool OnEvent(int player_id, int id, BitStream *bs) {
+  bool OnEvent(int player_id, unsigned char event_id, BitStream *bs) {
     if constexpr (event_type == PR_OUTGOING_PACKET) {
-      if (!ExecPublic(public_on_outcoming_packet_, player_id, id, bs)) {
+      if (!ExecPublic(public_on_outcoming_packet_, player_id, event_id, bs)) {
         return false;
       }
     } else if constexpr (event_type == PR_OUTGOING_RPC) {
-      if (!ExecPublic(public_on_outcoming_rpc_, player_id, id, bs)) {
+      if (!ExecPublic(public_on_outcoming_rpc_, player_id, event_id, bs)) {
         return false;
       }
     }
 
-    if (!ExecPublic(publics_[event_type], player_id, id, bs)) {
+    if (!ExecPublic(std::get<event_type>(publics_), player_id, event_id, bs)) {
       return false;
     }
 
-    for (const auto &handler : handlers_[event_type][id]) {
+    for (const auto &handler : std::get<event_type>(handlers_).at(event_id)) {
       bs->ResetReadPointer();
 
       if (!handler->Exec(player_id, bs)) {
@@ -136,12 +137,13 @@ class Script : public ptl::AbstractScript<Script> {
     return true;
   }
 
-  bool ExecPublic(const PublicPtr &pub, int player_id, int event_id,
+  bool ExecPublic(const PublicPtr &pub, int player_id, unsigned char event_id,
                   BitStream *bs);
 
   void InitPublic(PR_EventType type, const std::string &public_name);
 
-  void InitHandler(int id, const std::string &public_name, PR_EventType type);
+  void InitHandler(unsigned char event_id, const std::string &public_name,
+                   PR_EventType type);
 
   void InitHandlers();
 

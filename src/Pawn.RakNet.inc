@@ -296,7 +296,7 @@
         native BS_WriteValue(BitStream:bs, {PR_ValueType, Float, _}:...);
         native BS_ReadValue(BitStream:bs, {PR_ValueType, Float, _}:...);
 
-        native PR_RegHandler(id, const publicname[], PR_EventType:type);
+        native PR_RegHandler(eventid, const publicname[], PR_EventType:type);
 
         #define BS_ReadInt8(%0,%1) BS_ReadValue(%0,PR_INT8,%1)
         #define BS_ReadInt16(%0,%1) BS_ReadValue(%0,PR_INT16,%1)

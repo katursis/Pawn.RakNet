@@ -31,9 +31,10 @@ cell Script::PR_Init() {
   return 1;
 }
 
-// native PR_RegHandler(id, const publicname[], PR_EventType:type);
-cell Script::PR_RegHandler(int id, std::string public_name, PR_EventType type) {
-  InitHandler(id, public_name, type);
+// native PR_RegHandler(eventid, const publicname[], PR_EventType:type);
+cell Script::PR_RegHandler(unsigned char event_id, std::string public_name,
+                           PR_EventType type) {
+  InitHandler(event_id, public_name, type);
 
   return 1;
 }
@@ -58,15 +59,14 @@ cell Script::PR_SendPacket(BitStream *bs, int player_id,
 // native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority
 // = PR_HIGH_PRIORITY, PR_PacketReliability:reliability =
 // PR_RELIABLE_ORDERED);
-cell Script::PR_SendRPC(BitStream *bs, int player_id, int rpc_id,
+cell Script::PR_SendRPC(BitStream *bs, int player_id, RPCIndex rpc_id,
                         PR_PacketPriority priority,
                         PR_PacketReliability reliability) {
   const bool broadcast = player_id == -1;
 
   auto &rakserver = Plugin::Get().GetRakServer();
 
-  return rakserver->RPC(reinterpret_cast<RPCIndex *>(&rpc_id), bs, priority,
-                        reliability, '\0',
+  return rakserver->RPC(&rpc_id, bs, priority, reliability, '\0',
                         broadcast ? UNASSIGNED_PLAYER_ID
                                   : rakserver->GetPlayerIDFromIndex(player_id),
                         broadcast, false)
@@ -84,7 +84,8 @@ cell Script::PR_EmulateIncomingPacket(BitStream *bs, int player_id) {
 }
 
 // native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
-cell Script::PR_EmulateIncomingRPC(BitStream *bs, int player_id, int rpc_id) {
+cell Script::PR_EmulateIncomingRPC(BitStream *bs, int player_id,
+                                   RPCIndex rpc_id) {
   auto &plugin = Plugin::Get();
   auto &rakserver = plugin.GetRakServer();
 
@@ -531,8 +532,8 @@ bool Script::OnLoad() {
   return true;
 }
 
-bool Script::ExecPublic(const PublicPtr &pub, int player_id, int event_id,
-                        BitStream *bs) {
+bool Script::ExecPublic(const PublicPtr &pub, int player_id,
+                        unsigned char event_id, BitStream *bs) {
   if (!pub || !pub->Exists()) {
     return true;
   }
@@ -546,14 +547,14 @@ void Script::InitPublic(PR_EventType type, const std::string &public_name) {
   publics_.at(type) = MakePublic(public_name, config_->UseCaching());
 }
 
-void Script::InitHandler(int id, const std::string &public_name,
+void Script::InitHandler(unsigned char event_id, const std::string &public_name,
                          PR_EventType type) {
   auto pub = MakePublic(public_name, config_->UseCaching());
   if (!pub->Exists()) {
     throw std::runtime_error{"Public " + public_name + " does not exist"};
   }
 
-  handlers_.at(type).at(id).push_back(pub);
+  handlers_.at(type).at(event_id).push_back(pub);
 }
 
 void Script::InitHandlers() {

@@ -83,7 +83,7 @@ bool THISCALL Hooks::RakServer__RPC(void *_this, RPCIndex *uniqueID,
     return false;
   }
 
-  const int rpc_id = *uniqueID;
+  const auto rpc_id = *uniqueID;
 
   BitStream empty_bs;
   if (!bs) {
@@ -118,6 +118,7 @@ Packet *THISCALL Hooks::RakServer__Receive(void *_this) {
     }
 
     BitStream bs{packet->data, packet->length, false};
+
     if (Plugin::OnEvent<PR_INCOMING_PACKET>(player_id,
                                             plugin.GetPacketId(packet), &bs)) {
       if (packet->data != bs.GetData()) {
@@ -145,7 +146,7 @@ void *THISCALL Hooks::RakServer__RegisterAsRemoteProcedureCall(
   auto &rakserver = plugin.GetRakServer();
   auto &config = plugin.GetConfig();
 
-  const int rpc_id = *uniqueID;
+  const auto rpc_id = *uniqueID;
 
   plugin.SetOriginalRPCHandler(rpc_id, functionPointer);
 
@@ -156,7 +157,7 @@ void *THISCALL Hooks::RakServer__RegisterAsRemoteProcedureCall(
   return rakserver->RegisterAsRemoteProcedureCall(uniqueID, functionPointer);
 }
 
-void Hooks::HandleRPC(int rpc_id, RPCParameters *p) {
+void Hooks::HandleRPC(RPCIndex rpc_id, RPCParameters *p) {
   auto &plugin = Plugin::Get();
   auto &rakserver = plugin.GetRakServer();
 

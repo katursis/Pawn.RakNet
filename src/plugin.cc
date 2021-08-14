@@ -150,7 +150,7 @@ void Plugin::InstallRakServerHooks(urmem::address_t addr_rakserver) {
   }
 }
 
-int Plugin::GetPacketId(Packet *packet) {
+unsigned char Plugin::GetPacketId(Packet *packet) {
   return urmem::call_function<urmem::calling_convention::cdeclcall,
                               unsigned char>(addr_get_packet_id_, packet);
 }
@@ -190,19 +190,19 @@ Packet *Plugin::GetNextPacketToEmulate() {
   return packet;
 }
 
-void Plugin::SetOriginalRPCHandler(int rpc_id, RPCFunction handler) {
+void Plugin::SetOriginalRPCHandler(RPCIndex rpc_id, RPCFunction handler) {
   original_rpc_.at(rpc_id) = handler;
 }
 
-RPCFunction Plugin::GetOriginalRPCHandler(int rpc_id) {
+RPCFunction Plugin::GetOriginalRPCHandler(RPCIndex rpc_id) {
   return original_rpc_.at(rpc_id);
 }
 
-void Plugin::SetFakeRPCHandler(int rpc_id, RPCFunction handler) {
+void Plugin::SetFakeRPCHandler(RPCIndex rpc_id, RPCFunction handler) {
   fake_rpc_.at(rpc_id) = handler;
 }
 
-RPCFunction Plugin::GetFakeRPCHandler(int rpc_id) {
+RPCFunction Plugin::GetFakeRPCHandler(RPCIndex rpc_id) {
   return fake_rpc_.at(rpc_id);
 }
 

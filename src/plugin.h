@@ -39,7 +39,7 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   void InstallRakServerHooks(urmem::address_t addr_rakserver);
 
-  int GetPacketId(Packet *packet);
+  unsigned char GetPacketId(Packet *packet);
 
   Packet *NewPacket(PlayerIndex index, const BitStream &bs);
 
@@ -47,13 +47,13 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   Packet *GetNextPacketToEmulate();
 
-  void SetOriginalRPCHandler(int rpc_id, RPCFunction handler);
+  void SetOriginalRPCHandler(RPCIndex rpc_id, RPCFunction handler);
 
-  RPCFunction GetOriginalRPCHandler(int rpc_id);
+  RPCFunction GetOriginalRPCHandler(RPCIndex rpc_id);
 
-  void SetFakeRPCHandler(int rpc_id, RPCFunction handler);
+  void SetFakeRPCHandler(RPCIndex rpc_id, RPCFunction handler);
 
-  RPCFunction GetFakeRPCHandler(int rpc_id);
+  RPCFunction GetFakeRPCHandler(RPCIndex rpc_id);
 
   const std::shared_ptr<urmem::hook> &GetHookGetRakServerInterface();
 
@@ -64,9 +64,9 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
   const std::shared_ptr<RakServer> &GetRakServer();
 
   template <PR_EventType event_type>
-  static bool OnEvent(int player_id, int id, BitStream *bs) {
+  static bool OnEvent(int player_id, unsigned char event_id, BitStream *bs) {
     return EveryScript([=](const std::shared_ptr<Script> &script) {
-      return script->OnEvent<event_type>(player_id, id, bs);
+      return script->OnEvent<event_type>(player_id, event_id, bs);
     });
   }
 

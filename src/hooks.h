@@ -63,7 +63,7 @@ class Hooks {
     };
   };
 
-  static void HandleRPC(int rpc_id, RPCParameters *p);
+  static void HandleRPC(RPCIndex rpc_id, RPCParameters *p);
 
   static urmem::address_t GetRakServerInterface();
 

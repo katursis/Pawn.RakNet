@@ -28,6 +28,8 @@
 struct NativeParam : Script::NativeParam {
   operator BitStream*() { return script.GetBitStream(raw_value); }
 
+  operator RPCIndex() { return static_cast<RPCIndex>(raw_value); }
+
   operator PR_PacketPriority() {
     return static_cast<PR_PacketPriority>(raw_value);
   }
