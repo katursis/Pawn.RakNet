@@ -166,7 +166,7 @@ class Script : public ptl::AbstractScript<Script> {
 
  private:
   const std::regex regex_reg_handler_public_name_{
-      R"(^pr_r(?:ip|ir|op|or|irp)_\w+$)"};
+      R"(^pr_r(?:ip|ir|op|or|irp|iip|oip)_\w+$)"};
 
   std::shared_ptr<Config> config_;
 

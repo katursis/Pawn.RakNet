@@ -88,6 +88,8 @@ void Plugin::OnUnload() {
   Log("plugin unloaded");
 }
 
+void Plugin::OnProcessTick() { ProcessInternalPackets(); }
+
 void Plugin::InstallPreHooks() {
   urmem::sig_scanner scanner;
 
@@ -147,6 +149,11 @@ void Plugin::InstallRakServerHooks(urmem::address_t addr_rakserver) {
     message_handler_ = std::make_shared<MessageHandler>();
 
     rakserver_->AttachPlugin(message_handler_.get());
+  }
+
+  if (config_->InterceptIncomingInternalPacket() ||
+      config_->InterceptOutgoingInternalPacket()) {
+    internal_packet_channel_ = std::make_shared<InternalPacketChannel>();
   }
 }
 
@@ -217,3 +224,37 @@ const std::shared_ptr<urmem::hook> &Plugin::GetHookAmxCleanup() {
 const std::shared_ptr<Config> &Plugin::GetConfig() { return config_; }
 
 const std::shared_ptr<RakServer> &Plugin::GetRakServer() { return rakserver_; }
+
+const std::shared_ptr<InternalPacketChannel>
+    &Plugin::GetInternalPacketChannel() {
+  return internal_packet_channel_;
+}
+
+void Plugin::ProcessInternalPackets() {
+  auto &ch = internal_packet_channel_;
+  if (!ch || ch->IsClosed()) {
+    return;
+  }
+
+  auto internal_packet = ch->TryPopPacket();
+  if (!internal_packet) {
+    return;
+  }
+
+  int player_id = rakserver_->GetIndexFromPlayerID(ch->GetPlayerId());
+  BitStream bs{internal_packet->data,
+               BITS_TO_BYTES(internal_packet->dataBitLength), false};
+
+  auto on_event = ch->IsOutgoingPacket() ? OnEvent<PR_OUTGOING_INTERNAL_PACKET>
+                                         : OnEvent<PR_INCOMING_INTERNAL_PACKET>;
+
+  bool result = on_event(player_id, internal_packet->data[0], &bs);
+
+  if (internal_packet->data != bs.GetData()) {
+    delete[] internal_packet->data;
+
+    internal_packet->dataBitLength = bs.CopyData(&internal_packet->data);
+  }
+
+  ch->PushResult(result);
+}

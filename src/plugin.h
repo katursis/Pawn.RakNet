@@ -35,6 +35,8 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   void OnUnload();
 
+  void OnProcessTick();
+
   void InstallPreHooks();
 
   void InstallRakServerHooks(urmem::address_t addr_rakserver);
@@ -62,6 +64,10 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
   const std::shared_ptr<Config> &GetConfig();
 
   const std::shared_ptr<RakServer> &GetRakServer();
+
+  const std::shared_ptr<InternalPacketChannel> &GetInternalPacketChannel();
+
+  void ProcessInternalPackets();
 
   template <PR_EventType event_type>
   static bool OnEvent(int player_id, unsigned char event_id, BitStream *bs) {
@@ -114,6 +120,8 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
   std::shared_ptr<urmem::hook> hook_amx_cleanup_;
 
   std::shared_ptr<PluginInterface> message_handler_;
+
+  std::shared_ptr<InternalPacketChannel> internal_packet_channel_;
 
   std::array<RPCFunction, PR_MAX_HANDLERS> original_rpc_;
   std::array<RPCFunction, PR_MAX_HANDLERS> fake_rpc_;

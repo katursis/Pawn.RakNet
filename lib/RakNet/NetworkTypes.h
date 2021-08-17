@@ -60,6 +60,16 @@ struct Packet
 	bool deleteData;
 };
 
+struct InternalPacket {
+#ifdef _WIN32
+	unsigned char pad[48];
+#else
+	unsigned char pad[43];
+#endif
+	unsigned int dataBitLength;
+	unsigned char *data;
+};
+
 struct RPCParameters
 {
 	unsigned char *input;

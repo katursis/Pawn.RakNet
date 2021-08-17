@@ -3,3 +3,4 @@ EXPORTS
 	Load
 	Unload
 	AmxLoad
+	ProcessTick

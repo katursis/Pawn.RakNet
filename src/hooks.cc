@@ -55,6 +55,42 @@ PluginReceiveResult MessageHandler::OnReceive(RakPeerInterface *peer,
   return PluginReceiveResult::RR_CONTINUE_PROCESSING;
 }
 
+void MessageHandler::OnInternalPacket(InternalPacket *internalPacket,
+                                      unsigned frameNumber,
+                                      PlayerID remoteSystemID, RakNetTime time,
+                                      bool isSend) {
+  auto &plugin = Plugin::Get();
+  auto &config = plugin.GetConfig();
+  auto &ch = plugin.GetInternalPacketChannel();
+
+  if (!internalPacket || !internalPacket->data || !ch || ch->IsClosed() ||
+      (isSend && !config->InterceptOutgoingInternalPacket()) ||
+      (!isSend && !config->InterceptIncomingInternalPacket()) ||
+      !config->IsWhiteListedInternalPacket(internalPacket->data[0])) {
+    return;
+  }
+
+  ch->PushPacket(internalPacket, remoteSystemID, isSend);
+
+  if (!ch->PopResult()) {
+    internalPacket->data[0] = 0;
+  }
+}
+
+void MessageHandler::OnInitialize(RakPeerInterface *peer) {
+  auto &ch = Plugin::Get().GetInternalPacketChannel();
+  if (ch) {
+    ch->Open();
+  }
+}
+
+void MessageHandler::OnDisconnect(RakPeerInterface *peer) {
+  auto &ch = Plugin::Get().GetInternalPacketChannel();
+  if (ch) {
+    ch->Close();
+  }
+}
+
 bool THISCALL Hooks::RakServer__Send(void *_this, BitStream *bs, int priority,
                                      int reliability, char orderingChannel,
                                      PlayerID playerId, bool broadcast) {

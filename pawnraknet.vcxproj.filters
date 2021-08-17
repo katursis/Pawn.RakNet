@@ -45,9 +45,11 @@
     <ClInclude Include="lib\RakNet\PluginInterface.h">
       <Filter>lib\RakNet</Filter>
     </ClInclude>
+    <ClInclude Include="src\internal_packet_channel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Pawn.RakNet.inc" />
+    <None Include="pawnraknet.def" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="lib">

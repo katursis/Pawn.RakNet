@@ -62,6 +62,22 @@ class Config {
                                   .value_or(intercept_outcoming_rpc);
     intercept_incoming_raw_packet_ =
         config->get_as<bool>("InterceptIncomingRawPacket").value_or(true);
+    intercept_incoming_internal_packet_ =
+        config->get_as<bool>("InterceptIncomingInternalPacket").value_or(false);
+    intercept_outgoing_internal_packet_ =
+        config->get_as<bool>("InterceptOutgoingInternalPacket").value_or(false);
+
+    auto packet_ids = config->get_array_of<int64_t>("WhiteListInternalPackets")
+                          .value_or(std::vector<int64_t>{});
+    for (auto &packet_id : packet_ids) {
+      if (packet_id < 0 ||
+          packet_id > (std::numeric_limits<unsigned char>::max)()) {
+        continue;
+      }
+
+      whitelist_internal_packets_.insert(static_cast<unsigned char>(packet_id));
+    }
+
     use_caching_ = config->get_as<bool>("UseCaching").value_or(false);
   }
 
@@ -74,6 +90,17 @@ class Config {
     config->insert("InterceptOutgoingRPC", intercept_outgoing_rpc_);
     config->insert("InterceptIncomingRawPacket",
                    intercept_incoming_raw_packet_);
+    config->insert("InterceptIncomingInternalPacket",
+                   intercept_incoming_internal_packet_);
+    config->insert("InterceptOutgoingInternalPacket",
+                   intercept_outgoing_internal_packet_);
+
+    auto packet_ids = cpptoml::make_array();
+    for (auto &packet_id : whitelist_internal_packets_) {
+      packet_ids->push_back(packet_id);
+    }
+    config->insert("WhiteListInternalPackets", packet_ids);
+
     config->insert("UseCaching", use_caching_);
 
     std::fstream{file_path_, std::fstream::out | std::fstream::trunc}
@@ -92,6 +119,19 @@ class Config {
     return intercept_incoming_raw_packet_;
   }
 
+  bool InterceptIncomingInternalPacket() const {
+    return intercept_incoming_internal_packet_;
+  }
+
+  bool InterceptOutgoingInternalPacket() const {
+    return intercept_outgoing_internal_packet_;
+  }
+
+  bool IsWhiteListedInternalPacket(unsigned char packet_id) const {
+    return whitelist_internal_packets_.empty() ||
+           whitelist_internal_packets_.count(packet_id);
+  }
+
   bool UseCaching() const { return use_caching_; }
 
  private:
@@ -102,6 +142,11 @@ class Config {
   bool intercept_outgoing_packet_{};
   bool intercept_outgoing_rpc_{};
   bool intercept_incoming_raw_packet_{};
+  bool intercept_incoming_internal_packet_{};
+  bool intercept_outgoing_internal_packet_{};
+
+  std::set<unsigned char> whitelist_internal_packets_;
+
   bool use_caching_{};
 };
 

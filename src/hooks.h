@@ -28,6 +28,13 @@
 class MessageHandler : public PluginInterface {
  public:
   PluginReceiveResult OnReceive(RakPeerInterface *peer, Packet *packet);
+
+  void OnInternalPacket(InternalPacket *internalPacket, unsigned frameNumber,
+                        PlayerID remoteSystemID, RakNetTime time, bool isSend);
+
+  void OnInitialize(RakPeerInterface *peer);
+
+  void OnDisconnect(RakPeerInterface *peer);
 };
 
 class Hooks {

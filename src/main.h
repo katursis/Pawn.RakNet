@@ -35,11 +35,15 @@
 #include "cpptoml/include/cpptoml.h"
 
 #include <unordered_set>
+#include <set>
+#include <limits>
 #include <list>
 #include <array>
 #include <string>
 #include <regex>
 #include <queue>
+#include <thread>
+#include <atomic>
 
 #include "Pawn.RakNet.inc"
 
@@ -54,6 +58,7 @@
 #endif
 
 #include "config.h"
+#include "internal_packet_channel.h"
 #include "rakserver.h"
 #include "script.h"
 #include "native_param.h"
