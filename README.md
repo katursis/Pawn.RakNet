@@ -22,7 +22,7 @@ IPacket:PLAYER_SYNC(playerid, BitStream:bs)
 {
   new onFootData[PR_OnFootSync];
 
-  BS_IgnoreBits(bs, 8);
+  BS_IgnoreBits(bs, 8); // ignore packet id (uint8)
   BS_ReadOnFootSync(bs, onFootData);
 
   printf(
