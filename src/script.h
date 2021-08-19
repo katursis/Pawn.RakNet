@@ -122,8 +122,11 @@ class Script : public ptl::AbstractScript<Script> {
       }
     }
 
-    if (!ExecPublic(std::get<event_type>(publics_), player_id, event_id, bs)) {
-      return false;
+    if constexpr (event_type != PR_INCOMING_CUSTOM_RPC) {
+      if (!ExecPublic(std::get<event_type>(publics_), player_id, event_id,
+                      bs)) {
+        return false;
+      }
     }
 
     for (const auto &handler : std::get<event_type>(handlers_).at(event_id)) {
@@ -166,7 +169,7 @@ class Script : public ptl::AbstractScript<Script> {
 
  private:
   const std::regex regex_reg_handler_public_name_{
-      R"(^pr_r(?:ip|ir|op|or|irp|iip|oip)_\w+$)"};
+      R"(^pr_r(?:ip|ir|op|or|irp|iip|oip|icr)_\w+$)"};
 
   std::shared_ptr<Config> config_;
 

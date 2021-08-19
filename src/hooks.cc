@@ -198,28 +198,35 @@ void Hooks::HandleRPC(RPCIndex rpc_id, RPCParameters *p) {
   auto &rakserver = plugin.GetRakServer();
 
   const int player_id = rakserver->GetIndexFromPlayerID(p->sender);
+  if (player_id == -1) {
+    return;
+  }
 
   BitStream bs;
+  if (p->input) {
+    bs.SetData(p->input);
+    bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
+    bs.SetWriteOffset(p->numberOfBitsOfData);
+  }
 
-  if (player_id != -1) {
-    if (p->input) {
-      bs.SetData(p->input);
-      bs.SetNumberOfBitsAllocated(p->numberOfBitsOfData);
-      bs.SetWriteOffset(p->numberOfBitsOfData);
-    }
+  const auto original_handler = plugin.GetOriginalRPCHandler(rpc_id);
 
-    if (!Plugin::OnEvent<PR_INCOMING_RPC>(player_id, rpc_id, &bs)) {
-      return;
-    }
+  const auto on_event = original_handler
+                            ? Plugin::OnEvent<PR_INCOMING_RPC>
+                            : Plugin::OnEvent<PR_INCOMING_CUSTOM_RPC>;
+  if (!on_event(player_id, rpc_id, &bs)) {
+    return;
+  }
 
+  if (original_handler) {
     const auto numberOfBitsUsed = bs.GetNumberOfBitsUsed();
     if (p->numberOfBitsOfData != numberOfBitsUsed) {
       p->input = numberOfBitsUsed > 0 ? bs.GetData() : nullptr;
       p->numberOfBitsOfData = numberOfBitsUsed;
     }
-  }
 
-  plugin.GetOriginalRPCHandler(rpc_id)(p);
+    original_handler(p);
+  }
 }
 
 urmem::address_t Hooks::GetRakServerInterface() {

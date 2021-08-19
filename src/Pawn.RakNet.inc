@@ -39,6 +39,7 @@
         PR_INCOMING_RAW_PACKET,
         PR_INCOMING_INTERNAL_PACKET,
         PR_OUTGOING_INTERNAL_PACKET,
+        PR_INCOMING_CUSTOM_RPC,
 
         PR_NUMBER_OF_EVENT_TYPES,
 
@@ -122,6 +123,7 @@
         #define IRawPacket:%0(%1) PR_Handler<PR_INCOMING_RAW_PACKET,irp>:%0(%1)
         #define IInternalPacket:%0(%1) PR_Handler<PR_INCOMING_INTERNAL_PACKET,iip>:%0(%1)
         #define OInternalPacket:%0(%1) PR_Handler<PR_OUTGOING_INTERNAL_PACKET,oip>:%0(%1)
+        #define ICustomRPC:%0(%1) PR_Handler<PR_INCOMING_CUSTOM_RPC,icr>:%0(%1)
 
         #define IncomingPacket IPacket
         #define IncomingRPC IRPC
@@ -130,6 +132,7 @@
         #define IncomingRawPacket IRawPacket
         #define IncomingInternalPacket IInternalPacket
         #define OutgoingInternalPacket OInternalPacket
+        #define IncomingCustomRPC ICustomRPC
 
         // backward compatibility
         #define OutcomingPacket OutgoingPacket

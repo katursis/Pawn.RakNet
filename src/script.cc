@@ -553,9 +553,22 @@ void Script::InitPublic(PR_EventType type, const std::string &public_name) {
 
 void Script::InitHandler(unsigned char event_id, const std::string &public_name,
                          PR_EventType type) {
+  auto &plugin = Plugin::Get();
+  auto &rakserver = plugin.GetRakServer();
+
   auto pub = MakePublic(public_name, config_->UseCaching());
   if (!pub->Exists()) {
     throw std::runtime_error{"Public " + public_name + " does not exist"};
+  }
+
+  if (type == PR_INCOMING_CUSTOM_RPC) {
+    if (plugin.GetOriginalRPCHandler(event_id)) {
+      throw std::runtime_error{"Custom rpc id " + std::to_string(event_id) +
+                               " is occupied"};
+    }
+
+    rakserver->RegisterAsRemoteProcedureCall(
+        &event_id, plugin.GetFakeRPCHandler(event_id));
   }
 
   handlers_.at(type).at(event_id).push_back(pub);
