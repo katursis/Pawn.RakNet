@@ -244,6 +244,17 @@
             Float:PR_position[3],
         };
 
+        enum PR_MarkersSync
+        {
+            PR_numberOfPlayers,
+            PR_playerIsActive[MAX_PLAYERS],
+            PR_playerPositionX[MAX_PLAYERS],
+            PR_playerPositionY[MAX_PLAYERS],
+            PR_playerPositionZ[MAX_PLAYERS],
+
+            PR_playerIsParticipant[MAX_PLAYERS], // Pawn.RakNet internal helping field
+        };
+
         enum PR_WeaponsUpdate
         {
             PR_targetId,
@@ -251,7 +262,7 @@
             PR_slotWeaponId[PR_MAX_WEAPON_SLOTS],
             PR_slotWeaponAmmo[PR_MAX_WEAPON_SLOTS],
 
-            PR_slotUpdated[PR_MAX_WEAPON_SLOTS], // internal helping field
+            PR_slotUpdated[PR_MAX_WEAPON_SLOTS], // Pawn.RakNet internal helping field
         };
 
         enum PR_StatsUpdate
@@ -649,6 +660,44 @@
             );
         }
 
+        stock BS_ReadMarkersSync(BitStream:bs, data[PR_MarkersSync])
+        {
+            new numberOfPlayers;
+
+            BS_ReadInt32(bs, numberOfPlayers);
+
+            if (numberOfPlayers < 0 || numberOfPlayers > MAX_PLAYERS) {
+                return;
+            }
+
+            data[PR_numberOfPlayers] = numberOfPlayers;
+
+            for (new i; i < numberOfPlayers; i++) {
+                new playerId, isActive;
+
+                BS_ReadUint16(bs, playerId);
+
+                if (playerId >= MAX_PLAYERS) {
+                    return;
+                }
+
+                data[PR_playerIsParticipant][playerId] = true;
+
+                BS_ReadCompressedBool(bs, isActive);
+
+                if (isActive) {
+                    data[PR_playerIsActive][playerId] = true;
+
+                    BS_ReadValue(
+                        bs,
+                        PR_INT16, data[PR_playerPositionX][playerId],
+                        PR_INT16, data[PR_playerPositionY][playerId],
+                        PR_INT16, data[PR_playerPositionZ][playerId]
+                    );
+                }
+            }
+        }
+
         stock BS_ReadWeaponsUpdate(BitStream:bs, data[PR_WeaponsUpdate])
         {
             new numberOfBytes, numberOfSlots;
@@ -925,6 +974,32 @@
                 PR_UINT16, data[PR_keys],
                 PR_FLOAT3, data[PR_position]
             );
+        }
+
+        stock BS_WriteMarkersSync(BitStream:bs, data[PR_MarkersSync])
+        {
+            BS_WriteInt32(bs, data[PR_numberOfPlayers]);
+
+            for (new i; i < MAX_PLAYERS; i++) {
+                if (!data[PR_playerIsParticipant][i]) {
+                    continue;
+                }
+
+                BS_WriteValue(
+                    bs,
+                    PR_UINT16, i,
+                    PR_CBOOL, data[PR_playerIsActive][i]
+                );
+
+                if (data[PR_playerIsActive][i]) {
+                    BS_WriteValue(
+                        bs,
+                        PR_INT16, data[PR_playerPositionX][i],
+                        PR_INT16, data[PR_playerPositionY][i],
+                        PR_INT16, data[PR_playerPositionZ][i]
+                    );
+                }
+            }
         }
 
         stock BS_WriteWeaponsUpdate(BitStream:bs, data[PR_WeaponsUpdate])
