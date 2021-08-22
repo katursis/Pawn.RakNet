@@ -33,9 +33,23 @@
 Release/
 Debug/
 bin/
+build/
 
 # Visual Studio user-specific files
 *.vcxproj.user
 
 # macOS files
 .DS_Store
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
