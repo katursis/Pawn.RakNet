@@ -41,15 +41,18 @@ class Script : public ptl::AbstractScript<Script> {
                      PR_EventType type);
 
   // native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority =
-  // PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
+  // PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED,
+  // orderingchannel = 0);
   cell PR_SendPacket(BitStream *bs, int player_id, PR_PacketPriority priority,
-                     PR_PacketReliability reliability);
+                     PR_PacketReliability reliability,
+                     unsigned char ordering_channel);
 
   // native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority
   // = PR_HIGH_PRIORITY, PR_PacketReliability:reliability =
-  // PR_RELIABLE_ORDERED);
+  // PR_RELIABLE_ORDERED, orderingchannel = 0);
   cell PR_SendRPC(BitStream *bs, int player_id, RPCIndex rpc_id,
-                  PR_PacketPriority priority, PR_PacketReliability reliability);
+                  PR_PacketPriority priority, PR_PacketReliability reliability,
+                  unsigned char ordering_channel);
 
   // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
   cell PR_EmulateIncomingPacket(BitStream *bs, int player_id);

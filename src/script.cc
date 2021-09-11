@@ -40,15 +40,17 @@ cell Script::PR_RegHandler(unsigned char event_id, std::string public_name,
 }
 
 // native PR_SendPacket(BitStream:bs, playerid, PR_PacketPriority:priority =
-// PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED);
+// PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED,
+// orderingchannel = 0);
 cell Script::PR_SendPacket(BitStream *bs, int player_id,
                            PR_PacketPriority priority,
-                           PR_PacketReliability reliability) {
+                           PR_PacketReliability reliability,
+                           unsigned char ordering_channel) {
   const bool broadcast = player_id == -1;
 
   auto &rakserver = Plugin::Get().GetRakServer();
 
-  return rakserver->Send(bs, priority, reliability, '\0',
+  return rakserver->Send(bs, priority, reliability, ordering_channel,
                          broadcast ? UNASSIGNED_PLAYER_ID
                                    : rakserver->GetPlayerIDFromIndex(player_id),
                          broadcast)
@@ -58,15 +60,16 @@ cell Script::PR_SendPacket(BitStream *bs, int player_id,
 
 // native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority
 // = PR_HIGH_PRIORITY, PR_PacketReliability:reliability =
-// PR_RELIABLE_ORDERED);
+// PR_RELIABLE_ORDERED, orderingchannel = 0);
 cell Script::PR_SendRPC(BitStream *bs, int player_id, RPCIndex rpc_id,
                         PR_PacketPriority priority,
-                        PR_PacketReliability reliability) {
+                        PR_PacketReliability reliability,
+                        unsigned char ordering_channel) {
   const bool broadcast = player_id == -1;
 
   auto &rakserver = Plugin::Get().GetRakServer();
 
-  return rakserver->RPC(&rpc_id, bs, priority, reliability, '\0',
+  return rakserver->RPC(&rpc_id, bs, priority, reliability, ordering_channel,
                         broadcast ? UNASSIGNED_PLAYER_ID
                                   : rakserver->GetPlayerIDFromIndex(player_id),
                         broadcast, false)
