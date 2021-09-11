@@ -75,7 +75,9 @@ class Config {
         continue;
       }
 
-      whitelist_internal_packets_.insert(static_cast<unsigned char>(packet_id));
+      whitelist_internal_packets_[packet_id] = true;
+
+      whitelist_is_empty_ = false;
     }
 
     use_caching_ = config->get_as<bool>("UseCaching").value_or(false);
@@ -96,8 +98,13 @@ class Config {
                    intercept_outgoing_internal_packet_);
 
     auto packet_ids = cpptoml::make_array();
-    for (auto &packet_id : whitelist_internal_packets_) {
-      packet_ids->push_back(packet_id);
+    if (!whitelist_is_empty_) {
+      for (int packet_id{}; packet_id < whitelist_internal_packets_.size();
+           packet_id++) {
+        if (whitelist_internal_packets_[packet_id]) {
+          packet_ids->push_back(packet_id);
+        }
+      }
     }
     config->insert("WhiteListInternalPackets", packet_ids);
 
@@ -128,8 +135,7 @@ class Config {
   }
 
   bool IsWhiteListedInternalPacket(unsigned char packet_id) const {
-    return whitelist_internal_packets_.empty() ||
-           whitelist_internal_packets_.count(packet_id);
+    return whitelist_is_empty_ || whitelist_internal_packets_[packet_id];
   }
 
   bool UseCaching() const { return use_caching_; }
@@ -145,7 +151,8 @@ class Config {
   bool intercept_incoming_internal_packet_{};
   bool intercept_outgoing_internal_packet_{};
 
-  std::set<unsigned char> whitelist_internal_packets_;
+  std::array<bool, PR_MAX_HANDLERS> whitelist_internal_packets_{};
+  bool whitelist_is_empty_{true};
 
   bool use_caching_{};
 };
