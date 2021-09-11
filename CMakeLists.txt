@@ -19,6 +19,7 @@ add_library(${PROJECT_NAME} MODULE
   src/plugin.cc
   src/native_param.h
   src/config.h
+  src/bitstream_pool.h
   src/internal_packet_channel.h
   src/script.h
   src/script.cc

@@ -111,14 +111,20 @@ cell Script::PR_EmulateIncomingRPC(BitStream *bs, int player_id,
 }
 
 // native BitStream:BS_New();
-cell Script::BS_New() { return NewBitStream(); }
+cell Script::BS_New() { return reinterpret_cast<cell>(bitstream_pool_.New()); }
 
 // native BitStream:BS_NewCopy(BitStream:bs);
-cell Script::BS_NewCopy(BitStream *bs) { return NewBitStreamCopy(bs); }
+cell Script::BS_NewCopy(BitStream *bs) {
+  const auto bs_copy = bitstream_pool_.New();
+
+  bs_copy->Write(bs);
+
+  return reinterpret_cast<cell>(bs_copy);
+}
 
 // native BS_Delete(&BitStream:bs);
 cell Script::BS_Delete(cell *bs) {
-  DeleteBitStream(*bs);
+  bitstream_pool_.Delete(GetBitStream(*bs));
 
   *bs = 0;
 
@@ -585,23 +591,6 @@ void Script::InitHandlers() {
   }
 }
 
-cell Script::NewBitStream() {
-  const auto bs = std::make_shared<BitStream>();
-
-  bitstreams_.insert(bs);
-
-  return reinterpret_cast<cell>(bs.get());
-}
-
-cell Script::NewBitStreamCopy(BitStream *src) {
-  const auto bs = std::make_shared<BitStream>(
-      src->GetData(), src->GetNumberOfBytesUsed(), true);
-
-  bitstreams_.insert(bs);
-
-  return reinterpret_cast<cell>(bs.get());
-}
-
 BitStream *Script::GetBitStream(cell handle) {
   const auto bs = reinterpret_cast<BitStream *>(handle);
   if (!bs) {
@@ -609,23 +598,6 @@ BitStream *Script::GetBitStream(cell handle) {
   }
 
   return bs;
-}
-
-std::unordered_set<std::shared_ptr<BitStream>>::iterator Script::FindBitStream(
-    cell handle) {
-  const auto bs =
-      std::find_if(bitstreams_.begin(), bitstreams_.end(), [=](const auto &bs) {
-        return reinterpret_cast<cell>(bs.get()) == handle;
-      });
-  if (bs == bitstreams_.end()) {
-    throw std::runtime_error{"Invalid BitStream handle"};
-  }
-
-  return bs;
-}
-
-void Script::DeleteBitStream(cell handle) {
-  bitstreams_.erase(FindBitStream(handle));
 }
 
 template <typename T, bool compressed>

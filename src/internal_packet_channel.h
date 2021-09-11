@@ -22,6 +22,9 @@
  * SOFTWARE.
  */
 
+#ifndef PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_
+#define PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_
+
 class InternalPacketChannel {
  public:
   void PushPacket(InternalPacket *packet, const PlayerID &player_id,
@@ -84,3 +87,5 @@ class InternalPacketChannel {
 
   bool result_{};
 };
+
+#endif  // PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_

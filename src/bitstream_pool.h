@@ -22,49 +22,44 @@
  * SOFTWARE.
  */
 
-#ifndef PAWNRAKNET_MAIN_H_
-#define PAWNRAKNET_MAIN_H_
+#ifndef PAWNRAKNET_BITSTREAM_POOL_H_
+#define PAWNRAKNET_BITSTREAM_POOL_H_
 
-#define _GLIBCXX_USE_CXX11_ABI 0 // For compatibility with samp03svr that was compiled with an older (< 5.1) version of GCC
+class BitStreamPool {
+ public:
+  BitStream *New() {
+    for (auto &item : items_) {
+      if (!item.second) {
+        item.second = true;
 
-#include "samp-ptl/ptl.h"
-#include "RakNet/BitStream.h"
-#include "RakNet/StringCompressor.h"
-#include "RakNet/PluginInterface.h"
-#include "urmem/urmem.hpp"
-#include "cpptoml/include/cpptoml.h"
+        return item.first.get();
+      }
+    }
 
-#include <unordered_set>
-#include <set>
-#include <limits>
-#include <list>
-#include <array>
-#include <string>
-#include <regex>
-#include <queue>
-#include <thread>
-#include <atomic>
-#include <vector>
+    const auto bs = std::make_shared<BitStream>();
 
-#include "Pawn.RakNet.inc"
+    items_.emplace_back(std::make_pair(bs, true));
 
-#ifdef THISCALL
-#undef THISCALL
-#endif
+    return bs.get();
+  }
 
-#ifdef _WIN32
-#define THISCALL __thiscall
-#else
-#define THISCALL
-#endif
+  void Delete(BitStream *bs) {
+    for (auto &item : items_) {
+      if (item.first.get() == bs) {
+        item.second = false;
 
-#include "config.h"
-#include "bitstream_pool.h"
-#include "internal_packet_channel.h"
-#include "rakserver.h"
-#include "script.h"
-#include "native_param.h"
-#include "plugin.h"
-#include "hooks.h"
+        item.first->Reset();
 
-#endif  // PAWNRAKNET_MAIN_H_
+        return;
+      }
+    }
+  }
+
+ private:
+  using Item =
+      std::pair<std::shared_ptr<BitStream> /* bs */, bool /* is_occupied */>;
+
+  std::vector<Item> items_;
+};
+
+#endif  // PAWNRAKNET_BITSTREAM_POOL_H_

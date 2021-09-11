@@ -153,16 +153,7 @@ class Script : public ptl::AbstractScript<Script> {
 
   void InitHandlers();
 
-  cell NewBitStream();
-
-  cell NewBitStreamCopy(BitStream *src);
-
-  std::unordered_set<std::shared_ptr<BitStream>>::iterator FindBitStream(
-      cell handle);
-
   BitStream *GetBitStream(cell handle);
-
-  void DeleteBitStream(cell handle);
 
   template <typename T, bool compressed = false>
   void WriteValue(BitStream *bs, cell value);
@@ -187,7 +178,7 @@ class Script : public ptl::AbstractScript<Script> {
   PublicPtr public_on_outcoming_packet_;
   PublicPtr public_on_outcoming_rpc_;
 
-  std::unordered_set<std::shared_ptr<BitStream>> bitstreams_;
+  BitStreamPool bitstream_pool_;
 };
 
 #endif  // PAWNRAKNET_SCRIPT_H_
