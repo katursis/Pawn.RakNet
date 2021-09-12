@@ -75,7 +75,7 @@ class Config {
         continue;
       }
 
-      whitelist_internal_packets_[packet_id] = true;
+      whitelist_internal_packets_[static_cast<unsigned char>(packet_id)] = true;
 
       whitelist_is_empty_ = false;
     }
@@ -99,8 +99,8 @@ class Config {
 
     auto packet_ids = cpptoml::make_array();
     if (!whitelist_is_empty_) {
-      for (int packet_id{}; packet_id < whitelist_internal_packets_.size();
-           packet_id++) {
+      for (std::size_t packet_id{};
+           packet_id < whitelist_internal_packets_.size(); packet_id++) {
         if (whitelist_internal_packets_[packet_id]) {
           packet_ids->push_back(packet_id);
         }

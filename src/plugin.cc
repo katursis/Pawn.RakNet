@@ -169,6 +169,9 @@ Packet *Plugin::NewPacket(PlayerIndex index, const BitStream &bs) {
   }
 
   Packet *p = reinterpret_cast<Packet *>(malloc(sizeof(Packet) + length));
+  if (!p) {
+    throw std::runtime_error{"Function malloc returned nullptr"};
+  }
 
   p->playerIndex = index;
   p->playerId = GetRakServer()->GetPlayerIDFromIndex(index);
