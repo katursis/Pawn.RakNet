@@ -1045,7 +1045,7 @@
             );
         }
 
-        stock PR_SendPacketToPlayerStream(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
+        stock PR_SendPacketToPlayerStream(BitStream:bs, playerid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED, orderingchannel = 0)
         {
             #if defined foreach
             foreach (new i : Player) {
@@ -1056,11 +1056,11 @@
                     continue;
                 }
 
-                PR_SendPacket(bs, i, priority, reliability);
+                PR_SendPacket(bs, i, priority, reliability, orderingchannel);
             }
         }
 
-        stock PR_SendRPCToPlayerStream(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
+        stock PR_SendRPCToPlayerStream(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED, orderingchannel = 0)
         {
             #if defined foreach
             foreach (new i : Player) {
@@ -1071,11 +1071,11 @@
                     continue;
                 }
 
-                PR_SendRPC(bs, i, rpcid, priority, reliability);
+                PR_SendRPC(bs, i, rpcid, priority, reliability, orderingchannel);
             }
         }
 
-        stock PR_SendPacketToVehicleStream(BitStream:bs, vehicleid, excludedplayerid = INVALID_PLAYER_ID, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
+        stock PR_SendPacketToVehicleStream(BitStream:bs, vehicleid, excludedplayerid = INVALID_PLAYER_ID, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED, orderingchannel = 0)
         {
             #if defined foreach
             foreach (new i : Player) {
@@ -1086,11 +1086,11 @@
                     continue;
                 }
 
-                PR_SendPacket(bs, i, priority, reliability);
+                PR_SendPacket(bs, i, priority, reliability, orderingchannel);
             }
         }
 
-        stock PR_SendRPCToVehicleStream(BitStream:bs, vehicleid, rpcid, excludedplayerid = INVALID_PLAYER_ID, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED)
+        stock PR_SendRPCToVehicleStream(BitStream:bs, vehicleid, rpcid, excludedplayerid = INVALID_PLAYER_ID, PR_PacketPriority:priority = PR_HIGH_PRIORITY, PR_PacketReliability:reliability = PR_RELIABLE_ORDERED, orderingchannel = 0)
         {
             #if defined foreach
             foreach (new i : Player) {
@@ -1101,7 +1101,7 @@
                     continue;
                 }
 
-                PR_SendRPC(bs, i, rpcid, priority, reliability);
+                PR_SendRPC(bs, i, rpcid, priority, reliability, orderingchannel);
             }
         }
 
