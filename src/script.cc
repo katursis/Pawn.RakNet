@@ -295,7 +295,7 @@ cell Script::BS_WriteValue(cell *params) {
         bs->WriteBits(reinterpret_cast<const unsigned char *>(&value),
                       number_of_bits, true);
 
-        ++i;
+        i++;
 
         break;
       }
@@ -304,7 +304,7 @@ cell Script::BS_WriteValue(cell *params) {
         const std::size_t arr_size = (type == PR_FLOAT3 ? 3 : 4);
         const auto arr = &value;
 
-        for (std::size_t index{}; index < arr_size; ++index) {
+        for (std::size_t index{}; index < arr_size; index++) {
           WriteValue<float>(bs, arr[index]);
         }
 
@@ -374,7 +374,7 @@ cell Script::BS_ReadValue(cell *params) {
 
         SetString(&value, str.get(), size + 1);
 
-        ++i;
+        i++;
 
         break;
       }
@@ -435,7 +435,7 @@ cell Script::BS_ReadValue(cell *params) {
         bs->ReadBits(reinterpret_cast<unsigned char *>(&value), number_of_bits,
                      true);
 
-        ++i;
+        i++;
 
         break;
       }
@@ -444,7 +444,7 @@ cell Script::BS_ReadValue(cell *params) {
         const std::size_t arr_size = (type == PR_FLOAT3 ? 3 : 4);
         auto arr = &value;
 
-        for (std::size_t index{}; index < arr_size; ++index) {
+        for (std::size_t index{}; index < arr_size; index++) {
           arr[index] = ReadValue<float>(bs);
         }
 
@@ -490,7 +490,7 @@ cell Script::BS_ReadValue(cell *params) {
           SetString(&value, str.get(), size + 1);
         }
 
-        ++i;
+        i++;
 
         break;
       }
