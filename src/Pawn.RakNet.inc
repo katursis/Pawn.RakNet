@@ -1014,7 +1014,7 @@
                 PR_UINT16, data[PR_targetActorId]
             );
 
-            for (new slotId; slotId < PR_MAX_WEAPON_SLOTS; ++slotId) {
+            for (new slotId; slotId < PR_MAX_WEAPON_SLOTS; slotId++) {
                 if (!data[PR_slotUpdated][slotId]) {
                     continue;
                 }
@@ -1050,7 +1050,7 @@
             #if defined foreach
             foreach (new i : Player) {
             #else
-            for (new i = GetPlayerPoolSize(); i >= 0; --i) {
+            for (new i = GetPlayerPoolSize(); i >= 0; i--) {
             #endif
                 if (!IsPlayerStreamedIn(i, playerid)) {
                     continue;
@@ -1065,7 +1065,7 @@
             #if defined foreach
             foreach (new i : Player) {
             #else
-            for (new i = GetPlayerPoolSize(); i >= 0; --i) {
+            for (new i = GetPlayerPoolSize(); i >= 0; i--) {
             #endif
                 if (!IsPlayerStreamedIn(i, playerid)) {
                     continue;
@@ -1080,7 +1080,7 @@
             #if defined foreach
             foreach (new i : Player) {
             #else
-            for (new i = GetPlayerPoolSize(); i >= 0; --i) {
+            for (new i = GetPlayerPoolSize(); i >= 0; i--) {
             #endif
                 if (i == excludedplayerid || !IsVehicleStreamedIn(vehicleid, i)) {
                     continue;
@@ -1095,7 +1095,7 @@
             #if defined foreach
             foreach (new i : Player) {
             #else
-            for (new i = GetPlayerPoolSize(); i >= 0; --i) {
+            for (new i = GetPlayerPoolSize(); i >= 0; i--) {
             #endif
                 if (i == excludedplayerid || !IsVehicleStreamedIn(vehicleid, i)) {
                     continue;
