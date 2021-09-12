@@ -28,27 +28,26 @@
 class BitStreamPool {
  public:
   BitStream *New() {
-    for (auto &item : items_) {
-      if (!item.second) {
-        item.second = true;
+    for (auto &[bs, is_occupied] : items_) {
+      if (!is_occupied) {
+        is_occupied = true;
 
-        return item.first.get();
+        return bs.get();
       }
     }
 
-    const auto bs = std::make_shared<BitStream>();
-
-    items_.emplace_back(std::make_pair(bs, true));
+    const auto &[bs, is_occupied] =
+        items_.emplace_back(std::make_shared<BitStream>(), true);
 
     return bs.get();
   }
 
-  void Delete(BitStream *bs) {
-    for (auto &item : items_) {
-      if (item.first.get() == bs) {
-        item.second = false;
+  void Delete(BitStream *ptr) {
+    for (auto &[bs, is_occupied] : items_) {
+      if (bs.get() == ptr) {
+        bs->Reset();
 
-        item.first->Reset();
+        is_occupied = false;
 
         return;
       }

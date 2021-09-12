@@ -123,8 +123,8 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   std::shared_ptr<InternalPacketChannel> internal_packet_channel_;
 
-  std::array<RPCFunction, PR_MAX_HANDLERS> original_rpc_;
-  std::array<RPCFunction, PR_MAX_HANDLERS> fake_rpc_;
+  std::array<RPCFunction, PR_MAX_HANDLERS> original_rpc_{};
+  std::array<RPCFunction, PR_MAX_HANDLERS> fake_rpc_{};
 
   std::queue<Packet *> emulating_packets_;
 };

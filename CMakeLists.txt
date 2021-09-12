@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-DHAVE_STDINT_H)
+  add_definitions(/wd4305)
 endif()
 
 include_directories(lib)
