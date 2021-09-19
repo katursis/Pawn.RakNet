@@ -29,8 +29,6 @@ bool Plugin::OnLoad() {
 
   StringCompressor::AddReference();
 
-  InstallPreHooks();
-
   RegisterNative<&Script::PR_Init>("PR_Init");
   RegisterNative<&Script::PR_RegHandler>("PR_RegHandler");
   RegisterNative<&Script::PR_SendPacket>("PR_SendPacket");
@@ -91,32 +89,18 @@ void Plugin::OnUnload() {
 void Plugin::OnProcessTick() { ProcessInternalPackets(); }
 
 void Plugin::InstallPreHooks() {
-  urmem::sig_scanner scanner;
-
-  if (!scanner.init(reinterpret_cast<urmem::address_t>(*plugin_data_))) {
-    throw std::runtime_error{"Sig scanner init error"};
+  if(initialized_hooks_) {
+    return;
   }
-
-  urmem::address_t get_rakserver_interface_addr{};
-
-  if (!scanner.find(get_rakserver_interface_pattern_,
-                    get_rakserver_interface_mask_,
-                    get_rakserver_interface_addr)) {
-    throw std::runtime_error{"GetRakServerInterface not found"};
-  }
-
-  if (!scanner.find(get_packet_id_pattern_, get_packet_id_mask_,
-                    addr_get_packet_id_)) {
-    throw std::runtime_error{"GetPacketId not found"};
-  }
-
-  hook_get_rakserver_interface_ = urmem::hook::make(
-      get_rakserver_interface_addr, &Hooks::GetRakServerInterface);
 
   hook_amx_cleanup_ = urmem::hook::make(
       reinterpret_cast<urmem::address_t *>(
           plugin_data_[PLUGIN_DATA_AMX_EXPORTS])[PLUGIN_AMX_EXPORT_Cleanup],
       &Hooks::amx_Cleanup);
+
+  urmem::address_t rakserver_addr = reinterpret_cast<urmem::address_t>(
+      reinterpret_cast<urmem::address_t * (*)()>(plugin_data_[0xE2])()); // PLUGIN_DATA_RAKSERVER
+  InstallRakServerHooks(rakserver_addr);
 }
 
 void Plugin::InstallRakServerHooks(urmem::address_t addr_rakserver) {
@@ -155,6 +139,8 @@ void Plugin::InstallRakServerHooks(urmem::address_t addr_rakserver) {
       config_->InterceptOutgoingInternalPacket()) {
     internal_packet_channel_ = std::make_shared<InternalPacketChannel>();
   }
+
+  initialized_hooks_ = true;
 }
 
 unsigned char Plugin::GetPacketId(Packet *packet) {
@@ -222,10 +208,6 @@ void Plugin::SetFakeRPCHandler(RPCIndex rpc_id, RPCFunction handler) {
 
 RPCFunction Plugin::GetFakeRPCHandler(RPCIndex rpc_id) {
   return fake_rpc_.at(rpc_id);
-}
-
-const std::shared_ptr<urmem::hook> &Plugin::GetHookGetRakServerInterface() {
-  return hook_get_rakserver_interface_;
 }
 
 const std::shared_ptr<urmem::hook> &Plugin::GetHookAmxCleanup() {

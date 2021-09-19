@@ -229,18 +229,6 @@ void Hooks::HandleRPC(RPCIndex rpc_id, RPCParameters *p) {
   }
 }
 
-urmem::address_t Hooks::GetRakServerInterface() {
-  auto &plugin = Plugin::Get();
-
-  const auto addr_rakserver =
-      plugin.GetHookGetRakServerInterface()
-          ->call<urmem::calling_convention::cdeclcall, urmem::address_t>();
-
-  plugin.InstallRakServerHooks(addr_rakserver);
-
-  return addr_rakserver;
-}
-
 int AMXAPI Hooks::amx_Cleanup(AMX *amx) {
   auto &plugin = Plugin::Get();
 

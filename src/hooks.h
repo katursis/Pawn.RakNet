@@ -72,8 +72,6 @@ class Hooks {
 
   static void HandleRPC(RPCIndex rpc_id, RPCParameters *p);
 
-  static urmem::address_t GetRakServerInterface();
-
   static int AMXAPI amx_Cleanup(AMX *amx);
 };
 

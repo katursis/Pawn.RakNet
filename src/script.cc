@@ -510,6 +510,8 @@ cell Script::BS_ReadValue(cell *params) {
 bool Script::OnLoad() {
   config_ = Plugin::Get().GetConfig();
 
+  Plugin::Get().InstallPreHooks();
+
   int num_publics{};
   amx_->NumPublics(&num_publics);
 
