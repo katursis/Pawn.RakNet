@@ -158,8 +158,19 @@ void Plugin::InstallRakServerHooks(urmem::address_t addr_rakserver) {
 }
 
 unsigned char Plugin::GetPacketId(Packet *packet) {
-  return urmem::call_function<urmem::calling_convention::cdeclcall,
-                              unsigned char>(addr_get_packet_id_, packet);
+  if (packet == 0) {
+    return 255;
+  }
+
+  unsigned char id = static_cast<unsigned char>(packet->data[0]);
+
+  // ID_TIMESTAMP = 40
+  if (id == 40) {
+    return static_cast<unsigned char>(packet->data[5]);
+  }
+  else {
+    return id;
+  }
 }
 
 Packet *Plugin::NewPacket(PlayerIndex index, const BitStream &bs) {
