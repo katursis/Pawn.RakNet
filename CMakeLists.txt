@@ -2,18 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(pawnraknet)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-if(MSVC)
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  add_definitions(-DHAVE_STDINT_H)
-  add_definitions(/wd4305)
-endif()
+include(AddSAMPPlugin)
 
-include_directories(lib)
+add_samp_plugin(${PROJECT_NAME}
+  plugin.def
 
-add_library(${PROJECT_NAME} MODULE
+  src/Pawn.RakNet.inc
   src/main.h
   src/main.cc
   src/plugin.h
@@ -28,18 +24,14 @@ add_library(${PROJECT_NAME} MODULE
   src/rakserver.cc
   src/hooks.h
   src/hooks.cc
-  src/Pawn.RakNet.inc
-  plugin.def
+
+  lib/RakNet/BitStream.h
+  lib/RakNet/BitStream.cpp
+  lib/RakNet/StringCompressor.h
+  lib/RakNet/StringCompressor.cpp
+  lib/RakNet/PluginInterface.h
+  lib/RakNet/PluginInterface.cpp
+  lib/RakNet/DS_HuffmanEncodingTreeNode.h
+  lib/RakNet/DS_HuffmanEncodingTree.h
+  lib/RakNet/DS_HuffmanEncodingTree.cpp
 )
-
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
-
-if(CMAKE_COMPILER_IS_GNUCC)
-  set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE Off)
-  set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS "-m32 -O3 -w")
-  set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS "-m32 -O3 -static-libgcc -static-libstdc++")
-endif()
-
-add_subdirectory(lib/RakNet)
-
-target_link_libraries(${PROJECT_NAME} raknet)
