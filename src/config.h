@@ -29,116 +29,29 @@ class Config {
  public:
   Config() = delete;
 
-  Config(const std::string &file_path, bool read = false)
-      : file_path_{file_path} {
-    if (read) {
-      Read();
-    }
-  }
+  explicit Config(const std::string &file_path);
 
-  static std::shared_ptr<Config> New(const std::string &file_path,
-                                     bool read = false) {
-    return std::make_shared<Config>(file_path, read);
-  }
+  void Read();
 
-  void Read() {
-    std::fstream{file_path_, std::fstream::out | std::fstream::app};
+  void Save();
 
-    const auto config = cpptoml::parse_file(file_path_);
+  bool InterceptIncomingPacket() const;
 
-    // backward compatibility
-    bool intercept_outcoming_packet =
-        config->get_as<bool>("InterceptOutcomingPacket").value_or(true);
-    bool intercept_outcoming_rpc =
-        config->get_as<bool>("InterceptOutcomingRPC").value_or(true);
+  bool InterceptIncomingRPC() const;
 
-    intercept_incoming_packet_ =
-        config->get_as<bool>("InterceptIncomingPacket").value_or(true);
-    intercept_incoming_rpc_ =
-        config->get_as<bool>("InterceptIncomingRPC").value_or(true);
-    intercept_outgoing_packet_ = config->get_as<bool>("InterceptOutgoingPacket")
-                                     .value_or(intercept_outcoming_packet);
-    intercept_outgoing_rpc_ = config->get_as<bool>("InterceptOutgoingRPC")
-                                  .value_or(intercept_outcoming_rpc);
-    intercept_incoming_raw_packet_ =
-        config->get_as<bool>("InterceptIncomingRawPacket").value_or(true);
-    intercept_incoming_internal_packet_ =
-        config->get_as<bool>("InterceptIncomingInternalPacket").value_or(false);
-    intercept_outgoing_internal_packet_ =
-        config->get_as<bool>("InterceptOutgoingInternalPacket").value_or(false);
+  bool InterceptOutgoingPacket() const;
 
-    auto packet_ids = config->get_array_of<int64_t>("WhiteListInternalPackets")
-                          .value_or(std::vector<int64_t>{});
-    for (auto &packet_id : packet_ids) {
-      if (packet_id < 0 ||
-          packet_id > (std::numeric_limits<unsigned char>::max)()) {
-        continue;
-      }
+  bool InterceptOutgoingRPC() const;
 
-      whitelist_internal_packets_[static_cast<unsigned char>(packet_id)] = true;
+  bool InterceptIncomingRawPacket() const;
 
-      whitelist_is_empty_ = false;
-    }
+  bool InterceptIncomingInternalPacket() const;
 
-    use_caching_ = config->get_as<bool>("UseCaching").value_or(false);
-  }
+  bool InterceptOutgoingInternalPacket() const;
 
-  void Save() {
-    auto config = cpptoml::make_table();
+  bool IsWhiteListedInternalPacket(unsigned char packet_id) const;
 
-    config->insert("InterceptIncomingPacket", intercept_incoming_packet_);
-    config->insert("InterceptIncomingRPC", intercept_incoming_rpc_);
-    config->insert("InterceptOutgoingPacket", intercept_outgoing_packet_);
-    config->insert("InterceptOutgoingRPC", intercept_outgoing_rpc_);
-    config->insert("InterceptIncomingRawPacket",
-                   intercept_incoming_raw_packet_);
-    config->insert("InterceptIncomingInternalPacket",
-                   intercept_incoming_internal_packet_);
-    config->insert("InterceptOutgoingInternalPacket",
-                   intercept_outgoing_internal_packet_);
-
-    auto packet_ids = cpptoml::make_array();
-    if (!whitelist_is_empty_) {
-      for (std::size_t packet_id{};
-           packet_id < whitelist_internal_packets_.size(); packet_id++) {
-        if (whitelist_internal_packets_[packet_id]) {
-          packet_ids->push_back(packet_id);
-        }
-      }
-    }
-    config->insert("WhiteListInternalPackets", packet_ids);
-
-    config->insert("UseCaching", use_caching_);
-
-    std::fstream{file_path_, std::fstream::out | std::fstream::trunc}
-        << (*config);
-  }
-
-  bool InterceptIncomingPacket() const { return intercept_incoming_packet_; }
-
-  bool InterceptIncomingRPC() const { return intercept_incoming_rpc_; }
-
-  bool InterceptOutgoingPacket() const { return intercept_outgoing_packet_; }
-
-  bool InterceptOutgoingRPC() const { return intercept_outgoing_rpc_; }
-
-  bool InterceptIncomingRawPacket() const {
-    return intercept_incoming_raw_packet_;
-  }
-
-  bool InterceptIncomingInternalPacket() const {
-    return intercept_incoming_internal_packet_;
-  }
-
-  bool InterceptOutgoingInternalPacket() const {
-    return intercept_outgoing_internal_packet_;
-  }
-
-  bool IsWhiteListedInternalPacket(unsigned char packet_id) const {
-    return whitelist_is_empty_ || whitelist_internal_packets_[packet_id];
-  }
-
-  bool UseCaching() const { return use_caching_; }
+  bool UseCaching() const;
 
  private:
   std::string file_path_;

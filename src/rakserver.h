@@ -49,7 +49,7 @@ class RakServer {
 #endif
   };
 
-  RakServer(urmem::address_t addr_rakserver);
+  explicit RakServer(urmem::address_t addr_rakserver);
 
   bool Send(BitStream *bitStream, int priority, int reliability,
             char orderingChannel, PlayerID playerId, bool broadcast);

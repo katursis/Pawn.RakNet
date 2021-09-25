@@ -22,40 +22,54 @@
  * SOFTWARE.
  */
 
-#ifndef PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_
-#define PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_
+#include "main.h"
 
-class InternalPacketChannel {
- public:
-  void PushPacket(InternalPacket *packet, const PlayerID &player_id,
-                  bool is_outgoing_packet);
+void InternalPacketChannel::PushPacket(InternalPacket *packet,
+                                       const PlayerID &player_id,
+                                       bool is_outgoing_packet) {
+  packet_ = packet;
+  player_id_ = player_id;
+  is_outgoing_packet_ = is_outgoing_packet;
 
-  InternalPacket *TryPopPacket();
+  packet_is_ready_ = true;
+}
 
-  const PlayerID &GetPlayerId();
+InternalPacket *InternalPacketChannel::TryPopPacket() {
+  if (!packet_is_ready_) {
+    return nullptr;
+  }
 
-  bool IsOutgoingPacket();
+  packet_is_ready_ = false;
 
-  void PushResult(bool result);
+  return packet_;
+}
 
-  bool PopResult();
+const PlayerID &InternalPacketChannel::GetPlayerId() { return player_id_; }
 
-  void Open();
+bool InternalPacketChannel::IsOutgoingPacket() { return is_outgoing_packet_; }
 
-  void Close();
+void InternalPacketChannel::PushResult(bool result) {
+  result_ = result;
 
-  bool IsClosed();
+  result_is_ready_ = true;
+}
 
- private:
-  std::atomic_bool packet_is_ready_{false};  // ready for consumer
-  std::atomic_bool result_is_ready_{false};  // ready for producer
-  std::atomic_bool is_closed_{false};
+bool InternalPacketChannel::PopResult() {
+  while (!result_is_ready_) {
+    if (is_closed_) {
+      return true;
+    }
 
-  InternalPacket *packet_{};
-  PlayerID player_id_{};
-  bool is_outgoing_packet_{};
+    std::this_thread::yield();
+  }
 
-  bool result_{};
-};
+  result_is_ready_ = false;
 
-#endif  // PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_
+  return result_;
+}
+
+void InternalPacketChannel::Open() { is_closed_ = false; }
+
+void InternalPacketChannel::Close() { is_closed_ = true; }
+
+bool InternalPacketChannel::IsClosed() { return is_closed_; };
