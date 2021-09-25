@@ -666,7 +666,7 @@
 
         stock BS_ReadMarkersSync(BitStream:bs, data[PR_MarkersSync])
         {
-            new numberOfPlayers;
+            new numberOfPlayers, playerId, isActive;
 
             BS_ReadInt32(bs, numberOfPlayers);
 
@@ -677,7 +677,7 @@
             data[PR_numberOfPlayers] = numberOfPlayers;
 
             for (new i; i < numberOfPlayers; i++) {
-                new playerId, isActive;
+                playerId = isActive = 0;
 
                 BS_ReadUint16(bs, playerId);
 
@@ -704,7 +704,7 @@
 
         stock BS_ReadWeaponsUpdate(BitStream:bs, data[PR_WeaponsUpdate])
         {
-            new numberOfBytes, numberOfSlots;
+            new numberOfBytes, numberOfSlots, slotId, weaponId, ammo;
 
             BS_GetNumberOfBytesUsed(bs, numberOfBytes);
 
@@ -719,7 +719,7 @@
             );
 
             while (numberOfSlots--) {
-                new slotId, weaponId, ammo;
+                slotId = weaponId = ammo = 0;
 
                 BS_ReadValue(
                     bs,
