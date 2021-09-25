@@ -27,32 +27,9 @@
 
 class BitStreamPool {
  public:
-  BitStream *New() {
-    for (auto &[bs, is_occupied] : items_) {
-      if (!is_occupied) {
-        is_occupied = true;
+  BitStream *New();
 
-        return bs.get();
-      }
-    }
-
-    const auto &[bs, is_occupied] =
-        items_.emplace_back(std::make_shared<BitStream>(), true);
-
-    return bs.get();
-  }
-
-  void Delete(BitStream *ptr) {
-    for (auto &[bs, is_occupied] : items_) {
-      if (bs.get() == ptr) {
-        bs->Reset();
-
-        is_occupied = false;
-
-        return;
-      }
-    }
-  }
+  void Delete(BitStream *ptr);
 
  private:
   using Item =

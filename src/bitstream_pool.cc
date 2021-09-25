@@ -22,40 +22,31 @@
  * SOFTWARE.
  */
 
-#ifndef PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_
-#define PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_
+#include "main.h"
 
-class InternalPacketChannel {
- public:
-  void PushPacket(InternalPacket *packet, const PlayerID &player_id,
-                  bool is_outgoing_packet);
+BitStream *BitStreamPool::New() {
+  for (auto &[bs, is_occupied] : items_) {
+    if (!is_occupied) {
+      is_occupied = true;
 
-  InternalPacket *TryPopPacket();
+      return bs.get();
+    }
+  }
 
-  const PlayerID &GetPlayerId();
+  const auto &[bs, is_occupied] =
+      items_.emplace_back(std::make_shared<BitStream>(), true);
 
-  bool IsOutgoingPacket();
+  return bs.get();
+}
 
-  void PushResult(bool result);
+void BitStreamPool::Delete(BitStream *ptr) {
+  for (auto &[bs, is_occupied] : items_) {
+    if (bs.get() == ptr) {
+      bs->Reset();
 
-  bool PopResult();
+      is_occupied = false;
 
-  void Open();
-
-  void Close();
-
-  bool IsClosed();
-
- private:
-  std::atomic_bool packet_is_ready_{false};  // ready for consumer
-  std::atomic_bool result_is_ready_{false};  // ready for producer
-  std::atomic_bool is_closed_{false};
-
-  InternalPacket *packet_{};
-  PlayerID player_id_{};
-  bool is_outgoing_packet_{};
-
-  bool result_{};
-};
-
-#endif  // PAWNRAKNET_INTERNAL_PACKET_CHANNEL_H_
+      return;
+    }
+  }
+}

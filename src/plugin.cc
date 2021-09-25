@@ -25,7 +25,9 @@
 #include "main.h"
 
 bool Plugin::OnLoad() {
-  config_ = Config::New("plugins/pawnraknet.cfg", true);
+  config_ = std::make_shared<Config>("plugins/pawnraknet.cfg");
+
+  config_->Read();
 
   StringCompressor::AddReference();
 

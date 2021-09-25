@@ -16,8 +16,11 @@ add_samp_plugin(${PROJECT_NAME}
   src/plugin.cc
   src/native_param.h
   src/config.h
+  src/config.cc
   src/bitstream_pool.h
+  src/bitstream_pool.cc
   src/internal_packet_channel.h
+  src/internal_packet_channel.cc
   src/script.h
   src/script.cc
   src/rakserver.h
@@ -34,4 +37,6 @@ add_samp_plugin(${PROJECT_NAME}
   lib/RakNet/DS_HuffmanEncodingTreeNode.h
   lib/RakNet/DS_HuffmanEncodingTree.h
   lib/RakNet/DS_HuffmanEncodingTree.cpp
+
+  lib/samp-ptl/ptl.h
 )
