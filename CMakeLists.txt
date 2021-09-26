@@ -40,3 +40,5 @@ add_samp_plugin(${PROJECT_NAME}
 
   lib/samp-ptl/ptl.h
 )
+
+target_include_directories(${PROJECT_NAME} PRIVATE lib)
