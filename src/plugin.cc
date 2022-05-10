@@ -29,8 +29,6 @@ bool Plugin::OnLoad() {
 
   config_->Read();
 
-  StringCompressor::AddReference();
-
   InstallPreHooks();
 
   RegisterNative<&Script::PR_Init>("PR_Init");
@@ -60,9 +58,9 @@ bool Plugin::OnLoad() {
   RegisterNative<&Script::BS_ReadValue, false>("BS_ReadValue");
 
   Log("\n\n"
-      "    | %s %s | 2016 - %s"
+      "    | %s %s | omp-beta4 | 2016 - %s"
       "\n"
-      "    |--------------------------------"
+      "    |--------------------------------------------"
       "\n"
       "    | Author and maintainer: katursis"
       "\n\n\n"
@@ -70,7 +68,7 @@ bool Plugin::OnLoad() {
       "\n"
       "    |--------------------------------------------------------------"
       "\n"
-      "    | Repository: https://github.com/katursis/%s"
+      "    | Repository: https://github.com/katursis/%s/tree/omp"
       "\n"
       "    |--------------------------------------------------------------"
       "\n"
@@ -85,105 +83,16 @@ bool Plugin::OnLoad() {
 void Plugin::OnUnload() {
   config_->Save();
 
-  StringCompressor::RemoveReference();
-
   Log("plugin unloaded");
 }
 
-void Plugin::OnProcessTick() { ProcessInternalPackets(); }
+void Plugin::OnProcessTick() {}
 
 void Plugin::InstallPreHooks() {
-  urmem::sig_scanner scanner;
-
-  if (!scanner.init(reinterpret_cast<urmem::address_t>(*plugin_data_))) {
-    throw std::runtime_error{"Sig scanner init error"};
-  }
-
-  urmem::address_t get_rakserver_interface_addr{};
-
-  if (!scanner.find(get_rakserver_interface_pattern_,
-                    get_rakserver_interface_mask_,
-                    get_rakserver_interface_addr)) {
-    throw std::runtime_error{"GetRakServerInterface not found"};
-  }
-
-  if (!scanner.find(get_packet_id_pattern_, get_packet_id_mask_,
-                    addr_get_packet_id_)) {
-    throw std::runtime_error{"GetPacketId not found"};
-  }
-
-  hook_get_rakserver_interface_ = urmem::hook::make(
-      get_rakserver_interface_addr, &Hooks::GetRakServerInterface);
-
   hook_amx_cleanup_ = urmem::hook::make(
       reinterpret_cast<urmem::address_t *>(
           plugin_data_[PLUGIN_DATA_AMX_EXPORTS])[PLUGIN_AMX_EXPORT_Cleanup],
       &Hooks::amx_Cleanup);
-}
-
-void Plugin::InstallRakServerHooks(urmem::address_t addr_rakserver) {
-  rakserver_ = std::make_shared<RakServer>(addr_rakserver);
-
-  if (config_->InterceptIncomingPacket()) {
-    rakserver_->InstallHook(RakServer::MethodIndex::kReceive,
-                            &Hooks::RakServer__Receive);
-  }
-
-  rakserver_->InstallHook(
-      RakServer::MethodIndex::kRegisterAsRemoteProcedureCall,
-      &Hooks::RakServer__RegisterAsRemoteProcedureCall);
-
-  if (config_->InterceptIncomingRPC()) {
-    Hooks::ReceiveRPC::Init();
-  }
-
-  if (config_->InterceptOutgoingPacket()) {
-    rakserver_->InstallHook(RakServer::MethodIndex::kSend,
-                            &Hooks::RakServer__Send);
-  }
-
-  if (config_->InterceptOutgoingRPC()) {
-    rakserver_->InstallHook(RakServer::MethodIndex::kRPC,
-                            &Hooks::RakServer__RPC);
-  }
-
-  if (config_->InterceptIncomingRawPacket()) {
-    message_handler_ = std::make_shared<MessageHandler>();
-
-    rakserver_->AttachPlugin(message_handler_.get());
-  }
-
-  if (config_->InterceptIncomingInternalPacket() ||
-      config_->InterceptOutgoingInternalPacket()) {
-    internal_packet_channel_ = std::make_shared<InternalPacketChannel>();
-  }
-}
-
-unsigned char Plugin::GetPacketId(Packet *packet) {
-  return urmem::call_function<urmem::calling_convention::cdeclcall,
-                              unsigned char>(addr_get_packet_id_, packet);
-}
-
-Packet *Plugin::NewPacket(PlayerIndex index, const BitStream &bs) {
-  const std::size_t length = bs.GetNumberOfBytesUsed();
-  if (!length) {
-    throw std::runtime_error{"Data is empty"};
-  }
-
-  Packet *p = reinterpret_cast<Packet *>(malloc(sizeof(Packet) + length));
-  if (!p) {
-    throw std::runtime_error{"Function malloc returned nullptr"};
-  }
-
-  p->playerIndex = index;
-  p->playerId = GetRakServer()->GetPlayerIDFromIndex(index);
-  p->length = length;
-  p->bitSize = bs.GetNumberOfBitsUsed();
-  p->data = reinterpret_cast<unsigned char *>(&p[1]);
-  memcpy(p->data, bs.GetData(), length);
-  p->deleteData = false;
-
-  return p;
 }
 
 void Plugin::PushPacketToEmulate(Packet *packet) {
@@ -202,64 +111,8 @@ Packet *Plugin::GetNextPacketToEmulate() {
   return packet;
 }
 
-void Plugin::SetOriginalRPCHandler(RPCIndex rpc_id, RPCFunction handler) {
-  original_rpc_.at(rpc_id) = handler;
-}
-
-RPCFunction Plugin::GetOriginalRPCHandler(RPCIndex rpc_id) {
-  return original_rpc_.at(rpc_id);
-}
-
-void Plugin::SetFakeRPCHandler(RPCIndex rpc_id, RPCFunction handler) {
-  fake_rpc_.at(rpc_id) = handler;
-}
-
-RPCFunction Plugin::GetFakeRPCHandler(RPCIndex rpc_id) {
-  return fake_rpc_.at(rpc_id);
-}
-
-const std::shared_ptr<urmem::hook> &Plugin::GetHookGetRakServerInterface() {
-  return hook_get_rakserver_interface_;
-}
-
 const std::shared_ptr<urmem::hook> &Plugin::GetHookAmxCleanup() {
   return hook_amx_cleanup_;
 }
 
 const std::shared_ptr<Config> &Plugin::GetConfig() { return config_; }
-
-const std::shared_ptr<RakServer> &Plugin::GetRakServer() { return rakserver_; }
-
-const std::shared_ptr<InternalPacketChannel>
-    &Plugin::GetInternalPacketChannel() {
-  return internal_packet_channel_;
-}
-
-void Plugin::ProcessInternalPackets() {
-  auto &ch = internal_packet_channel_;
-  if (!ch || ch->IsClosed()) {
-    return;
-  }
-
-  auto internal_packet = ch->TryPopPacket();
-  if (!internal_packet) {
-    return;
-  }
-
-  int player_id = rakserver_->GetIndexFromPlayerID(ch->GetPlayerId());
-  BitStream bs{internal_packet->data,
-               BITS_TO_BYTES(internal_packet->dataBitLength), false};
-
-  auto on_event = ch->IsOutgoingPacket() ? OnEvent<PR_OUTGOING_INTERNAL_PACKET>
-                                         : OnEvent<PR_INCOMING_INTERNAL_PACKET>;
-
-  bool result = on_event(player_id, internal_packet->data[0], &bs);
-
-  if (internal_packet->data != bs.GetData()) {
-    delete[] internal_packet->data;
-
-    internal_packet->dataBitLength = bs.CopyData(&internal_packet->data);
-  }
-
-  ch->PushResult(result);
-}

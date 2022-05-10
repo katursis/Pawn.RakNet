@@ -16,31 +16,10 @@
 /// option) any later version.
 
 #ifndef __NETWORK_TYPES_H
-#define __NETWORK_TYPES_H
-
-#define __BITSTREAM_NATIVE_END
-
-/// Forward declaration
-class BitStream;
-
-struct RPCParameters;
-
-#define BITS_TO_BYTES(x) (((x)+7)>>3)
-#define BYTES_TO_BITS(x) ((x)<<3)
+#define __NETWORK_TYPES_H // TODO: remove the file
 
 typedef unsigned short PlayerIndex;
 typedef unsigned char RPCIndex;
-const int MAX_RPC_MAP_SIZE = ((RPCIndex)-1) - 1;
-
-using RPCFunction = void(*)(RPCParameters *p);
-
-#ifdef __GET_TIME_64BIT
-typedef long long RakNetTime;
-typedef long long RakNetTimeNS;
-#else
-typedef unsigned int RakNetTime;
-typedef long long RakNetTimeNS;
-#endif
 
 #pragma pack(push, 1)
 
@@ -59,25 +38,6 @@ struct Packet
 	unsigned char* data;
 	bool deleteData;
 };
-
-struct InternalPacket {
-#ifdef _WIN32
-	unsigned char pad[48];
-#else
-	unsigned char pad[43];
-#endif
-	unsigned int dataBitLength;
-	unsigned char *data;
-};
-
-struct RPCParameters
-{
-	unsigned char *input;
-	unsigned int numberOfBitsOfData;
-	PlayerID sender;
-};
-
-const PlayerID UNASSIGNED_PLAYER_ID = {0xFFFFFFFF, 0xFFFF};
 
 #pragma pack(pop)
 

@@ -133,12 +133,14 @@ class Script : public ptl::AbstractScript<Script> {
     }
 
     for (const auto &handler : std::get<event_type>(handlers_).at(event_id)) {
-      bs->ResetReadPointer();
+      bs->resetReadPointer();
 
       if (!handler->Exec(player_id, bs)) {
         return false;
       }
     }
+
+    bs->resetReadPointer();
 
     return true;
   }

@@ -48,14 +48,27 @@ cell Script::PR_SendPacket(BitStream *bs, int player_id,
                            unsigned char ordering_channel) {
   const bool broadcast = player_id == -1;
 
-  auto &rakserver = Plugin::Get().GetRakServer();
+  auto core = PluginComponent::getCore();
+  if (!core) {
+    // TODO: throw exception
+  }
 
-  return rakserver->Send(bs, priority, reliability, ordering_channel,
-                         broadcast ? UNASSIGNED_PLAYER_ID
-                                   : rakserver->GetPlayerIDFromIndex(player_id),
-                         broadcast)
-             ? 1
-             : 0;
+  if (broadcast) {
+    // TODO: need method INetwork::broadcastPacket
+  } else {
+    auto player = core->getPlayers().get(player_id);
+    if (!player) {
+      // TODO: throw exception
+    }
+
+    if (!player->sendPacket(
+            Span<uint8_t>(bs->GetData(), bs->GetNumberOfBitsUsed()),
+            ordering_channel)) {  // TODO: need param dispatchEvents=false
+      return 0;
+    }
+  }
+
+  return 1;
 }
 
 // native PR_SendRPC(BitStream:bs, playerid, rpcid, PR_PacketPriority:priority
@@ -67,21 +80,34 @@ cell Script::PR_SendRPC(BitStream *bs, int player_id, RPCIndex rpc_id,
                         unsigned char ordering_channel) {
   const bool broadcast = player_id == -1;
 
-  auto &rakserver = Plugin::Get().GetRakServer();
+  auto core = PluginComponent::getCore();
+  if (!core) {
+    // TODO: throw exception
+  }
 
-  return rakserver->RPC(&rpc_id, bs, priority, reliability, ordering_channel,
-                        broadcast ? UNASSIGNED_PLAYER_ID
-                                  : rakserver->GetPlayerIDFromIndex(player_id),
-                        broadcast, false)
-             ? 1
-             : 0;
+  if (broadcast) {
+    for (auto network : core->getNetworks()) {
+      network->broadcastRPC(
+          rpc_id, Span<uint8_t>(bs->GetData(), bs->GetNumberOfBitsUsed()),
+          ordering_channel);
+    }
+  } else {
+    auto player = core->getPlayers().get(player_id);
+    if (!player) {
+      // TODO: throw exception
+    }
+
+    if (!player->sendRPC(
+            rpc_id, Span<uint8_t>(bs->GetData(), bs->GetNumberOfBitsUsed()),
+            ordering_channel)) {  // TODO: need param dispatchEvents=false
+      return 0;
+    }
+  }
 }
 
 // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
 cell Script::PR_EmulateIncomingPacket(BitStream *bs, int player_id) {
-  auto &plugin = Plugin::Get();
-
-  plugin.PushPacketToEmulate(plugin.NewPacket(player_id, *bs));
+  // TODO: implement
 
   return 1;
 }
@@ -89,23 +115,7 @@ cell Script::PR_EmulateIncomingPacket(BitStream *bs, int player_id) {
 // native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
 cell Script::PR_EmulateIncomingRPC(BitStream *bs, int player_id,
                                    RPCIndex rpc_id) {
-  auto &plugin = Plugin::Get();
-  auto &rakserver = plugin.GetRakServer();
-
-  const auto &handler = plugin.GetOriginalRPCHandler(rpc_id);
-  if (!handler) {
-    throw std::runtime_error{"Invalid rpcid"};
-  }
-
-  RPCParameters rpc_params{};
-
-  rpc_params.numberOfBitsOfData = bs->GetNumberOfBitsUsed();
-  rpc_params.sender = rakserver->GetPlayerIDFromIndex(player_id);
-  if (rpc_params.numberOfBitsOfData) {
-    rpc_params.input = bs->GetData();
-  }
-
-  handler(&rpc_params);
+  // TODO: implement
 
   return 1;
 }
@@ -133,21 +143,21 @@ cell Script::BS_Delete(cell *bs) {
 
 // native BS_Reset(BitStream:bs);
 cell Script::BS_Reset(BitStream *bs) {
-  bs->Reset();
+  bs->reset();
 
   return 1;
 }
 
 // native BS_ResetReadPointer(BitStream:bs);
 cell Script::BS_ResetReadPointer(BitStream *bs) {
-  bs->ResetReadPointer();
+  bs->resetReadPointer();
 
   return 1;
 }
 
 // native BS_ResetWritePointer(BitStream:bs);
 cell Script::BS_ResetWritePointer(BitStream *bs) {
-  bs->ResetWritePointer();
+  bs->resetWritePointer();
 
   return 1;
 }
@@ -551,7 +561,7 @@ bool Script::ExecPublic(const PublicPtr &pub, int player_id,
     return true;
   }
 
-  bs->ResetReadPointer();
+  bs->resetReadPointer();
 
   return pub->Exec(player_id, event_id, bs);
 }
@@ -563,7 +573,6 @@ void Script::InitPublic(PR_EventType type, const std::string &public_name) {
 void Script::InitHandler(unsigned char event_id, const std::string &public_name,
                          PR_EventType type) {
   auto &plugin = Plugin::Get();
-  auto &rakserver = plugin.GetRakServer();
 
   auto pub = MakePublic(public_name, config_->UseCaching());
   if (!pub->Exists()) {
@@ -571,13 +580,7 @@ void Script::InitHandler(unsigned char event_id, const std::string &public_name,
   }
 
   if (type == PR_INCOMING_CUSTOM_RPC) {
-    if (plugin.GetOriginalRPCHandler(event_id)) {
-      throw std::runtime_error{"Custom rpc id " + std::to_string(event_id) +
-                               " is occupied"};
-    }
-
-    rakserver->RegisterAsRemoteProcedureCall(
-        &event_id, plugin.GetFakeRPCHandler(event_id));
+    // TODO: implement
   }
 
   handlers_.at(type).at(event_id).push_back(pub);

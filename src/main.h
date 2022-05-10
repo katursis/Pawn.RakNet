@@ -25,10 +25,14 @@
 #ifndef PAWNRAKNET_MAIN_H_
 #define PAWNRAKNET_MAIN_H_
 
+#define _GLIBCXX_USE_CXX11_ABI 1
+
+#include "sdk.hpp"
+#include "Server/Components/Pawn/pawn.hpp"
 #include "samp-ptl/ptl.h"
-#include "RakNet/BitStream.h"
-#include "RakNet/StringCompressor.h"
-#include "RakNet/PluginInterface.h"
+#include "RakNet/bitstream.hpp"
+#include "RakNet/Encoding/str_compress.hpp"
+#include "RakNet/NetworkTypes.h"
 #include "urmem/urmem.hpp"
 #include "cpptoml/include/cpptoml.h"
 
@@ -43,6 +47,7 @@
 #include <thread>
 #include <atomic>
 #include <vector>
+#include <cstdarg>
 
 #include "Pawn.RakNet.inc"
 
@@ -56,13 +61,60 @@
 #define THISCALL
 #endif
 
+using BitStream = NetworkBitStream; // TODO: remove
+
 #include "config.h"
 #include "bitstream_pool.h"
-#include "internal_packet_channel.h"
-#include "rakserver.h"
 #include "script.h"
 #include "native_param.h"
 #include "plugin.h"
 #include "hooks.h"
+
+class PluginComponent final : public IComponent,
+                              public PawnEventHandler,
+                              public CoreEventHandler,
+                              public NetworkInEventHandler,
+                              public NetworkOutEventHandler {
+ public:
+  PROVIDE_UID(0x4a8b15c16d23e42f);
+
+  StringView componentName() const override;
+
+  SemanticVersion componentVersion() const override;
+
+  void onLoad(ICore *c) override;
+
+  void onInit(IComponentList *components) override;
+
+  void onAmxLoad(void *amx) override;
+
+  void onAmxUnload(void *amx) override;
+
+  void onTick(Microseconds elapsed, TimePoint now) override;
+
+  bool receivedPacket(IPlayer &peer, int id, NetworkBitStream &bs) override;
+
+  bool receivedRPC(IPlayer &peer, int id, NetworkBitStream &bs) override;
+
+  bool sentPacket(IPlayer *peer, int id, NetworkBitStream &bs) override;
+
+  bool sentRPC(IPlayer *peer, int id, NetworkBitStream &bs) override;
+
+  void onFree(IComponent *component) override;
+
+  void reset() override;
+
+  void free() override;
+
+  static void PluginLogprintf(const char *fmt, ...);
+
+  static ICore *&getCore();
+
+ private:
+  ICore *core_{};
+  IPawnComponent *pawn_component_{};
+
+  void *plugin_data_[MAX_PLUGIN_DATA]{};
+};
 
 #endif  // PAWNRAKNET_MAIN_H_

@@ -1,6 +1,2 @@
 EXPORTS
-	Supports
-	Load
-	Unload
-	AmxLoad
-	ProcessTick
+	ComponentEntryPoint

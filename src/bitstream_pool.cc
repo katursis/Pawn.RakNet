@@ -42,7 +42,7 @@ BitStream *BitStreamPool::New() {
 void BitStreamPool::Delete(BitStream *ptr) {
   for (auto &[bs, is_occupied] : items_) {
     if (bs.get() == ptr) {
-      bs->Reset();
+      bs->reset();
 
       is_occupied = false;
 

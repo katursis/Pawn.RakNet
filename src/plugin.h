@@ -39,35 +39,13 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   void InstallPreHooks();
 
-  void InstallRakServerHooks(urmem::address_t addr_rakserver);
-
-  unsigned char GetPacketId(Packet *packet);
-
-  Packet *NewPacket(PlayerIndex index, const BitStream &bs);
-
   void PushPacketToEmulate(Packet *packet);
 
   Packet *GetNextPacketToEmulate();
 
-  void SetOriginalRPCHandler(RPCIndex rpc_id, RPCFunction handler);
-
-  RPCFunction GetOriginalRPCHandler(RPCIndex rpc_id);
-
-  void SetFakeRPCHandler(RPCIndex rpc_id, RPCFunction handler);
-
-  RPCFunction GetFakeRPCHandler(RPCIndex rpc_id);
-
-  const std::shared_ptr<urmem::hook> &GetHookGetRakServerInterface();
-
   const std::shared_ptr<urmem::hook> &GetHookAmxCleanup();
 
   const std::shared_ptr<Config> &GetConfig();
-
-  const std::shared_ptr<RakServer> &GetRakServer();
-
-  const std::shared_ptr<InternalPacketChannel> &GetInternalPacketChannel();
-
-  void ProcessInternalPackets();
 
   template <PR_EventType event_type>
   static bool OnEvent(int player_id, unsigned char event_id, BitStream *bs) {
@@ -79,52 +57,9 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
   static Plugin &Get() { return Instance(); }
 
  private:
-#ifdef _WIN32
-  const char *get_rakserver_interface_pattern_ =
-      "\x6A\xFF\x68\x5B\xA4\x4A\x00\x64\xA1\x00\x00"
-      "\x00\x00\x50\x64\x89\x25\x00\x00\x00\x00\x51"
-      "\x68\x18\x0E\x00\x00\xE8\xFF\xFF\xFF\xFF\x83"
-      "\xC4\x04\x89\x04\x24\x85\xC0\xC7\x44\x24\xFF"
-      "\x00\x00\x00\x00\x74\x16";
-  const char *get_rakserver_interface_mask_ =
-      "???????xxxxxxxxxxxxxxxx????x????xxxxxxxxxxx?xxxxxx";
-
-  const char *get_packet_id_pattern_ =
-      "\x8B\x44\x24\x04\x85\xC0\x75\x03\x0C\xFF\xC3\x8B\x48\x10\x8A\x01"
-      "\x3C\xFF\x75\x03\x8A\x41\x05\xC3";
-  const char *get_packet_id_mask_ = "?????xxxxxxxxxxxx?xxxxxx";
-#else
-  const char *get_rakserver_interface_pattern_ =
-      "\x55\x89\xE5\x83\xEC\x18\xC7\x04\x24\xFF\xFF"
-      "\xFF\xFF\x89\x75\xFF\x89\x5D\xFF\xE8\xFF\xFF"
-      "\xFF\xFF\x89\x04\x24\x89\xC6\xE8\xFF\xFF\xFF"
-      "\xFF\x89\xF0\x8B\x5D\xFF\x8B\x75\xFF\x89\xEC"
-      "\x5D\xC3";
-  const char *get_rakserver_interface_mask_ =
-      "?????xxxx????xx?xx?x????xxxxxx????xxxx?xx?xxxx";
-
-  const char *get_packet_id_pattern_ =
-      "\x55\xB8\xFF\x00\x00\x00\x89\xE5\x8B\x55\x08\x85\xD2\x74\x0D\x8B"
-      "\x52\x10\x0F\xB6\x02\x3C\xFF\x74\x07\x0F\xB6\xC0\x5D\xC3\x66\x90"
-      "\x0F\xB6\x42\x05\x5D\xC3";
-  const char *get_packet_id_mask_ = "?????xxxxxxxxxxxxxxxxx?xxxxxxxxxxxxxxx";
-#endif
-
   std::shared_ptr<Config> config_;
 
-  urmem::address_t addr_get_packet_id_{};
-
-  std::shared_ptr<RakServer> rakserver_;
-
-  std::shared_ptr<urmem::hook> hook_get_rakserver_interface_;
   std::shared_ptr<urmem::hook> hook_amx_cleanup_;
-
-  std::shared_ptr<PluginInterface> message_handler_;
-
-  std::shared_ptr<InternalPacketChannel> internal_packet_channel_;
-
-  std::array<RPCFunction, PR_MAX_HANDLERS> original_rpc_{};
-  std::array<RPCFunction, PR_MAX_HANDLERS> fake_rpc_{};
 
   std::queue<Packet *> emulating_packets_;
 };
