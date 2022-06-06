@@ -58,7 +58,7 @@ bool Plugin::OnLoad() {
   RegisterNative<&Script::BS_ReadValue, false>("BS_ReadValue");
 
   Log("\n\n"
-      "    | %s %s | omp-beta4 | 2016 - %s"
+      "    | %s %s | omp-beta5 | 2016 - %s"
       "\n"
       "    |--------------------------------------------"
       "\n"
@@ -95,21 +95,9 @@ void Plugin::InstallPreHooks() {
       &Hooks::amx_Cleanup);
 }
 
-void Plugin::PushPacketToEmulate(Packet *packet) {
-  emulating_packets_.push(packet);
-}
+void Plugin::SetCustomRPC(RPCIndex rpc_id) { custom_rpc_[rpc_id] = true; }
 
-Packet *Plugin::GetNextPacketToEmulate() {
-  if (emulating_packets_.empty()) {
-    return nullptr;
-  }
-
-  auto packet = emulating_packets_.front();
-
-  emulating_packets_.pop();
-
-  return packet;
-}
+bool Plugin::IsCustomRPC(RPCIndex rpc_id) { return custom_rpc_[rpc_id]; }
 
 const std::shared_ptr<urmem::hook> &Plugin::GetHookAmxCleanup() {
   return hook_amx_cleanup_;

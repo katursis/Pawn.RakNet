@@ -29,10 +29,10 @@
 
 #include "sdk.hpp"
 #include "Server/Components/Pawn/pawn.hpp"
+#include "Impl/network_impl.hpp"
 #include "samp-ptl/ptl.h"
 #include "RakNet/bitstream.hpp"
 #include "RakNet/Encoding/str_compress.hpp"
-#include "RakNet/NetworkTypes.h"
 #include "urmem/urmem.hpp"
 #include "cpptoml/include/cpptoml.h"
 
@@ -61,7 +61,8 @@
 #define THISCALL
 #endif
 
-using BitStream = NetworkBitStream; // TODO: remove
+using BitStream = NetworkBitStream;
+using RPCIndex = unsigned char;
 
 #include "config.h"
 #include "bitstream_pool.h"
@@ -92,13 +93,13 @@ class PluginComponent final : public IComponent,
 
   void onTick(Microseconds elapsed, TimePoint now) override;
 
-  bool receivedPacket(IPlayer &peer, int id, NetworkBitStream &bs) override;
+  bool onReceivePacket(IPlayer &peer, int id, NetworkBitStream &bs) override;
 
-  bool receivedRPC(IPlayer &peer, int id, NetworkBitStream &bs) override;
+  bool onReceiveRPC(IPlayer &peer, int id, NetworkBitStream &bs) override;
 
-  bool sentPacket(IPlayer *peer, int id, NetworkBitStream &bs) override;
+  bool onSendPacket(IPlayer *peer, int id, NetworkBitStream &bs) override;
 
-  bool sentRPC(IPlayer *peer, int id, NetworkBitStream &bs) override;
+  bool onSendRPC(IPlayer *peer, int id, NetworkBitStream &bs) override;
 
   void onFree(IComponent *component) override;
 
@@ -109,6 +110,8 @@ class PluginComponent final : public IComponent,
   static void PluginLogprintf(const char *fmt, ...);
 
   static ICore *&getCore();
+
+  static PluginComponent *&get();
 
  private:
   ICore *core_{};

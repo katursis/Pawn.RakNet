@@ -50,20 +50,22 @@ cell Script::PR_SendPacket(BitStream *bs, int player_id,
 
   auto core = PluginComponent::getCore();
   if (!core) {
-    // TODO: throw exception
+    throw std::runtime_error{"Invalid component core"};
   }
 
   if (broadcast) {
-    // TODO: need method INetwork::broadcastPacket
+    core->getPlayers().broadcastPacket(
+        Span<uint8_t>(bs->GetData(), bs->GetNumberOfBitsUsed()),
+        ordering_channel, nullptr, false);
   } else {
     auto player = core->getPlayers().get(player_id);
     if (!player) {
-      // TODO: throw exception
+      throw std::runtime_error{"Invalid player"};
     }
 
     if (!player->sendPacket(
             Span<uint8_t>(bs->GetData(), bs->GetNumberOfBitsUsed()),
-            ordering_channel)) {  // TODO: need param dispatchEvents=false
+            ordering_channel, false)) {
       return 0;
     }
   }
@@ -82,24 +84,22 @@ cell Script::PR_SendRPC(BitStream *bs, int player_id, RPCIndex rpc_id,
 
   auto core = PluginComponent::getCore();
   if (!core) {
-    // TODO: throw exception
+    throw std::runtime_error{"Invalid component core"};
   }
 
   if (broadcast) {
-    for (auto network : core->getNetworks()) {
-      network->broadcastRPC(
-          rpc_id, Span<uint8_t>(bs->GetData(), bs->GetNumberOfBitsUsed()),
-          ordering_channel);
-    }
+    core->getPlayers().broadcastRPC(
+        rpc_id, Span<uint8_t>(bs->GetData(), bs->GetNumberOfBitsUsed()),
+        ordering_channel, nullptr, false);
   } else {
     auto player = core->getPlayers().get(player_id);
     if (!player) {
-      // TODO: throw exception
+      throw std::runtime_error{"Invalid player"};
     }
 
     if (!player->sendRPC(
             rpc_id, Span<uint8_t>(bs->GetData(), bs->GetNumberOfBitsUsed()),
-            ordering_channel)) {  // TODO: need param dispatchEvents=false
+            ordering_channel, false)) {
       return 0;
     }
   }
@@ -107,7 +107,54 @@ cell Script::PR_SendRPC(BitStream *bs, int player_id, RPCIndex rpc_id,
 
 // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
 cell Script::PR_EmulateIncomingPacket(BitStream *bs, int player_id) {
-  // TODO: implement
+  auto core = PluginComponent::getCore();
+  if (!core) {
+    throw std::runtime_error{"Invalid component core"};
+  }
+
+  auto player = core->getPlayers().get(player_id);
+  if (!player) {
+    throw std::runtime_error{"Invalid player"};
+  }
+
+  auto data = bs->GetData();
+  if (!data) {
+    throw std::runtime_error{"Invalid bs data"};
+  }
+
+  int packet_id = static_cast<int>(data[0]);
+
+  for (auto network : core->getNetworks()) {
+    auto event_dispatcher =
+        reinterpret_cast<Impl::DefaultEventDispatcher<NetworkInEventHandler> *>(
+            &network->getInEventDispatcher());
+
+    if (!event_dispatcher->stopAtFalse(
+            [player, bs, packet_id](NetworkInEventHandler *handler) {
+              if (handler == PluginComponent::get()) {
+                return true;
+              }
+
+              bs->resetReadPointer();
+
+              return handler->onReceivePacket(*player, packet_id, *bs);
+            })) {
+      return 1;
+    }
+
+    auto event_single_dispatcher = reinterpret_cast<
+        Impl::DefaultIndexedEventDispatcher<SingleNetworkInEventHandler> *>(
+        &network->getPerPacketInEventDispatcher());
+
+    if (!event_single_dispatcher->stopAtFalse(
+            packet_id, [player, bs](SingleNetworkInEventHandler *handler) {
+              bs->resetReadPointer();
+
+              return handler->onReceive(*player, *bs);
+            })) {
+      return 1;
+    }
+  }
 
   return 1;
 }
@@ -115,7 +162,47 @@ cell Script::PR_EmulateIncomingPacket(BitStream *bs, int player_id) {
 // native PR_EmulateIncomingRPC(BitStream:bs, playerid, rpcid);
 cell Script::PR_EmulateIncomingRPC(BitStream *bs, int player_id,
                                    RPCIndex rpc_id) {
-  // TODO: implement
+  auto core = PluginComponent::getCore();
+  if (!core) {
+    throw std::runtime_error{"Invalid component core"};
+  }
+
+  auto player = core->getPlayers().get(player_id);
+  if (!player) {
+    throw std::runtime_error{"Invalid player"};
+  }
+
+  for (auto network : core->getNetworks()) {
+    auto event_dispatcher =
+        reinterpret_cast<Impl::DefaultEventDispatcher<NetworkInEventHandler> *>(
+            &network->getInEventDispatcher());
+
+    if (!event_dispatcher->stopAtFalse(
+            [player, bs, rpc_id](NetworkInEventHandler *handler) {
+              if (handler == PluginComponent::get()) {
+                return true;
+              }
+
+              bs->resetReadPointer();
+
+              return handler->onReceiveRPC(*player, rpc_id, *bs);
+            })) {
+      return 1;
+    }
+
+    auto event_single_dispatcher = reinterpret_cast<
+        Impl::DefaultIndexedEventDispatcher<SingleNetworkInEventHandler> *>(
+        &network->getPerRPCInEventDispatcher());
+
+    if (!event_single_dispatcher->stopAtFalse(
+            rpc_id, [player, bs](SingleNetworkInEventHandler *handler) {
+              bs->resetReadPointer();
+
+              return handler->onReceive(*player, *bs);
+            })) {
+      return 1;
+    }
+  }
 
   return 1;
 }
@@ -579,11 +666,11 @@ void Script::InitHandler(unsigned char event_id, const std::string &public_name,
     throw std::runtime_error{"Public " + public_name + " does not exist"};
   }
 
-  if (type == PR_INCOMING_CUSTOM_RPC) {
-    // TODO: implement
-  }
-
   handlers_.at(type).at(event_id).push_back(pub);
+
+  if (type == PR_INCOMING_CUSTOM_RPC) {
+    plugin.SetCustomRPC(event_id);
+  }
 }
 
 void Script::InitHandlers() {

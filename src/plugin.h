@@ -39,9 +39,9 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   void InstallPreHooks();
 
-  void PushPacketToEmulate(Packet *packet);
+  void SetCustomRPC(RPCIndex rpc_id);
 
-  Packet *GetNextPacketToEmulate();
+  bool IsCustomRPC(RPCIndex rpc_id);
 
   const std::shared_ptr<urmem::hook> &GetHookAmxCleanup();
 
@@ -61,7 +61,7 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   std::shared_ptr<urmem::hook> hook_amx_cleanup_;
 
-  std::queue<Packet *> emulating_packets_;
+  std::array<bool, PR_MAX_HANDLERS> custom_rpc_{};
 };
 
 #endif  // PAWNRAKNET_PLUGIN_H_

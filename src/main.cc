@@ -39,6 +39,7 @@ void PluginComponent::onLoad(ICore *c) {
   core_ = c;
 
   getCore() = c;
+  get() = this;
 }
 
 void PluginComponent::onInit(IComponentList *components) {
@@ -79,21 +80,29 @@ void PluginComponent::onTick(Microseconds elapsed, TimePoint now) {
   Plugin::DoProcessTick();
 }
 
-bool PluginComponent::receivedPacket(IPlayer &peer, int id,
-                                     NetworkBitStream &bs) {
+bool PluginComponent::onReceivePacket(IPlayer &peer, int id,
+                                      NetworkBitStream &bs) {
   return Plugin::OnEvent<PR_INCOMING_PACKET>(peer.getID(), id, &bs);
 }
 
-bool PluginComponent::receivedRPC(IPlayer &peer, int id, NetworkBitStream &bs) {
-  return Plugin::OnEvent<PR_INCOMING_RPC>(peer.getID(), id, &bs);
+bool PluginComponent::onReceiveRPC(IPlayer &peer, int id,
+                                   NetworkBitStream &bs) {
+  auto &plugin = Plugin::Get();
+
+  const auto on_event = plugin.IsCustomRPC(static_cast<RPCIndex>(id))
+                            ? Plugin::OnEvent<PR_INCOMING_CUSTOM_RPC>
+                            : Plugin::OnEvent<PR_INCOMING_RPC>;
+
+  return on_event(peer.getID(), id, &bs);
 }
 
-bool PluginComponent::sentPacket(IPlayer *peer, int id, NetworkBitStream &bs) {
+bool PluginComponent::onSendPacket(IPlayer *peer, int id,
+                                   NetworkBitStream &bs) {
   return Plugin::OnEvent<PR_OUTGOING_PACKET>(peer ? peer->getID() : -1, id,
                                              &bs);
 }
 
-bool PluginComponent::sentRPC(IPlayer *peer, int id, NetworkBitStream &bs) {
+bool PluginComponent::onSendRPC(IPlayer *peer, int id, NetworkBitStream &bs) {
   return Plugin::OnEvent<PR_OUTGOING_RPC>(peer ? peer->getID() : -1, id, &bs);
 }
 
@@ -135,6 +144,12 @@ ICore *&PluginComponent::getCore() {
   static ICore *core{};
 
   return core;
+}
+
+PluginComponent *&PluginComponent::get() {
+  static PluginComponent *component{};
+
+  return component;
 }
 
 COMPONENT_ENTRY_POINT() { return new PluginComponent(); }
