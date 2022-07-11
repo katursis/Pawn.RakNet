@@ -110,6 +110,10 @@ void PluginComponent::onFree(IComponent *component) {
   if (component == pawn_component_ || component == this) {
     Plugin::DoUnload();
 
+    if (pawn_component_) {
+        core_->getEventDispatcher().removeEventHandler(this);
+        pawn_component_->getEventDispatcher().removeEventHandler(this);
+    }
     pawn_component_ = nullptr;
   }
 }
@@ -117,11 +121,6 @@ void PluginComponent::onFree(IComponent *component) {
 void PluginComponent::reset() {}
 
 void PluginComponent::free() {
-  if (pawn_component_) {
-    core_->getEventDispatcher().removeEventHandler(this);
-    pawn_component_->getEventDispatcher().removeEventHandler(this);
-  }
-
   delete this;
 }
 

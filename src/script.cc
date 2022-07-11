@@ -103,6 +103,8 @@ cell Script::PR_SendRPC(BitStream *bs, int player_id, RPCIndex rpc_id,
       return 0;
     }
   }
+
+  return 1;
 }
 
 // native PR_EmulateIncomingPacket(BitStream:bs, playerid);
