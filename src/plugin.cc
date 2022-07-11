@@ -25,7 +25,7 @@
 #include "main.h"
 
 bool Plugin::OnLoad() {
-  config_ = std::make_shared<Config>("plugins/pawnraknet.cfg");
+  config_ = std::make_shared<Config>("components/pawnraknet.cfg");
 
   config_->Read();
 
