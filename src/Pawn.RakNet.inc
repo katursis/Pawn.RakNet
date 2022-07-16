@@ -40,9 +40,6 @@
         PR_INCOMING_RPC,
         PR_OUTGOING_PACKET,
         PR_OUTGOING_RPC,
-        PR_INCOMING_RAW_PACKET,
-        PR_INCOMING_INTERNAL_PACKET,
-        PR_OUTGOING_INTERNAL_PACKET,
         PR_INCOMING_CUSTOM_RPC,
 
         PR_NUMBER_OF_EVENT_TYPES,
@@ -124,18 +121,12 @@
         #define IRPC:%0(%1) PR_Handler<PR_INCOMING_RPC,ir>:%0(%1)
         #define OPacket:%0(%1) PR_Handler<PR_OUTGOING_PACKET,op>:%0(%1)
         #define ORPC:%0(%1) PR_Handler<PR_OUTGOING_RPC,or>:%0(%1)
-        #define IRawPacket:%0(%1) PR_Handler<PR_INCOMING_RAW_PACKET,irp>:%0(%1)
-        #define IInternalPacket:%0(%1) PR_Handler<PR_INCOMING_INTERNAL_PACKET,iip>:%0(%1)
-        #define OInternalPacket:%0(%1) PR_Handler<PR_OUTGOING_INTERNAL_PACKET,oip>:%0(%1)
         #define ICustomRPC:%0(%1) PR_Handler<PR_INCOMING_CUSTOM_RPC,icr>:%0(%1)
 
         #define IncomingPacket IPacket
         #define IncomingRPC IRPC
         #define OutgoingPacket OPacket
         #define OutgoingRPC ORPC
-        #define IncomingRawPacket IRawPacket
-        #define IncomingInternalPacket IInternalPacket
-        #define OutgoingInternalPacket OInternalPacket
         #define IncomingCustomRPC ICustomRPC
 
         // backward compatibility
@@ -1109,9 +1100,6 @@
         forward OnIncomingRPC(playerid, rpcid, BitStream:bs);
         forward OnOutgoingPacket(playerid, packetid, BitStream:bs);
         forward OnOutgoingRPC(playerid, rpcid, BitStream:bs);
-        forward OnIncomingRawPacket(playerid, packetid, BitStream:bs);
-        forward OnIncomingInternalPacket(playerid, packetid, BitStream:bs);
-        forward OnOutgoingInternalPacket(playerid, packetid, BitStream:bs);
 
         #pragma deprecated Use OnOutgoingPacket instead
         forward OnOutcomingPacket(playerid, packetid, BitStream:bs);

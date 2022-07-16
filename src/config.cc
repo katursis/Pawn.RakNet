@@ -45,25 +45,6 @@ void Config::Read() {
                                    .value_or(intercept_outcoming_packet);
   intercept_outgoing_rpc_ = config->get_as<bool>("InterceptOutgoingRPC")
                                 .value_or(intercept_outcoming_rpc);
-  intercept_incoming_raw_packet_ =
-      config->get_as<bool>("InterceptIncomingRawPacket").value_or(true);
-  intercept_incoming_internal_packet_ =
-      config->get_as<bool>("InterceptIncomingInternalPacket").value_or(false);
-  intercept_outgoing_internal_packet_ =
-      config->get_as<bool>("InterceptOutgoingInternalPacket").value_or(false);
-
-  auto packet_ids = config->get_array_of<int64_t>("WhiteListInternalPackets")
-                        .value_or(std::vector<int64_t>{});
-  for (auto &packet_id : packet_ids) {
-    if (packet_id < 0 ||
-        packet_id > (std::numeric_limits<unsigned char>::max)()) {
-      continue;
-    }
-
-    whitelist_internal_packets_[static_cast<unsigned char>(packet_id)] = true;
-
-    whitelist_is_empty_ = false;
-  }
 
   use_caching_ = config->get_as<bool>("UseCaching").value_or(false);
 }
@@ -75,22 +56,6 @@ void Config::Save() {
   config->insert("InterceptIncomingRPC", intercept_incoming_rpc_);
   config->insert("InterceptOutgoingPacket", intercept_outgoing_packet_);
   config->insert("InterceptOutgoingRPC", intercept_outgoing_rpc_);
-  config->insert("InterceptIncomingRawPacket", intercept_incoming_raw_packet_);
-  config->insert("InterceptIncomingInternalPacket",
-                 intercept_incoming_internal_packet_);
-  config->insert("InterceptOutgoingInternalPacket",
-                 intercept_outgoing_internal_packet_);
-
-  auto packet_ids = cpptoml::make_array();
-  if (!whitelist_is_empty_) {
-    for (std::size_t packet_id{};
-         packet_id < whitelist_internal_packets_.size(); packet_id++) {
-      if (whitelist_internal_packets_[packet_id]) {
-        packet_ids->push_back(packet_id);
-      }
-    }
-  }
-  config->insert("WhiteListInternalPackets", packet_ids);
 
   config->insert("UseCaching", use_caching_);
 
@@ -109,21 +74,5 @@ bool Config::InterceptOutgoingPacket() const {
 }
 
 bool Config::InterceptOutgoingRPC() const { return intercept_outgoing_rpc_; }
-
-bool Config::InterceptIncomingRawPacket() const {
-  return intercept_incoming_raw_packet_;
-}
-
-bool Config::InterceptIncomingInternalPacket() const {
-  return intercept_incoming_internal_packet_;
-}
-
-bool Config::InterceptOutgoingInternalPacket() const {
-  return intercept_outgoing_internal_packet_;
-}
-
-bool Config::IsWhiteListedInternalPacket(unsigned char packet_id) const {
-  return whitelist_is_empty_ || whitelist_internal_packets_[packet_id];
-}
 
 bool Config::UseCaching() const { return use_caching_; }

@@ -624,12 +624,6 @@ bool Script::OnLoad() {
       InitPublic(PR_OUTGOING_PACKET, public_name);
     } else if (public_name == "OnOutgoingRPC") {
       InitPublic(PR_OUTGOING_RPC, public_name);
-    } else if (public_name == "OnIncomingRawPacket") {
-      InitPublic(PR_INCOMING_RAW_PACKET, public_name);
-    } else if (public_name == "OnIncomingInternalPacket") {
-      InitPublic(PR_INCOMING_INTERNAL_PACKET, public_name);
-    } else if (public_name == "OnOutgoingInternalPacket") {
-      InitPublic(PR_OUTGOING_INTERNAL_PACKET, public_name);
     }
 
     // backward compatibility

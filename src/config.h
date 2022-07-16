@@ -43,14 +43,6 @@ class Config {
 
   bool InterceptOutgoingRPC() const;
 
-  bool InterceptIncomingRawPacket() const;
-
-  bool InterceptIncomingInternalPacket() const;
-
-  bool InterceptOutgoingInternalPacket() const;
-
-  bool IsWhiteListedInternalPacket(unsigned char packet_id) const;
-
   bool UseCaching() const;
 
  private:
@@ -60,12 +52,6 @@ class Config {
   bool intercept_incoming_rpc_{};
   bool intercept_outgoing_packet_{};
   bool intercept_outgoing_rpc_{};
-  bool intercept_incoming_raw_packet_{};
-  bool intercept_incoming_internal_packet_{};
-  bool intercept_outgoing_internal_packet_{};
-
-  std::array<bool, PR_MAX_HANDLERS> whitelist_internal_packets_{};
-  bool whitelist_is_empty_{true};
 
   bool use_caching_{};
 };
