@@ -58,7 +58,7 @@ bool Plugin::OnLoad() {
   RegisterNative<&Script::BS_ReadValue, false>("BS_ReadValue");
 
   Log("\n\n"
-      "    | %s %s | omp-beta7 | 2016 - %s"
+      "    | %s %s | omp-beta9 | 2016 - %s"
       "\n"
       "    |--------------------------------------------"
       "\n"
