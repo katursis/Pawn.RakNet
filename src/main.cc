@@ -70,11 +70,11 @@ void PluginComponent::onInit(IComponentList *components) {
   Plugin::DoLoad(plugin_data_);
 }
 
-void PluginComponent::onAmxLoad(void *amx) {
-  Plugin::DoAmxLoad(static_cast<AMX *>(amx));
+void PluginComponent::onAmxLoad(IPawnScript &script) {
+  Plugin::DoAmxLoad(static_cast<AMX *>(script.GetAMX()));
 };
 
-void PluginComponent::onAmxUnload(void *amx){};
+void PluginComponent::onAmxUnload(IPawnScript &script){};
 
 void PluginComponent::onTick(Microseconds elapsed, TimePoint now) {
   Plugin::DoProcessTick();

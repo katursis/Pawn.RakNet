@@ -38,6 +38,6 @@ add_samp_plugin(${PROJECT_NAME}
   lib/samp-ptl/ptl.h
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE lib)
+target_include_directories(${PROJECT_NAME} PRIVATE lib lib/samp-ptl)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE OMP-SDK)

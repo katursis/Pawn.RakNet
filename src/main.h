@@ -87,9 +87,9 @@ class PluginComponent final : public IComponent,
 
   void onInit(IComponentList *components) override;
 
-  void onAmxLoad(void *amx) override;
+  void onAmxLoad(IPawnScript &script) override;
 
-  void onAmxUnload(void *amx) override;
+  void onAmxUnload(IPawnScript &script) override;
 
   void onTick(Microseconds elapsed, TimePoint now) override;
 
