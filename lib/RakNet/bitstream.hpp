@@ -1,11 +1,3 @@
-/*
- *  This Source Code Form is subject to the terms of the Mozilla Public License,
- *  v. 2.0. If a copy of the MPL was not distributed with this file, You can
- *  obtain one at http://mozilla.org/MPL/2.0/.
- *
- *  The original code is copyright (c) 2022, open.mp team and contributors.
- */
-
 /// \file
 /// \brief This class allows you to write and read native types as a string of bits.  NetworkBitStream is used extensively throughout RakNet and is designed to be used by users as well.
 ///
@@ -47,7 +39,7 @@ class NetworkBitStream {
 
 public:
     /// The version of the NetworkBitStream class; increased when breaking changes are introduced
-    constexpr static const int Version = 1;
+    constexpr static const int Version = 3;
 
     /// Default Constructor
     NetworkBitStream();
@@ -277,29 +269,46 @@ public:
         return res;
     }
 
-    inline bool readDOUBLE(double& data)
+    [[nodiscard]] inline bool readDOUBLE(double& data)
     {
-        return Read(data);
+        const bool res = Read(data);
+        return res && std::isfinite(data);
     }
 
-    inline bool readFLOAT(float& data)
+    [[nodiscard]] inline bool readFLOAT(float& data)
     {
-        return Read(data);
+        const bool res = Read(data);
+        return res && std::isfinite(data);
     }
 
-    inline bool readVEC2(Vector2& data)
+    [[nodiscard]] inline bool readVEC2(Vector2& data)
     {
-        return Read(data);
+        const bool res = Read(data);
+        return res && std::isfinite(data.x) && std::isfinite(data.y);
     }
 
-    inline bool readVEC3(Vector3& data)
+    [[nodiscard]] inline bool readVEC3(Vector3& data)
     {
-        return Read(data);
+        const bool res = Read(data);
+        return res && std::isfinite(data.x) && std::isfinite(data.y) && std::isfinite(data.z);
     }
 
-    inline bool readVEC4(Vector4& data)
+    [[nodiscard]] inline bool readPosVEC3(Vector3& data)
     {
-        return Read(data);
+        const bool res = Read(data);
+        return res && std::isfinite(data.x) && std::isfinite(data.y) && std::isfinite(data.z) && data.x < 20000.0f && data.x > -20000.0f && data.y < 20000.0f && data.y > -20000.0f && data.z < 200000.0f && data.z > -1000.0f;
+    }
+
+    [[nodiscard]] inline bool readVelVEC3(Vector3& data)
+    {
+        const bool res = Read(data);
+        return res && std::isfinite(data.x) && std::isfinite(data.y) && std::isfinite(data.z) && glm::dot(data, data) <= 100.0f * 100.0f;
+    }
+
+    [[nodiscard]] inline bool readVEC4(Vector4& data)
+    {
+        const bool res = Read(data);
+        return res && std::isfinite(data.x) && std::isfinite(data.y) && std::isfinite(data.z) && std::isfinite(data.w);
     }
 
     template <size_t Size>
@@ -345,9 +354,10 @@ public:
         return true;
     }
 
-    inline bool readGTAQuat(GTAQuat& data)
+    [[nodiscard]] inline bool readGTAQuat(GTAQuat& data)
     {
-        return Read(data.q);
+        auto res = Read(data.q);
+        return res && std::isfinite(data.q.x) && std::isfinite(data.q.y) && std::isfinite(data.q.z) && std::isfinite(data.q.w);
     }
 
     template <typename LenType, size_t Size>
@@ -452,10 +462,6 @@ public:
     /// Partial bytes are left aligned.
     /// \return A pointer to the internal state
     inline unsigned char* GetData(void) const { return data; }
-
-    /// Makes a copy of the data if NetworkBitStream is not owning it so we can safely write.
-    /// Can be used to write on top of incoming packets.
-    void OwnData(void);
 
     /// Write a 0
     void Write0(void);
@@ -742,7 +748,7 @@ public:
     void AlignReadToByteBoundary(void);
 
     /// Returns the number of bits allocated
-	inline int GetNumberOfBitsAllocated() const { return numberOfBitsAllocated; };
+    inline int GetNumberOfBitsAllocated() const { return numberOfBitsAllocated; };
 
     /// Use this if you pass a pointer copy to the constructor
     /// *(_copyData==false) and want to overallocate to prevent
