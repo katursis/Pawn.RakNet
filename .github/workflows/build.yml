@@ -43,13 +43,17 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release .. -G "Visual Studio 16 2019" -A Win32
           cmake --build . --config Release
 
-      - name: Upload artifacts
+      - name: Upload artifacts (part 1)
         uses: actions/upload-artifact@v3
         with:
           name: pawnraknet-${{ env.PLUGIN_VERSION }}-win32
-          path: |
-            src/Pawn.RakNet.inc
-            build/Release/pawnraknet.dll
+          path: build/Release/pawnraknet.dll
+
+      - name: Upload artifacts (part 2)
+        uses: actions/upload-artifact@v3
+        with:
+          name: pawnraknet-${{ env.PLUGIN_VERSION }}-win32
+          path: src/Pawn.RakNet.inc
 
   build-linux-release:
     runs-on: ubuntu-18.04
