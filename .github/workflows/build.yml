@@ -12,6 +12,8 @@ on:
       - "*"
       - "*/*"
       - "**"
+env:
+  PLUGIN_VERSION: 1.5.1-omp
 
 jobs:
   build-windows-release:
@@ -33,17 +35,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install conan
+
       - name: Generate build files
         run: |
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release .. -G "Visual Studio 16 2019" -A Win32
           cmake --build . --config Release
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: pawnraknet-omp-win-release
-          path: build/Release/pawnraknet.dll
+          name: pawnraknet-${{ env.PLUGIN_VERSION }}-win32
+          path: |
+            src/Pawn.RakNet.inc
+            build/Release/pawnraknet.dll
 
   build-linux-release:
     runs-on: ubuntu-18.04
@@ -67,6 +73,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install conan
+
       - name: Generate build files
         run: mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
 
@@ -74,8 +81,12 @@ jobs:
         run: |
           cd build
           cmake --build . --config Release
+
+      - name: Create artifact
+        run: tar -czf pawnraknet-$PLUGIN_VERSION-linux.tar.gz -C build pawnraknet.so -C ../src Pawn.RakNet.inc
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: pawnraknet-omp-linux-release
-          path: build/pawnraknet.so
+          name: pawnraknet-${{ env.PLUGIN_VERSION }}-linux
+          path: pawnraknet-${{ env.PLUGIN_VERSION }}-linux.tar.gz
