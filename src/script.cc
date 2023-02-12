@@ -216,7 +216,13 @@ cell Script::BS_New() { return reinterpret_cast<cell>(bitstream_pool_.New()); }
 cell Script::BS_NewCopy(BitStream *bs) {
   const auto bs_copy = bitstream_pool_.New();
 
+  int original_read_offset = bs->GetReadOffset();
+
+  bs->resetReadPointer();
+
   bs_copy->Write(bs);
+
+  bs->SetReadOffset(original_read_offset);
 
   return reinterpret_cast<cell>(bs_copy);
 }
