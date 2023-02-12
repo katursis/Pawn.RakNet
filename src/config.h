@@ -53,6 +53,8 @@ class Config {
 
   bool UseCaching() const;
 
+  bool LogAmxErrors() const;
+
  private:
   std::string file_path_;
 
@@ -68,6 +70,7 @@ class Config {
   bool whitelist_is_empty_{true};
 
   bool use_caching_{};
+  bool log_amx_errors_{};
 };
 
 #endif  // PAWNRAKNET_CONFIG_H_

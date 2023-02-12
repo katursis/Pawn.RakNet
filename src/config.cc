@@ -66,6 +66,7 @@ void Config::Read() {
   }
 
   use_caching_ = config->get_as<bool>("UseCaching").value_or(false);
+  log_amx_errors_ = config->get_as<bool>("LogAmxErrors").value_or(true);
 }
 
 void Config::Save() {
@@ -93,6 +94,7 @@ void Config::Save() {
   config->insert("WhiteListInternalPackets", packet_ids);
 
   config->insert("UseCaching", use_caching_);
+  config->insert("LogAmxErrors", log_amx_errors_);
 
   std::fstream{file_path_, std::fstream::out | std::fstream::trunc}
       << (*config);
@@ -127,3 +129,5 @@ bool Config::IsWhiteListedInternalPacket(unsigned char packet_id) const {
 }
 
 bool Config::UseCaching() const { return use_caching_; }
+
+bool Config::LogAmxErrors() const { return log_amx_errors_; }
