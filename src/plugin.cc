@@ -80,6 +80,8 @@ bool Plugin::OnLoad() {
   return true;
 }
 
+bool Plugin::LogAmxErrors() { return config_->LogAmxErrors(); }
+
 void Plugin::OnUnload() {
   config_->Save();
 

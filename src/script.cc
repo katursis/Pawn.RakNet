@@ -646,7 +646,7 @@ bool Script::ExecPublic(const PublicPtr &pub, int player_id,
 
   bs->resetReadPointer();
 
-  return pub->Exec(player_id, event_id, bs);
+  return pub->Exec(player_id, static_cast<cell>(event_id), bs);
 }
 
 void Script::InitPublic(PR_EventType type, const std::string &public_name) {

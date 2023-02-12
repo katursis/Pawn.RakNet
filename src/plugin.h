@@ -33,6 +33,8 @@ class Plugin : public ptl::AbstractPlugin<Plugin, Script, NativeParam> {
 
   bool OnLoad();
 
+  bool LogAmxErrors();
+
   void OnUnload();
 
   void OnProcessTick();
