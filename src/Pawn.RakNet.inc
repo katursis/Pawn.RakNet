@@ -29,7 +29,7 @@
         #define PACK_PLUGIN_VERSION(%0,%1,%2) (((%0) << 16) | ((%1) << 8) | (%2))
     #endif
 
-    #define PAWNRAKNET_VERSION PACK_PLUGIN_VERSION(1, 5, 1)
+    #define PAWNRAKNET_VERSION PACK_PLUGIN_VERSION(1, 6, 0)
     #define PAWNRAKNET_INCLUDE_VERSION PAWNRAKNET_VERSION // backward compatibility
 
     #define PR_MAX_HANDLERS 256

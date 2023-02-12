@@ -13,7 +13,7 @@ on:
       - "*/*"
       - "**"
 env:
-  PLUGIN_VERSION: 1.5.1
+  PLUGIN_VERSION: 1.6.0
 
 jobs:
   build-windows-release:
