@@ -119,7 +119,7 @@ cell Script::BS_NewCopy(BitStream *bs) {
 
   int original_read_offset = bs->GetReadOffset();
 
-  bs->resetReadPointer();
+  bs->ResetReadPointer();
 
   bs_copy->Write(bs);
 
