@@ -82,11 +82,19 @@ void PluginComponent::onTick(Microseconds elapsed, TimePoint now) {
 
 bool PluginComponent::onReceivePacket(IPlayer &peer, int id,
                                       NetworkBitStream &bs) {
+  if (peer.getID() == -1) {
+    return true;
+  }
+
   return Plugin::OnEvent<PR_INCOMING_PACKET>(peer.getID(), id, &bs);
 }
 
 bool PluginComponent::onReceiveRPC(IPlayer &peer, int id,
                                    NetworkBitStream &bs) {
+  if (peer.getID() == -1) {
+    return true;
+  }
+
   auto &plugin = Plugin::Get();
 
   const auto on_event = plugin.IsCustomRPC(static_cast<RPCIndex>(id))
