@@ -111,17 +111,17 @@
         #define PR_BITS_TO_BYTES(%0) (((%0)+7)>>3)
         #define PR_BYTES_TO_BITS(%0) ((%0)<<3)
 
-        #define PR_Handler<%0,%1>:%2(%3) \
-        forward pr_r%1_%2(); \
-        public pr_r%1_%2() PR_RegHandler(%2,"pr_"#%1"_"#%2,%0); \
-        forward pr_%1_%2(%3); \
-        public pr_%1_%2(%3)
+        #define PR_Handler<%0,%1>:%2@%4(%3) \
+        forward pr_r%1_%2@%4(); \
+        public pr_r%1_%2@%4() PR_RegHandler(%2,"pr_"#%1"_"#%2"@"#%4,%0); \
+        forward pr_%1_%2@%4(%3); \
+        public pr_%1_%2@%4(%3)
 
-        #define IPacket:%0(%1) PR_Handler<PR_INCOMING_PACKET,ip>:%0(%1)
-        #define IRPC:%0(%1) PR_Handler<PR_INCOMING_RPC,ir>:%0(%1)
-        #define OPacket:%0(%1) PR_Handler<PR_OUTGOING_PACKET,op>:%0(%1)
-        #define ORPC:%0(%1) PR_Handler<PR_OUTGOING_RPC,or>:%0(%1)
-        #define ICustomRPC:%0(%1) PR_Handler<PR_INCOMING_CUSTOM_RPC,icr>:%0(%1)
+        #define IPacket:%0@%2(%1) PR_Handler<PR_INCOMING_PACKET,ip>:%0@%2(%1)
+        #define IRPC:%0@%2(%1) PR_Handler<PR_INCOMING_RPC,ir>:%0@%2(%1)
+        #define OPacket:%0@%2(%1) PR_Handler<PR_OUTGOING_PACKET,op>:%0@%2(%1)
+        #define ORPC:%0@%2(%1) PR_Handler<PR_OUTGOING_RPC,or>:%0@%2(%1)
+        #define ICustomRPC:%0@%2(%1) PR_Handler<PR_INCOMING_CUSTOM_RPC,icr>:%0@%2(%1)
 
         #define IncomingPacket IPacket
         #define IncomingRPC IRPC
