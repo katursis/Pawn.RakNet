@@ -117,11 +117,11 @@
         forward pr_%1_%2@%4(%3); \
         public pr_%1_%2@%4(%3)
 
-        #define IPacket:%0@%2(%1) PR_Handler<PR_INCOMING_PACKET,ip>:%0@%2(%1)
-        #define IRPC:%0@%2(%1) PR_Handler<PR_INCOMING_RPC,ir>:%0@%2(%1)
-        #define OPacket:%0@%2(%1) PR_Handler<PR_OUTGOING_PACKET,op>:%0@%2(%1)
-        #define ORPC:%0@%2(%1) PR_Handler<PR_OUTGOING_RPC,or>:%0@%2(%1)
-        #define ICustomRPC:%0@%2(%1) PR_Handler<PR_INCOMING_CUSTOM_RPC,icr>:%0@%2(%1)
+        #define cIPacket:%0(%1)<%2> PR_Handler<PR_INCOMING_PACKET,ip>:%0@%2(%1)
+        #define cIRPC:%0(%1)<%2> PR_Handler<PR_INCOMING_RPC,ir>:%0@%2(%1)
+        #define cOPacket:%0(%1)<%2> PR_Handler<PR_OUTGOING_PACKET,op>:%0@%2(%1)
+        #define cORPC:%0(%1)<%2> PR_Handler<PR_OUTGOING_RPC,or>:%0@%2(%1)
+        #define cICustomRPC:%0(%1)<%2> PR_Handler<PR_INCOMING_CUSTOM_RPC,icr>:%0@%2(%1)
 
         #define IPacket:%0(%1) PR_Handler<PR_INCOMING_PACKET,ip>:%0@default(%1)
         #define IRPC:%0(%1) PR_Handler<PR_INCOMING_RPC,ir>:%0@default(%1)
